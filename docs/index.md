@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "[Project title]"
+title: "Irony, gender and toxicity in Steam reviews"
 ---
 
 <!--
@@ -8,26 +8,25 @@ This website is public. Do not include private data, credentials, identifying
 information, or material that you do not have permission to share.
 -->
 
-# [Project title]
+# Irony, gender and toxicity in Steam reviews
 
-**Team:** [Names]
+**Team:** Richard, Josh, Ghif
 
 [In two or three sentences, state what you studied and the main result.]
 
 ## Research question and motivation
 
-**Research question:** [What are you trying to learn?]
+**Research question:** How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?
 
 [Explain why the question matters for social science. Define important terms
 and give readers enough context to understand the project.]
 
 ## Data
 
-- **Source:** [Where did the data come from? Link to the source when possible.]
-- **Unit of analysis:** [What does one row or document represent?]
-- **Coverage:** [Dates, filters, sample, and exclusions.]
-- **Access and ethics:** [What can be shared publicly? What privacy, consent,
-  representativeness, or data-quality concerns matter?]
+- **Source:** KieranPoc’s Kaggle Steam reviews dataset, collected via the Steam reviews API.
+- **Unit of analysis:** One Steam game review.
+- **Coverage:** Historical English reviews (2012–2023) for Counter-Strike (including CS:GO-era reviews), PUBG, and GTA V. Pilot of 300 reviews (100 per game), drawn from a 30,462-review English hash sample, including both recommendation labels. Separate supplement of 71 gender/age candidates. A separate helpful-review subset was used for exploratory toxicity keyword analysis.
+- **Access and ethics:** Local CSV data accessed via Kaggle. Omit user IDs and paraphrase public examples; identity claims remain unverified. Keyword matches are candidate flags, not confirmed categories or prevalence estimates.
 
 [Describe important collection and cleaning decisions. Do not publish private
 or restricted data.]
