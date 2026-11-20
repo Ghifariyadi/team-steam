@@ -59,12 +59,12 @@
   .hero { max-width: 980px; margin: 0 auto; padding: 84px 32px 44px; }
   .byline { margin: 0 0 22px; font: 500 14.5px/1.4 var(--sans); color: var(--soft); --d: .08s; animation: rise .8s var(--ease) both; animation-delay: var(--d); }
   h1 {
-    margin: 0 0 24px; max-width: 16ch; font: 600 clamp(2.6rem, 7.2vw, 5rem)/1.02 var(--sans); letter-spacing: -.05em;
+    margin: 0 0 24px; font: 600 clamp(2.6rem, 7.2vw, 5rem)/1.02 var(--sans); letter-spacing: -.05em;
     color: var(--ink);
     animation: rise .8s var(--ease) .16s both;
   }
-  .lede { max-width: 36em; margin: 0 0 40px; font-size: clamp(1.05rem, 1.7vw, 1.2rem); line-height: 1.55; color: var(--soft); animation: rise .8s var(--ease) .28s both; }
-  .ask { max-width: 720px; padding: 16px 18px 14px; border: 1px solid var(--edge); border-radius: 10px;
+  .lede { margin: 0 0 40px; font-size: clamp(1.05rem, 1.7vw, 1.2rem); line-height: 1.55; color: var(--soft); animation: rise .8s var(--ease) .28s both; }
+  .ask { width: 100%; padding: 16px 18px 14px; border: 1px solid var(--edge); border-radius: 10px;
     background: #fbfbfa;
     box-shadow: 0 1px 2px rgba(22, 22, 22, .05), 0 24px 50px -26px rgba(22, 22, 22, .35);
     animation: rise .8s var(--ease) .4s both; transition: box-shadow .3s, transform .3s; }
@@ -149,6 +149,11 @@
 
   footer { max-width: 980px; margin: 0 auto; padding: 24px 32px 120px; border-top: 1px solid var(--edge); font-size: 14px; color: var(--soft); }
 
+  /* idle hint: after a few seconds without scrolling, the next-step button nudges */
+  @keyframes bob { 0%, 55%, 100% { transform: translateY(0); } 15%, 40% { transform: translateY(5px); } 28% { transform: translateY(0); } }
+  @keyframes ring { 0%, 55%, 100% { box-shadow: 0 0 0 0 rgba(22, 22, 22, 0); } 20% { box-shadow: 0 0 0 6px rgba(22, 22, 22, .12); } }
+  .nudge svg { animation: bob 2.6s ease-in-out infinite; }
+  .nudge { animation: ring 2.6s ease-in-out infinite; }
   @media (max-width: 700px) {
     .row { grid-template-columns: 1fr; gap: 2px; }
     .panel { padding: 26px 22px 18px; }
@@ -422,6 +427,23 @@ if (typeof document !== 'undefined') {
 
       function unlock() { locked = false; clearTimeout(lockTimer); spy(); }
 
+      /* idle nudge: ~4s without scrolling, point at the next step */
+      var idleT, nudged = null;
+      function clearNudge() { if (nudged) { nudged.classList.remove('nudge'); nudged = null; } }
+      function armNudge() {
+        clearTimeout(idleT); clearNudge();
+        if (reduce) return;
+        idleT = setTimeout(function () {
+          var vh = window.innerHeight, el = null;
+          if (window.pageYOffset < 120) el = $('go');
+          else if (cur >= 0) {
+            var b = secs[cur] && secs[cur].querySelector('.pg.next');
+            if (b) { var r = b.getBoundingClientRect(); if (r.top > 60 && r.bottom < vh - 70) el = b; }
+          }
+          if (el) { el.classList.add('nudge'); nudged = el; }
+        }, 4000);
+      }
+
       /* inertial scrolling for mouse/trackpad (touch screens already have native momentum) */
       var smooth = !reduce && !window.matchMedia('(pointer: coarse)').matches;
       var cy = window.pageYOffset, ty = cy, rate = .09, running = false, last = 0;
@@ -504,7 +526,7 @@ if (typeof document !== 'undefined') {
       });
 
       $('go').addEventListener('click', function (e) { e.preventDefault(); go(0); });
-      window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+      window.addEventListener('scroll', function () { armNudge(); if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
       window.addEventListener('scrollend', function () { if (locked) unlock(); });
       window.addEventListener('resize', function () { place(); spy(); });
       window.addEventListener('hashchange', function () {
@@ -525,7 +547,7 @@ if (typeof document !== 'undefined') {
         secs.forEach(function (s) { [].forEach.call(s.children, function (c) { c.classList.add('rv'); io.observe(c); }); });
       }
 
-      setActive(0);
+      setActive(0); armNudge();
       requestAnimationFrame(function () { place(); requestAnimationFrame(function () { ind.classList.add('ready'); }); });
       var h0 = decodeURIComponent(location.hash.slice(1)), k0 = d.nav.findIndex(function (n) { return n.id === h0; });
       if (k0 >= 0) setTimeout(function () { go(k0, true); }, 60); else spy();
