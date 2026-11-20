@@ -1,5 +1,7 @@
 # Run Gemini labeling in your own VS Code
 
+For the current 1,000-per-game plan and GTA 300 top-up, start with [sampling and batch commands](sampling_1000.md).
+
 This workflow uses the same prompt, model (`gemini-3.5-flash-lite`), temperature (0), and yes/no/uncertain labels as Richard's completed GTA V 700 run. It labels toxicity and irony together. These are model predictions, not validated human labels.
 
 ## 1. Get the shared code
@@ -26,7 +28,7 @@ Alternatively, obtain `review_sample.csv` and the original pilot's `model_inputs
 uv run python scripts/sample_reviews.py --pool data/private/review_sample.csv --pilot data/private/model_inputs.csv --appid 578080 --output data/private/my_sample.csv
 ```
 
-This samples 700 without replacement using seed 20261118, excluding prior pilot IDs. It uses the team's existing English hash-sampled pool, not every Steam review. Retain the exact source pool, pilot file, game ID and command for reproducibility. The script refuses to overwrite an existing sample. Input texts are not supplied by the public result CSV.
+This samples 1,000 without replacement using seed 20261118, excluding prior pilot IDs. It uses the team's existing English hash-sampled pool, not every Steam review. Retain the exact source pool, pilot file, game ID and command for reproducibility. The script refuses to overwrite an existing sample. Input texts are not supplied by the public result CSV.
 
 ## 3. Validate without API calls
 
@@ -52,7 +54,7 @@ Run the same command **without** `--limit 3`:
 uv run python scripts/label_reviews.py --input data/private/my_sample.csv --output-dir data/private/my_run
 ```
 
-Completed IDs are skipped and each new result is saved immediately. There is a 15-second pause between requests plus API processing/retry time. Keep the computer awake. Ctrl+C stops the run; rerun the command to continue. Quota errors can stop a run before 700: retain the files and resume when quota is available. Do not change the model simply to bypass an error.
+Completed IDs are skipped and each new result is saved immediately. There is a 15-second pause between requests plus API processing/retry time. Keep the computer awake. Ctrl+C stops the run; rerun the command to continue. Quota errors can stop a run before completion: retain the files and resume when quota is available. Do not change the model simply to bypass an error.
 
 A `manifest.json` records the input hash and prompt/settings; changing them requires a separate output directory. Never run two processes into the same directory. If the computer crashes, remove `data/private/my_run/.running` **only after confirming the earlier process has stopped**. Then resume. If a saved CSV is damaged by a crash, keep a backup and ask for help before modifying it.
 
