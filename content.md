@@ -23,6 +23,8 @@ Richard, Josh, Ghif
 
 We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity mentions, irony, and references to gender or age. Gemini does the labeling from a written codebook, and two human annotators check the codebook first. The full run is still in progress, so this page reports the design and the validation so far, not final results.
 
+:::demo pipeline
+
 :::demo labeling
 
 :::demo stats

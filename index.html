@@ -239,6 +239,46 @@
   @keyframes d-draw { to { stroke-dashoffset: 0; } }
   @keyframes d-mark { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 
+  /* method pipeline (content.md: ":::demo pipeline") */
+  .demo[data-demo="pipeline"] { margin: 0 0 18px; }
+  .pl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .pl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .pl { grid-template-columns: 1fr; } }
+  .pl-step { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 18px 16px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 22px; background: linear-gradient(160deg, rgba(58, 143, 196, .12), rgba(255, 255, 255, .02) 60%), #0b1218; color: var(--ink); font: inherit; text-align: left; cursor: pointer; opacity: .5; transition: opacity .5s, border-color .5s, transform .5s var(--ease), box-shadow .5s; }
+  .pl-step.done { opacity: .8; }
+  .pl-step.on { opacity: 1; transform: translateY(-4px); border-color: rgba(92, 209, 191, .6); box-shadow: 0 26px 60px -24px rgba(92, 209, 191, .5); }
+  .pl-n { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .3); font: 700 13px/1 var(--mono); color: var(--soft); transition: background .4s, color .4s, border-color .4s; }
+  .pl-step.done .pl-n { border-color: var(--teal); color: var(--teal); }
+  .pl-step.on .pl-n { background: var(--teal); border-color: var(--teal); color: #04110f; box-shadow: 0 0 0 6px rgba(92, 209, 191, .18); }
+  .pl-step strong { font: 700 17px/1.25 var(--disp); letter-spacing: -.01em; color: var(--hi); }
+  .pl-d { font-size: 13.5px; line-height: 1.5; color: var(--soft); }
+  .pl .v { width: 100%; margin-top: auto; padding-top: 10px; min-height: 112px; }
+  .pl .v1 p { display: flex; flex-direction: column; gap: 1px; margin: 0 0 7px; padding: 6px 9px; border-radius: 9px; background: rgba(255, 255, 255, .05); opacity: 0; transform: translateX(-10px); transition: opacity .4s calc(var(--o, 0) * 1ms), transform .4s calc(var(--o, 0) * 1ms); }
+  .pl .v1 p:nth-child(1) { --o: 200; } .pl .v1 p:nth-child(2) { --o: 700; } .pl .v1 p:nth-child(3) { --o: 1200; }
+  .pl .v1 code { padding: 0; background: none; color: #bfeee6; font-size: 12px; }
+  .pl .v1 span { font: 400 11.5px/1.3 var(--mono); color: var(--dim); }
+  .pl-step.on .v1 p, .pl-step.done .v1 p { opacity: 1; transform: none; }
+  .pl .wfp { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin-bottom: 8px; }
+  .pl .wfp i { aspect-ratio: 1; border-radius: 2px; background: rgba(255, 255, 255, .08); transition: background .25s calc(var(--k) * 16ms); }
+  .pl-step.on .wfp i.g1, .pl-step.done .wfp i.g1 { background: #5cd1bf; }
+  .pl-step.on .wfp i.g2, .pl-step.done .wfp i.g2 { background: #4a9be8; }
+  .pl-step.on .wfp i.g3, .pl-step.done .wfp i.g3 { background: #e9a04f; }
+  .pl .games { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 500 11px/1.3 var(--mono); color: var(--soft); }
+  .pl .games .g1 { color: #5cd1bf; } .pl .games .g2 { color: #7fb8d6; } .pl .games .g3 { color: #f0b765; }
+  .pl .refine { display: inline-block; margin-top: 8px; padding: 3px 10px; border: 1px solid rgba(240, 183, 101, .5); border-radius: 999px; background: rgba(240, 183, 101, .1); font: 500 11.5px/1.4 var(--mono); color: #f7d58f; opacity: 0; transition: opacity .4s 1.7s; }
+  .pl-step.on .refine, .pl-step.done .refine { opacity: 1; }
+  .pl .kk { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: baseline; margin-bottom: 12px; }
+  .pl .kk span { font-size: 13px; color: var(--soft); }
+  .pl .kk b { font: 800 26px/1 var(--disp); letter-spacing: -.03em; color: var(--hi); font-variant-numeric: tabular-nums; }
+  .pl .kk em { grid-column: 1 / -1; display: block; height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .08); overflow: hidden; position: relative; }
+  .pl .kk em::after { content: ""; position: absolute; inset: 0; width: 0; border-radius: 99px; background: linear-gradient(90deg, #3a8fc4, #5cd1bf); transition: width 1.5s var(--ease); }
+  .pl-step.on .kk em::after, .pl-step.done .kk em::after { width: var(--w); }
+  .pl .v4 b { display: block; font: 800 38px/1 var(--disp); letter-spacing: -.04em; color: var(--hi); font-variant-numeric: tabular-nums; background: linear-gradient(135deg, #fff, #f7d58f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .pl .v4 small { display: block; margin: 4px 0 12px; font-size: 13px; color: var(--soft); }
+  .pl .v4 em { display: block; height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .08); position: relative; overflow: hidden; }
+  .pl .v4 em::after { content: ""; position: absolute; inset: 0; width: 0; border-radius: 99px; background: linear-gradient(90deg, #5cd1bf, #f0b765); transition: width 1.8s var(--ease); }
+  .pl-step.on .v4 em::after, .pl-step.done .v4 em::after { width: 100%; }
+
   /* at-a-glance tiles (content.md: ":::demo stats") */
   .demo[data-demo="stats"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; margin: 0 0 18px; }
   .st { min-width: 0; padding: 26px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 24px; background: linear-gradient(160deg, rgba(58, 143, 196, .3), rgba(255, 255, 255, .04) 62%), #0b1218; }
@@ -278,12 +318,16 @@
   .st[data-s="1"] .dg i.x, .st[data-s="2"] .dg i.x, .st[data-s="3"] .dg i.x { background: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; transform: none; }
   .st[data-s="3"] .dg i.b { animation: kpulse 1.4s ease-in-out infinite; }
   @keyframes kpulse { 50% { transform: scale(1.35); } }
+  .st .ktabs { display: inline-flex; gap: 2px; padding: 3px; margin: 0 0 16px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 999px; background: rgba(255, 255, 255, .04); }
+  .st .kt-b { padding: 7px 16px; border: 0; border-radius: 999px; background: transparent; color: var(--soft); font: 600 13px/1 var(--sans); cursor: pointer; transition: background .25s, color .25s; }
+  .st .kt-b.on { background: rgba(92, 209, 191, .2); color: var(--hi); box-shadow: 0 0 0 1px rgba(92, 209, 191, .4) inset; }
+  .st[data-tab="acc"] .kl { visibility: hidden; }
   .st .kl { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 14px; font-size: 12px; color: var(--soft); }
   .st .kl span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 0; }
   .st .kl .l1::before { background: #5cd1bf; }
   .st .kl .l2::before { background: #3d4f5c; }
   .st .kl .l3::before { background: #ff6b6b; }
-  .st .kn { min-height: 5.6em; margin: 0 0 10px; font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+  .st .kn { min-height: 6.2em; margin: 0 0 10px; font-size: 14.5px; line-height: 1.5; color: var(--ink); }
   .st .kf { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--dim); }
   .st.nt h4 { margin: 0 0 8px; font: 800 26px/1.1 var(--disp); letter-spacing: -.02em; color: var(--gold); }
   .st.nt p { margin: 0 0 10px; font-size: 15px; color: var(--soft); }
@@ -495,16 +539,18 @@ function initStats(root) {
       for (var i = 0; i < r[2]; i++) d += '<i class="' + (i < r[7] ? 'c' : i < r[7] + r[8] ? 'b' : 'x') + '" style="--k:' + i + '"></i>';
       return '<div class="kx" style="--c:' + r[1] + '"><div class="kx-h">' +
         '<span class="kx-a"><b>' + r[4].toFixed(1) + '%</b><small>' + r[0] + ': same label on ' + r[3] + ' of ' + r[2] + '</small></span>' +
-        '<span class="kx-k"><b>' + r[5].toFixed(3) + '</b><small>' + r[0] + ' kappa \u2248 ' + r[8] + ' \u00f7 (' + r[8] + ' + ' + r[9] + ')</small></span></div>' +
+        '<span class="kx-k"><b>' + r[5].toFixed(3) + '</b><small>' + r[0] + ' kappa</small></span></div>' +
         '<div class="dg" role="img" aria-label="' + r[0] + ': ' + r[3] + ' of ' + r[2] + ' reviews agree, kappa ' + r[5].toFixed(3) + '">' + d + '</div></div>';
     }
-    var STAGES = [
-      'Two annotators labeled the same pilot reviews.',
-      'They gave the same label on almost every review.',
-      'But most reviews are a plain \u201cno\u201d for both, so roughly 85 to 88% of that agreement would happen by luck (grey).',
-      'Kappa only counts what luck cannot explain, the teal and red dots. For toxicity they matched on 11 of those 13, so kappa is about 0.85.'
-    ];
-    var kappaTile = '<div class="st k"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(kx).join('') +
+    var CAP = {
+      acc: 'Both annotators gave the same label on 87 of 89 toxicity reviews and on 82 of 83 irony reviews. Red dots are the reviews where they disagreed.',
+      s1: 'Start from the raw agreement: the same label on almost every review.',
+      s2: 'But most reviews are a plain \u201cno\u201d for both, so most of that agreement would happen by luck anyway (grey).',
+      s3: 'Kappa only counts what luck cannot explain (the coloured dots): 0.845 for toxicity and 0.903 for irony.'
+    };
+    var kappaTile = '<div class="st k" data-tab="acc" data-s="1"><p class="ey">Do the two human annotators agree?</p>' +
+      '<div class="ktabs" role="tablist"><button type="button" role="tab" class="kt-b on" data-t="acc" aria-selected="true">Accuracy</button><button type="button" role="tab" class="kt-b" data-t="kappa" aria-selected="false">Kappa</button></div>' +
+      AGREE.map(kx).join('') +
       '<div class="kl"><span class="l1">agreed beyond luck</span><span class="l2">agreed, luck would give this</span><span class="l3">disagreed</span></div>' +
       '<p class="kn" aria-live="polite"></p>' +
       '<p class="kf">Dots show proportions, not single reviews. Luck is the agreement you would expect if both annotators used their own yes/no rates at random.</p></div>';
@@ -524,12 +570,21 @@ function initStats(root) {
       if (t.classList.contains('k')) kappaLoop(t);
     }
     function kappaLoop(t) {
-      var note = t.querySelector('.kn'), RMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var PLAN = [[0, 900], [1, 2400], [2, 3600], [3, 5200]];
-      function set(i) { t.setAttribute('data-s', i); note.textContent = STAGES[i]; }
-      if (RMq) { set(3); return; }
-      var k = 0;
-      (function step() { set(PLAN[k][0]); var ms = PLAN[k][1]; k = (k + 1) % PLAN.length; setTimeout(step, ms); })();
+      var note = t.querySelector('.kn'), timer = null, tab = 'acc';
+      var RMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var PLAN = [[1, 1100, 's1'], [2, 3600, 's2'], [3, 5200, 's3']];
+      function set(i, cap) { t.setAttribute('data-s', i); note.textContent = cap; }
+      function show(name) {
+        tab = name; clearTimeout(timer);
+        t.setAttribute('data-tab', name);
+        [].forEach.call(t.querySelectorAll('.kt-b'), function (b) { var on = b.getAttribute('data-t') === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+        if (name === 'acc') { set(1, CAP.acc); return; }
+        if (RMq) { set(3, CAP.s3); return; }
+        var k = 0;
+        (function step() { if (tab !== 'kappa') return; var p = PLAN[k]; set(p[0], CAP[p[2]]); k = (k + 1) % PLAN.length; timer = setTimeout(step, p[1]); })();
+      }
+      [].forEach.call(t.querySelectorAll('.kt-b'), function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-t')); }); });
+      show('acc');
     }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { fire(e.target); io.unobserve(e.target); } }); }, { threshold: 0.25 });
@@ -538,9 +593,63 @@ function initStats(root) {
   });
 }
 
+/* Method pipeline: renders where content.md has a ":::demo pipeline" line. Steps play in turn while on screen. */
+function initPipeline(root) {
+  [].forEach.call(root.querySelectorAll('.demo[data-demo="pipeline"]'), function (host) {
+    var RMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var dots = '';
+    for (var i = 0; i < 90; i++) dots += '<i class="' + (i < 30 ? 'g1' : i < 60 ? 'g2' : 'g3') + '" style="--k:' + i + '"></i>';
+    var STEPS = [
+      ['Define the codebook', 'Built from the research on dark participation and irony, as written yes / no rules.',
+        '<div class="v v1"><p><code>harm_mention</code><span>yes \u00b7 no \u00b7 uncertain</span></p><p><code>irony</code><span>yes \u00b7 no \u00b7 uncertain</span></p><p><code>reason</code><span>one short sentence</span></p></div>'],
+      ['Label a sample', '90 reviews, 30 per game, labeled blind by two annotators. Checking the labels refines the codebook.',
+        '<div class="v v2"><div class="wfp">' + dots + '</div><div class="games"><span class="g1">CS2 30</span><span class="g2">PUBG 30</span><span class="g3">GTA V 30</span></div><span class="refine">\u21bb refine codebook</span></div>'],
+      ['Calculate Cohen\u2019s kappa', 'How well the two annotators agree, once agreement by luck is taken out.',
+        '<div class="v v3"><div class="kk"><span>Toxicity</span><b class="cu" data-to="0.845" data-dec="3">0.000</b><em style="--w:84.5%"></em></div><div class="kk"><span>Irony</span><b class="cu" data-to="0.903" data-dec="3">0.000</b><em style="--w:90.3%"></em></div></div>'],
+      ['Scale to all reviews', 'Gemini applies the final codebook to every review in the three games.',
+        '<div class="v v4"><b class="cu" data-to="7365" data-dec="0">0</b><small>reviews labeled</small><em></em></div>']
+    ];
+    host.innerHTML = '<div class="pl">' + STEPS.map(function (st, i) {
+      return '<button type="button" class="pl-step" data-i="' + i + '"><span class="pl-n"><span>' + (i + 1) + '</span></span><strong>' + st[0] + '</strong><span class="pl-d">' + st[1] + '</span>' + st[2] + '</button>';
+    }).join('') + '</div>';
+    var steps = [].slice.call(host.querySelectorAll('.pl-step')), cur = -1, timer = null, visible = true;
+    function countUp(el) {
+      var to = parseFloat(el.getAttribute('data-to')), dec = +el.getAttribute('data-dec'), t0 = null;
+      function fmt(v) { return dec ? v.toFixed(dec) : Math.round(v).toLocaleString('en-US'); }
+      if (RMq) { el.textContent = fmt(to); return; }
+      el.textContent = fmt(0);
+      requestAnimationFrame(function tick(ts) { if (t0 === null) t0 = ts; var p = Math.min(1, (ts - t0) / 1500); el.textContent = fmt(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); });
+    }
+    function go(i) {
+      cur = i;
+      steps.forEach(function (el, k) {
+        el.classList.toggle('on', k === i);
+        el.classList.toggle('done', k < i);
+        if (k === i) [].forEach.call(el.querySelectorAll('.cu'), countUp);
+        if (k > i) { el.classList.remove('on'); [].forEach.call(el.querySelectorAll('.cu'), function (c) { c.textContent = c.getAttribute('data-dec') === '0' ? '0' : '0.000'; }); }
+      });
+    }
+    function next() {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        if (!visible) return next();
+        go(cur >= steps.length - 1 ? 0 : cur + 1);
+        next();
+      }, cur === steps.length - 1 ? 4200 : 3300);
+    }
+    steps.forEach(function (el, i) { el.addEventListener('click', function () { go(i); next(); }); });
+    if (RMq) { steps.forEach(function (el) { el.classList.add('on'); [].forEach.call(el.querySelectorAll('.cu'), countUp); }); return; }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { var was = visible; visible = es[0].isIntersecting; if (visible && !was && cur < 0) { go(0); next(); } }, { threshold: 0.2 }).observe(host);
+      visible = false;
+    } else { go(0); next(); }
+  });
+}
+
 /* Labeling demo: renders where content.md has a ":::demo labeling" line. Plays only while on screen. */
 function initDemos(root) {
   initStats(root);
+  initPipeline(root);
   var QUESTIONS = [
     { key: 'harm_mention', name: 'Does it mention toxicity?' },
     { key: 'irony', name: 'Is it ironic?' }
@@ -719,8 +828,7 @@ if (typeof document !== 'undefined') {
       if (d.lede) { $('lede').innerHTML = inline(d.lede); $('lede').hidden = false; }
       if (d.extra) { $('hero-extra').innerHTML = d.extra; $('hero-extra').hidden = false; initDemos($('hero-extra')); }
       if (d.question) {
-        var lab = $('hero-extra').querySelector('.demo[data-demo="labeling"]');
-        if (lab) lab.parentNode.insertBefore($('ask'), lab.nextSibling);
+        $('hero-extra').insertBefore($('ask'), $('hero-extra').firstChild);
         $('ask').hidden = false;
         $('ask-full').textContent = d.question;
         setTimeout(function () { typeInto($('ask-typed'), d.question); }, reduce ? 0 : 700);
