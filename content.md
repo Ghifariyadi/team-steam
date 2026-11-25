@@ -41,7 +41,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - Gender and age references show up in reviews as stereotypes, exclusion and self-description. They are what players say about themselves, and nobody verifies them.
 
 ### Key terms
-- **Toxicity mention (`harm_mention`):** The review reports, condemns, endorses or expresses insults, threats, discrimination, deliberate disruption, explicit cheating complaints or a toxic community. Bugs, pricing complaints and profanity alone do not count.
+- **Toxicity mention (`harm_mention`):** The review reports, condemns, endorses or expresses insults, threats, discrimination, deliberate disruption or a toxic community. A cheating complaint counts only when it also has one of these. Bugs, pricing complaints and profanity alone do not count.
 - **Irony (`irony`):** A supported ironic reading, including sarcasm: the literal evaluation contrasts with the intended one, or a described outcome mismatches the expectation. Humor or exaggeration alone does not count.
 
 ## Data
@@ -70,6 +70,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - Model: `gemini-3.5-flash-lite` through Vertex AI, temperature 0.
 - The project codebook is the system prompt. Each review goes in a separate request with its game and its Recommended / Not recommended flag.
 - Output is structured JSON: `harm_mention` (yes, no, uncertain), `irony` (yes, no, uncertain), `gender_age` (none, gender, age, both, uncertain), and a short English reason for each.
+- Second pass: the 3,499 reviews labeled toxic in the first pass go back to Gemini with the full codebook plus one added rule, that a cheating complaint alone is not toxicity. Reviews first labeled no are not re-asked, since a narrower rule can only turn a yes into a no. The first-pass labels are kept unchanged and the second pass is saved in separate files.
 - The run uses 8 parallel requests, retries on temporary Google errors (429, 500, 503, 504) with backoff, and saves every finished label right away. A re-run skips what is already saved.
 
 ### Comparisons
@@ -85,19 +86,19 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 ## Findings
 
 - **Gemini labeled every review.** 7,363 of the 7,365 reviews got a label with no failures. The other 2 were empty and skipped. The run took 46 minutes.
-- **Gemini flagged toxicity in 47.5% of the reviews and irony in 25.0%** (3,499 and 1,843 of 7,363). Uncertain answers were rare: 12 for toxicity and 96 for irony.
-- **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity, PUBG (50.9%) and Counter-Strike 2 (49.9%) are close, and GTA V is lower (39.7%).
-- **Reviews that do not recommend the game are flagged for toxicity more often:** 65.3% of the 2,369 "Not recommended" reviews, against 39.1% of the 4,994 "Recommended" ones. This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
-- **These labels are Gemini's, and they are not checked against humans on this data yet.** The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot's 10% toxicity rate cannot be compared with 47.5%.
-- **Human agreement on the pilot is high.** Toxicity kappa is 0.845 and irony kappa is 0.903.
+- **Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%** (of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.
+- **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity with the cheating rule, Counter-Strike 2 is highest (27.9%), then PUBG (20.8%) and GTA V (16.8%). The first pass put PUBG and Counter-Strike 2 level near 50%, so the cheating rule moved PUBG the most.
+- **In the first pass, reviews that do not recommend the game were flagged for toxicity more often:** 65.3% of the 2,369 "Not recommended" reviews, against 39.1% of the 4,994 "Recommended" ones. We have not recomputed this with the cheating rule. This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
+- **These labels are Gemini's, and they are not checked against humans on this data yet.** The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot's 10% toxicity rate cannot be compared with the full-run rate.
+- **Human agreement on the pilot is high.** Toxicity kappa is 0.845 and irony kappa is 0.903. This was measured before the cheating rule was added.
 - **Gemini matched the human label on 9 of 10 trial reviews for toxicity and on 10 of 10 for irony.** The trial reviews were all human-positive and the codebook was tuned on the same cases, so this is a best case and not an accuracy estimate.
 
-| Game | Reviews labeled | Toxicity yes | Irony yes |
-|---|---:|---:|---:|
-| Counter-Strike 2 | 3,017 | 1,505 (49.9%) | 993 (32.9%) |
-| Grand Theft Auto V | 1,944 | 772 (39.7%) | 383 (19.7%) |
-| PUBG: BATTLEGROUNDS | 2,402 | 1,222 (50.9%) | 467 (19.4%) |
-| All three | 7,363 | 3,499 (47.5%) | 1,843 (25.0%) |
+| Game | Reviews labeled | Toxicity yes, first pass | Toxicity yes, with cheating rule | Irony yes |
+|---|---:|---:|---:|---:|
+| Counter-Strike 2 | 3,017 | 1,505 (49.9%) | 27.9% | 993 (32.9%) |
+| Grand Theft Auto V | 1,944 | 772 (39.7%) | 16.8% | 383 (19.7%) |
+| PUBG: BATTLEGROUNDS | 2,402 | 1,222 (50.9%) | 20.8% | 467 (19.4%) |
+| All three | 7,363 | 3,499 (47.5%) | 22.7% | 1,843 (25.0%) |
 Table: Table 1. Gemini's labels by game. "Yes" counts only yes answers, not uncertain ones.
 
 | Check | N | Agreement | Cohen's kappa |
@@ -117,13 +118,14 @@ Table: Table 2. Agreement between the two human annotators on the pilot reviews 
 - The pilot is small (90 reviews, about 10% positive), so the kappa values are rough.
 - The codebook was checked almost only on English reviews, but about 80% of the data is not English.
 - The Gemini trial used only human-positive reviews and the codebook was tuned on the same cases.
+- The cheating rule was written after we saw the first-pass results, to fit how we want to define toxicity. It changes what the toxicity label means, and we have not checked it against humans.
 - The full-run labels come from Gemini alone. We have not yet compared them with humans on a random sample of these reviews.
 - Labels describe what the text says. They do not verify behavior, identity or events.
 - Three games only, so the results do not cover Steam as a whole.
 
 ### Claims the evidence does not support
 - That Gemini is accurate on non-English reviews. That has not been tested yet.
-- That 47.5% of Steam reviews mention toxicity. That is Gemini's rate on these three games, and it has not been validated.
+- That 22.7% of Steam reviews mention toxicity. That is Gemini's rate on these three games, and it has not been validated. It depends on the cheating rule: the first pass without it gave 47.5%.
 - How common toxicity, irony or gender talk is on Steam in general.
 - That toxic communities cause fewer recommendations. Any link between labels and recommendations is an association.
 :::
