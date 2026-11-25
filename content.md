@@ -21,13 +21,15 @@ HOW TO EDIT THIS FILE (the website reads it automatically)
 
 Richard, Josh, Ghif
 
-We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity mentions, irony, and references to gender or age. Gemini does the labeling from a written codebook, and two human annotators check the codebook first. The full run is still in progress, so this page reports the design and the validation so far, not final results.
+We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity mentions, irony, and references to gender or age. Gemini does the labeling from a written codebook, and two human annotators check the codebook first.
 
 :::demo pipeline
 
 :::demo labeling
 
 :::demo stats
+
+:::demo results
 
 > How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?
 
@@ -82,15 +84,27 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 
 ## Findings
 
+- **Gemini labeled every review.** 7,363 of the 7,365 reviews got a label with no failures. The other 2 were empty and skipped. The run took 46 minutes.
+- **Gemini flagged toxicity in 47.5% of the reviews and irony in 25.0%** (3,499 and 1,843 of 7,363). Uncertain answers were rare: 12 for toxicity and 96 for irony.
+- **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity, PUBG (50.9%) and Counter-Strike 2 (49.9%) are close, and GTA V is lower (39.7%).
+- **Reviews that do not recommend the game are flagged for toxicity more often:** 65.3% of the 2,369 "Not recommended" reviews, against 39.1% of the 4,994 "Recommended" ones. This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
+- **These labels are Gemini's, and they are not checked against humans on this data yet.** The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot's 10% toxicity rate cannot be compared with 47.5%.
 - **Human agreement on the pilot is high.** Toxicity kappa is 0.845 and irony kappa is 0.903.
 - **Gemini matched the human label on 9 of 10 trial reviews for toxicity and on 10 of 10 for irony.** The trial reviews were all human-positive and the codebook was tuned on the same cases, so this is a best case and not an accuracy estimate.
-- **The full 7,365-review run is not finished.** Label shares by game and language will be added when it is.
+
+| Game | Reviews labeled | Toxicity yes | Irony yes |
+|---|---:|---:|---:|
+| Counter-Strike 2 | 3,017 | 1,505 (49.9%) | 993 (32.9%) |
+| Grand Theft Auto V | 1,944 | 772 (39.7%) | 383 (19.7%) |
+| PUBG: BATTLEGROUNDS | 2,402 | 1,222 (50.9%) | 467 (19.4%) |
+| All three | 7,363 | 3,499 (47.5%) | 1,843 (25.0%) |
+Table: Table 1. Gemini's labels by game. "Yes" counts only yes answers, not uncertain ones.
 
 | Check | N | Agreement | Cohen's kappa |
 |---|---:|---:|---:|
 | Human vs human, toxicity | 89 | 97.8% | 0.845 |
 | Human vs human, irony | 83 | 98.8% | 0.903 |
-Table: Table 1. Agreement checks so far. Human pairs count the pilot reviews both annotators labeled.
+Table: Table 2. Agreement between the two human annotators on the pilot reviews both labeled.
 
 ## Interpretation
 
@@ -103,11 +117,13 @@ Table: Table 1. Agreement checks so far. Human pairs count the pilot reviews bot
 - The pilot is small (90 reviews, about 10% positive), so the kappa values are rough.
 - The codebook was checked almost only on English reviews, but about 80% of the data is not English.
 - The Gemini trial used only human-positive reviews and the codebook was tuned on the same cases.
+- The full-run labels come from Gemini alone. We have not yet compared them with humans on a random sample of these reviews.
 - Labels describe what the text says. They do not verify behavior, identity or events.
 - Three games only, so the results do not cover Steam as a whole.
 
 ### Claims the evidence does not support
 - That Gemini is accurate on non-English reviews. That has not been tested yet.
+- That 47.5% of Steam reviews mention toxicity. That is Gemini's rate on these three games, and it has not been validated.
 - How common toxicity, irony or gender talk is on Steam in general.
 - That toxic communities cause fewer recommendations. Any link between labels and recommendations is an association.
 :::

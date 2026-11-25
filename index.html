@@ -351,7 +351,7 @@
     .rv { opacity: 1; transform: none; }
   }
   /* big cards in the hero */
-  .hero-extra .demo, .hero-extra .demo[data-demo="labeling"], .hero-extra .demo[data-demo="pipeline"], .hero-extra .demo[data-demo="stats"] { display: block; padding: 28px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 30px; background: linear-gradient(160deg, rgba(58, 143, 196, .16), rgba(255, 255, 255, .025) 60%), #0a1117; box-shadow: 0 40px 100px -50px rgba(14, 107, 120, .55); margin: 0 0 20px; }
+  .hero-extra .demo, .hero-extra .demo[data-demo="labeling"], .hero-extra .demo[data-demo="pipeline"], .hero-extra .demo[data-demo="results"], .hero-extra .demo[data-demo="stats"] { display: block; padding: 28px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 30px; background: linear-gradient(160deg, rgba(58, 143, 196, .16), rgba(255, 255, 255, .025) 60%), #0a1117; box-shadow: 0 40px 100px -50px rgba(14, 107, 120, .55); margin: 0 0 20px; }
   .big-h { margin: 0 0 22px; }
   .big-hr { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .big-e { margin: 0 0 8px; font: 600 11.5px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
@@ -378,6 +378,32 @@
     .demo .d-cap { font-size: 12.5px; }
     .demo .d-bar span { display: none; }
   }
+  /* results card */
+  .hero-extra .demo[data-demo="results"] { display: block; }
+  .rs-top { display: flex; flex-wrap: wrap; gap: 14px 34px; margin: 0 0 24px; }
+  .rs-k b { display: block; font: 800 clamp(2.4rem, 6vw, 3.6rem)/1 var(--disp); letter-spacing: -.04em; background: linear-gradient(135deg, #fff, #5cd1bf); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .rs-k.r b { background: linear-gradient(135deg, #fff, #e9a04f); -webkit-background-clip: text; background-clip: text; }
+  .rs-k.s b { background: linear-gradient(135deg, #fff, #9cc9e0); -webkit-background-clip: text; background-clip: text; }
+  .rs-k span { display: block; margin-top: 6px; font-size: 14px; color: var(--soft); }
+  .rs-l { display: flex; gap: 18px; margin: 0 0 12px; font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+  .rs-l .t::before, .rs-l .r::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 7px; border-radius: 3px; vertical-align: 0; }
+  .rs-l .t { color: #8fe0d2; } .rs-l .t::before { background: #5cd1bf; }
+  .rs-l .r { color: #f2c48a; } .rs-l .r::before { background: #e9a04f; }
+  .rp { display: none; }
+  .rp.on { display: block; }
+  .rr { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 8px 20px; align-items: center; padding: 12px 0; border-top: 1px solid var(--edge); }
+  .rr:first-child { border-top: 0; }
+  .rr-n span { display: block; font: 700 15px/1.3 var(--sans); color: var(--hi); }
+  .rr-n small { font-size: 12.5px; color: var(--dim); }
+  .rr-b { display: grid; gap: 6px; }
+  .rb { position: relative; display: block; height: 22px; border-radius: 99px; background: rgba(255, 255, 255, .06); overflow: hidden; }
+  .rb i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 99px; transition: width 1.2s var(--ease) var(--dl, 0s); }
+  .rb.t i { background: linear-gradient(90deg, #2d8f86, #5cd1bf); }
+  .rb.r i { background: linear-gradient(90deg, #b9742a, #e9a04f); }
+  .rp.sh .rb i { width: var(--w); }
+  .rb b { position: absolute; right: 10px; top: 0; bottom: 0; display: flex; align-items: center; font: 600 12px/1 var(--mono); color: #eaf4f1; font-variant-numeric: tabular-nums; }
+  .rs-n { margin: 14px 0 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+  @media (max-width: 640px) { .rr { grid-template-columns: 1fr; gap: 6px; } }
 </style>
 </head>
 <body>
@@ -647,6 +673,40 @@ function initStats(root) {
   });
 }
 
+/* Results card: renders where content.md has a ":::demo results" line.
+   Numbers are Gemini's labels from data/gemini_labels_gemini-3.5-flash-lite.csv (7,363 labeled reviews); keep in sync with the Findings section. */
+function initResults(root) {
+  [].forEach.call(root.querySelectorAll('.demo[data-demo="results"]'), function (host) {
+    var GAME = [['Counter-Strike 2', 3017, 49.9, 32.9], ['Grand Theft Auto V', 1944, 39.7, 19.7], ['PUBG: BATTLEGROUNDS', 2402, 50.9, 19.4]];
+    var LANG = [['Simplified Chinese', 2303, 50.2, 21.5], ['English', 1457, 42.9, 26.1], ['Russian', 1068, 49.3, 44.6], ['Turkish', 564, 49.5, 16.5], ['Portuguese (BR)', 406, 42.4, 11.3], ['Korean', 328, 49.1, 18.6], ['Spanish', 323, 35.6, 22.0], ['German', 192, 58.3, 42.7], ['Polish', 155, 52.9, 37.4]];
+    function rows(list) {
+      return list.map(function (r, i) {
+        return '<div class="rr"><div class="rr-n"><span>' + r[0] + '</span><small>' + r[1].toLocaleString('en-US') + ' reviews</small></div>' +
+          '<div class="rr-b"><span class="rb t"><i style="--w:' + r[2] + '%;--dl:' + (i * 80) + 'ms"></i><b>' + r[2].toFixed(1) + '%</b></span><span class="rb r"><i style="--w:' + r[3] + '%;--dl:' + (i * 80 + 40) + 'ms"></i><b>' + r[3].toFixed(1) + '%</b></span></div></div>';
+      }).join('');
+    }
+    host.innerHTML =
+      '<div class="big-h"><p class="big-e">4 \u00b7 Results</p><p class="big-t">What Gemini found in all 7,365 reviews</p><p class="big-s">Share of reviews Gemini labeled yes. These are the model\u2019s labels, not checked against humans on this data yet.</p></div>' +
+      '<div class="rs-top"><div class="rs-k"><b>47.5%</b><span>mention toxicity</span></div><div class="rs-k r"><b>25.0%</b><span>are ironic</span></div><div class="rs-k s"><b>7,363</b><span>labeled, 0 failed, 46 min</span></div></div>' +
+      '<div class="stabs" role="tablist"><button type="button" role="tab" class="stab on" aria-selected="true">By game</button><button type="button" role="tab" class="stab" aria-selected="false">By language</button></div>' +
+      '<div class="rs-l"><span class="t">Toxicity yes</span><span class="r">Irony yes</span></div>' +
+      '<div class="rp on">' + rows(GAME) + '</div><div class="rp">' + rows(LANG) + '</div>' +
+      '<p class="rs-n">Languages with at least 150 reviews. Rates outside English are Gemini\u2019s labels and have not been human-checked.</p>';
+    var tabs = [].slice.call(host.querySelectorAll('.stab')), pans = [].slice.call(host.querySelectorAll('.rp')), shown = false;
+    function pick(i) {
+      tabs.forEach(function (t, k) { t.classList.toggle('on', k === i); t.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+      pans.forEach(function (p, k) { p.classList.remove('sh'); p.classList.toggle('on', k === i); });
+      if (shown) requestAnimationFrame(function () { requestAnimationFrame(function () { pans[i].classList.add('sh'); }); });
+    }
+    tabs.forEach(function (t, i) { t.addEventListener('click', function () { pick(i); }); });
+    function reveal() { shown = true; host.querySelector('.rp.on').classList.add('sh'); }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { reveal(); io.disconnect(); } }, { threshold: 0.15 });
+      io.observe(host);
+    } else reveal();
+  });
+}
+
 /* Method pipeline: renders where content.md has a ":::demo pipeline" line. Steps play in turn while on screen. */
 function initPipeline(root) {
   [].forEach.call(root.querySelectorAll('.demo[data-demo="pipeline"]'), function (host) {
@@ -724,6 +784,7 @@ function initPipeline(root) {
 /* Labeling demo: renders where content.md has a ":::demo labeling" line. Plays only while on screen. */
 function initDemos(root) {
   initStats(root);
+  initResults(root);
   initPipeline(root);
   var QUESTIONS = [
     { key: 'harm_mention', name: 'Does it mention toxicity?' },
