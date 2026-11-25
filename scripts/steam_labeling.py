@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 from google.genai import errors, types
-from IPython.display import HTML, display
+from IPython.display import HTML, Image, display
 
 RETRY_CODES = {429, 500, 503, 504}
 
@@ -359,12 +359,185 @@ class LabelRun:
             with open(self.err_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps({"key": job["key"], "error": res["error"], "ts": round(time.time())}) + "\n")
 
+    # ----- the final panel as a picture (shows up in the notebook output on GitHub too)
+    def _final_image(self, status):
+        try:
+            from matplotlib.figure import Figure
+            from matplotlib.patches import FancyBboxPatch, Rectangle, Circle
+        except ImportError:
+            return None
+        import io
+
+        C = dict(surface="#191919", panel="#242424", line="#343434", tx="#efefef", tx2="#9c9c9c", blue="#338ced",
+                 orange="#e76624", neutral="#5f5f5f", crit="#dc3c3d", good="#0aac23", warn="#fbb315")
+        col = {"yes": C["blue"], "uncertain": C["orange"], "no": C["neutral"]}
+        W, M = 1100, 40
+        IW = W - 2 * M
+        total, done, n_fail = len(self.jobs), self.state["done"], len(self.failed)
+        remaining = max(total - done - n_fail, 0)
+        elapsed = time.time() - self.t_start
+        new = done - getattr(self, "_done_at_start", 0)
+        rate = new / elapsed if elapsed > 0 else 0.0
+        eta = (remaining / rate) if (remaining and rate > 0) else None
+        pct = 100.0 * done / total if total else 100.0
+
+        s, gap = 24, 3
+        cols = max((IW + gap) // (s + gap), 1)
+        rows = -(-self.n_batches // cols)
+        y_tiles = 340
+        y_curbar = y_tiles + rows * (s + gap) - gap + 12
+        y_leg = y_curbar + 30
+        y_cols = y_leg + 44
+        y_latest = y_cols + 16 + 150
+        n_feed = len(self.recent)
+        H = y_latest + 24 + max(n_feed, 1) * 40 + (30 if self.state["skipped"] else 0) + 24
+
+        fig = Figure(figsize=(W / 100, H / 100), dpi=100, facecolor=C["surface"])
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.set_xlim(0, W)
+        ax.set_ylim(H, 0)
+        ax.axis("off")
+
+        def box(x, y, w, h, color, r=8):
+            p = FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={min(r, h / 2)}", fc=color, ec="none")
+            ax.add_patch(p)
+            return p
+
+        def text(x, y, t, size=9, color=C["tx"], weight="normal", ha="left"):
+            ax.text(x, y, t, fontsize=size, color=color, fontweight=weight, ha=ha, va="baseline")
+
+        def bar(x, y, w, h, frac):
+            base = box(x, y, w, h, C["panel"], r=h)
+            if frac > 0:
+                fill = Rectangle((x, y), w * min(frac, 1.0), h, fc=C["blue"], ec="none")
+                ax.add_patch(fill)
+                fill.set_clip_path(base)
+
+        def stack(x, y, w, h, counts):
+            base = box(x, y, w, h, C["panel"], r=h)
+            tot = sum(counts.values()) or 1
+            cx = x
+            for k in ("yes", "uncertain", "no"):
+                sw = w * counts[k] / tot
+                if sw <= 0:
+                    continue
+                seg = Rectangle((cx, y), sw, h, fc=col[k], ec=C["surface"], lw=1.5)
+                ax.add_patch(seg)
+                seg.set_clip_path(base)
+                cx += sw
+
+        # header
+        text(M, 50, "Steam review labeling", 14, weight="bold")
+        text(M, 74, f"{self.model} · {self.backend} · {self.workers} workers · batches of {self.batch_size}", 8.5, C["tx2"])
+        if status == "PAUSED":
+            chip, dot = "PAUSED · re-run the cell to resume", C["warn"]
+        elif n_fail:
+            chip, dot = f"! DONE · {n_fail} failed", C["crit"]
+        else:
+            chip, dot = "✓ DONE", C["good"]
+        cw = len(chip) * 8.2 + 44
+        box(W - M - cw, 30, cw, 32, C["panel"], r=16)
+        ax.add_patch(Circle((W - M - cw + 18, 46), 4.5, fc=dot, ec="none"))
+        text(W - M - cw + 32, 50, chip, 8, weight="bold")
+
+        # hero + overall bar
+        text(M, 148, f"{pct:.1f}%", 34, weight="bold")
+        text(M + len(f"{pct:.1f}%") * 30 + 18, 146, f"{done:,} of {total:,} reviews labeled", 10, C["tx2"])
+        bar(M, 168, IW, 14, pct / 100)
+
+        # stat tiles
+        stats = [("SPEED (AVG)", f"{rate:.1f} rev/s"), ("TIME LEFT", _fmt_eta(eta) if remaining else "—"),
+                 ("ELAPSED", _fmt_clock(elapsed)), ("RETRIES (503/429)", f"{self.net['retries']:,}"),
+                 ("FAILED", ("! " if n_fail else "") + f"{n_fail:,}")]
+        tw = (IW - 4 * 10) / 5
+        for i, (k, v) in enumerate(stats):
+            x = M + i * (tw + 10)
+            box(x, 206, tw, 66, C["panel"], r=12)
+            text(x + 14, 228, k, 6.5, C["tx2"])
+            text(x + 14, 256, v, 12.5, C["crit"] if (k == "FAILED" and n_fail) else C["tx"], weight="bold")
+
+        # batches
+        active = next((b for b in range(self.n_batches) if self.b_done[b] + self.b_fail[b] < self.b_total[b]), None)
+        if active is None:
+            cur_label, cur_pct = "All batches finished", 100.0
+        else:
+            cur_pct = 100.0 * self.b_done[active] / self.b_total[active]
+            cur_label = f"Batch {active + 1} of {self.n_batches} · {self.b_done[active]}/{self.b_total[active]} · {cur_pct:.0f}%"
+        text(M, 316, "Batches", 9, weight="bold")
+        text(W - M, 316, cur_label, 8, C["tx2"], ha="right")
+        for b in range(self.n_batches):
+            x = M + (b % cols) * (s + gap)
+            y = y_tiles + (b // cols) * (s + gap)
+            d, f, t = self.b_done[b], self.b_fail[b], self.b_total[b]
+            if f and d + f == t:
+                box(x, y, s, s, C["crit"], r=6)
+                text(x + s / 2, y + s / 2 + 4, "!", 9, "#ffffff", weight="bold", ha="center")
+            elif d == t:
+                box(x, y, s, s, C["blue"], r=6)
+            else:
+                base = box(x, y, s, s, C["panel"], r=6)
+                if d:
+                    fill = Rectangle((x, y + s * (1 - d / t)), s, s * d / t, fc=C["blue"], ec="none")
+                    ax.add_patch(fill)
+                    fill.set_clip_path(base)
+        bar(M, y_curbar, IW, 8, cur_pct / 100)
+        lx = M
+        for label, color, edge in (("pending", C["panel"], C["line"]), ("done / in progress", C["blue"], None), ("! has failures", C["crit"], None)):
+            ax.add_patch(Rectangle((lx, y_leg - 9), 10, 10, fc=color, ec=edge or "none", lw=0.8))
+            text(lx + 16, y_leg, label, 7.5, C["tx2"])
+            lx += 16 + len(label) * 6.2 + 24
+
+        # labels + per game
+        text(M, y_cols, "Labels so far", 9, weight="bold")
+        for i, (title, counts) in enumerate((("Toxicity", self.mix["harm_mention"]), ("Irony", self.mix["irony"]))):
+            y = y_cols + 28 + i * 66
+            text(M, y, title, 8.5)
+            text(M + 490, y, f"{sum(counts.values()):,} labeled", 8, C["tx2"], ha="right")
+            stack(M, y + 10, 490, 12, counts)
+            kx = M
+            for k in ("yes", "uncertain", "no"):
+                ax.add_patch(Circle((kx + 4, y + 36), 3.5, fc=col[k], ec="none"))
+                label = f"{k} {counts[k]:,}"
+                text(kx + 13, y + 40, label, 7.5, C["tx2"])
+                kx += 13 + len(label) * 6.4 + 14
+        gx = M + 530
+        text(gx, y_cols, "By game", 9, weight="bold")
+        for i, g in enumerate(self.games):
+            y = y_cols + 28 + i * 40
+            text(gx, y, g, 8.5)
+            text(gx + 490, y, f"{self.g_done[g]:,} / {self.g_total[g]:,}", 8, C["tx2"], ha="right")
+            bar(gx, y + 10, 490, 8, self.g_done[g] / max(self.g_total[g], 1))
+
+        # latest labeled
+        text(M, y_latest, "Latest labeled", 9, weight="bold")
+        if not self.recent:
+            text(M, y_latest + 30, "No new reviews labeled in this run.", 8.5, C["tx2"])
+        for i, e in enumerate(self.recent):
+            y = y_latest + 14 + i * 40
+            box(M, y, IW, 32, C["panel"], r=10)
+            text(M + 14, y + 20, _SHORT.get(e["game"], e["game"][:6]), 7, C["tx2"], weight="bold")
+            review = " ".join(str(e["_review"]).split())
+            text(M + 70, y + 20, review if len(review) <= 105 else review[:105] + "…", 8)
+            bx = W - M - 14
+            for label, v in (("irony", e.get("irony")), ("toxicity", e.get("harm_mention"))):
+                t = f"{label} {v}"
+                ax.add_patch(Circle((bx - len(t) * 4.8 - 9, y + 16), 3.5, fc=col.get(v, C["neutral"]), ec="none"))
+                text(bx, y + 20, t, 7.5, C["tx2"], ha="right")
+                bx -= len(t) * 4.8 + 30
+        if self.state["skipped"]:
+            text(M, H - 28, f"{self.state['skipped']} review(s) skipped (empty text).", 8, C["tx2"])
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=100, facecolor=C["surface"])
+        return Image(data=buf.getvalue(), format="png")
+
     def start(self):
         """Label everything that is not in the cache yet, with the live panel. Interrupt the kernel to pause."""
         self._reset_state()
         pending = [j for j in self.jobs if j["key"] not in self.results]
         resq = queue.Queue()
         self.t_start = time.time()
+        self._done_at_start = self.state["done"]
         status = "RUNNING"
         handle = display(HTML(self._render(status)), display_id=True)
         ex = ThreadPoolExecutor(max_workers=self.workers)
@@ -386,7 +559,8 @@ class LabelRun:
             status = "PAUSED"
         finally:
             ex.shutdown(wait=False, cancel_futures=True)
-            handle.update(HTML(self._render(status)))
+            final = self._final_image(status)     # a PNG survives in the saved notebook (the HTML panel's CSS doesn't)
+            handle.update(final if final is not None else HTML(self._render(status)))
 
         print(f"{status}: {self.state['done']:,}/{len(self.jobs):,} labeled · {len(self.failed)} failed · "
               f"this run took {_fmt_clock(time.time() - self.t_start)}")
