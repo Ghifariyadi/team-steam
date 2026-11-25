@@ -406,6 +406,7 @@
   .rb b { position: absolute; right: 10px; top: 0; bottom: 0; display: flex; align-items: center; font: 600 12px/1 var(--mono); color: #eaf4f1; font-variant-numeric: tabular-nums; }
   .rs-n { margin: 14px 0 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
   .rr-x { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .rr-x span small { display: block; margin-top: 2px; font: 400 11px/1.3 var(--sans); color: var(--dim); }
   .rr-x span { font: 500 12.5px/1.4 var(--mono); color: #d6e6ea; background: rgba(255, 255, 255, .05); border: 1px solid var(--edge); border-radius: 8px; padding: 4px 9px; overflow-wrap: anywhere; }
   .rr-n em { display: block; margin-top: 2px; font: 400 12.5px/1.4 var(--sans); font-style: normal; color: var(--dim); }
   @media (max-width: 640px) { .rr { grid-template-columns: 1fr; gap: 6px; } }
@@ -706,25 +707,24 @@ function initResults(root) {
 
 /* Toxic-words card: renders where content.md has a ":::demo toxic" line.
    Numbers come from data/toxic_evidence/gemini_toxic_evidence_*.csv (1,669 toxic reviews, quotes checked word for word).
-   Examples are picked by hand as the clearest ones; profanity is partly masked. */
+   Examples are picked by hand as the clearest ones. */
 function initToxic(root) {
   [].forEach.call(root.querySelectorAll('.demo[data-demo="toxic"]'), function (host) {
     var ROWS = [
-      ['Insult at a person', 'their skill, brain or character', 48.5, ['complete morons', 'toxic noobs']],
-      ['Attack on who someone is', '88% are about nationality or ethnicity', 25.9, ['it is 99% Chineses players that are hacking', 'every racial slur in the book']],
-      ['Swearing', 'curse words', 20.1, ['F***ING TEAMKILLER', 'FIX YOUR F***ING GAME']],
-      ['Toxic community', 'the reviewer says players or chat are hostile', 11.1, ['community is very toxic', 'Pretty toxic. Play with caution.']],
-      ['Threat or wishing harm', 'wishing someone dead or sick', 6.2, ['wishes you dead', 'telling people to get cancer']]
+      ['Insult at a person', 'aimed at other players', 48.5, [['A bunch of no-life cunts whom nobody likes', 'Polish, translated'], ['retards and fucking amoebas who have 500 ping', 'Polish, translated']]],
+      ['Racism and discrimination', 'nationality, race, gender or similar. 88% are about nationality or ethnicity', 25.9, [['get ready to be cursed by angry iranians', 'from the human-labeled pilot'], ['This game is so much fun when those motherfucking Russians aren’t around.', 'Turkish, translated'], ['those little monkeys don’t know how to play normally', 'Ukrainian, translated']]],
+      ['Swearing', 'curse words', 20.1, [['FUCKING TEAMKILLER', ''], ['Fuck you Rockstar. Fuck. You.', '']]],
+      ['Threat or wishing harm', 'wishing someone dead or sick', 6.2, [['wishes you dead', ''], ['may you die a slow and painful disease, guys', 'French, translated']]]
     ];
     var rows = ROWS.map(function (r, i) {
       return '<div class="rr"><div class="rr-n"><span>' + r[0] + '</span><em>' + r[1] + '</em></div>' +
         '<div class="rr-b"><span class="rb t"><i style="--w:' + r[2] + '%;--dl:' + (i * 90) + 'ms"></i><b>' + r[2].toFixed(1) + '%</b></span>' +
-        '<div class="rr-x">' + r[3].map(function (q) { return '<span>“' + q + '”</span>'; }).join('') + '</div></div></div>';
+        '<div class="rr-x">' + r[3].map(function (q) { return '<span>“' + q[0] + '”' + (q[1] ? '<small>' + q[1] + '</small>' : '') + '</span>'; }).join('') + '</div></div></div>';
     }).join('');
     host.innerHTML =
       '<div class="big-h"><p class="big-e">5 · What makes it toxic</p><p class="big-t">What the toxic words look like</p><p class="big-s">For the 1,669 reviews that stayed toxic, Gemini quoted the exact words and sorted them into types. Share of toxic reviews that have each type. A review can have several.</p></div>' +
       '<div class="rp on">' + rows + '</div>' +
-      '<p class="rs-n">Also found: other 7.8%, sexual harassment 1.0%, griefing or trolling 0.8%. Aimed at: players in general 58%, a nationality or group 22%, the developer 17%, teammates 7%. Examples are the clearest ones we picked, and profanity is partly masked. Some labeled phrases are jokes or sarcasm. These are Gemini’s labels, not checked against humans yet.</p>';
+      '<p class="rs-n">Reviews that only say the community is toxic (7.8% of the toxic ones) are not shown here. Also found: other 7.8%, sexual harassment 1.0%, griefing or trolling 0.8%. Aimed at: players in general 58%, a nationality or group 22%, the developer 17%, teammates 7%. The examples are real review text, picked as the clearest ones. Some labeled phrases are jokes or sarcasm. These are Gemini\u2019s labels, not checked against humans yet.</p>';
     var shown = false;
     function reveal() { shown = true; host.querySelector('.rp.on').classList.add('sh'); }
     if ('IntersectionObserver' in window) {
