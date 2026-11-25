@@ -31,6 +31,8 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 
 :::demo results
 
+:::demo toxic
+
 > How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?
 
 ## Question and motivation | Question
@@ -90,9 +92,6 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - **Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%** (1,669 and 1,843 of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. The re-check turned 1,829 of the 3,499 to no and left 1,669 as yes, and 1 as uncertain. About 1,670 of those changes were reviews that mention cheating. The other 161 were reviews without cheating that Gemini no longer counted as toxic on the second look, often single-word or joke reviews. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.
 - **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity with the cheating rule, Counter-Strike 2 is highest (27.9%), then PUBG (20.8%) and GTA V (16.8%). The first pass put PUBG and Counter-Strike 2 level near 50%, so the cheating rule moved PUBG the most.
 - **Reviews that do not recommend the game are flagged for toxicity more often:** 28.4% of the 2,369 "Not recommended" reviews, against 19.9% of the 4,994 "Recommended" ones. In the first pass the gap was larger (65.3% against 39.1%). This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
-- **Most toxicity is insults aimed at people.** For the 1,669 reviews that stayed toxic, Gemini quoted the exact words that make each one toxic and gave them a type. 48.5% have an insult at a person (their skill, brain or character), 25.9% attack who someone is, 20.1% swear without aiming at anyone, 11.1% describe a toxic community, and 6.2% contain a threat. A review can have several types.
-- **Attacks on identity mostly target nationality or ethnicity.** 432 reviews (25.9% of the toxic ones) attack identity, and 88% of those are about ethnicity or nationality. Disability, sexuality, gender and religion each appear in only a handful. These attacks are most common in Counter-Strike 2 (30.4% of its toxic reviews) and PUBG (26.0%), and less in GTA V (14.1%). This counts reviews that mention a nationality as a target. It says nothing about any nationality itself.
-- **Most toxic words are aimed at players in general.** Gemini says 58.4% of toxic reviews are aimed at players in general, 21.7% at a nationality or group, 17.0% at the developer and 7.4% at teammates.
 - **These labels are Gemini's, and they are not checked against humans on this data yet.** The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot's 10% toxicity rate cannot be compared with the full-run rate.
 - **Human agreement on the pilot is high.** Toxicity kappa is 0.845 and irony kappa is 0.903. This was measured before the cheating rule was added.
 - **Gemini matched the human label on 9 of 10 trial reviews for toxicity and on 10 of 10 for irony.** The trial reviews were all human-positive and the codebook was tuned on the same cases, so this is a best case and not an accuracy estimate.
