@@ -292,9 +292,6 @@
     .pl-step { flex: 0 0 84%; scroll-snap-align: center; }
     .pl-step.on { transform: none; }
     .pl-dots { display: flex; }
-    .hero-extra .demo[data-demo="stats"] { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; align-items: flex-start; margin: 0 -18px 18px; padding: 4px 18px 10px; }
-    .hero-extra .demo[data-demo="stats"]::-webkit-scrollbar { display: none; }
-    .hero-extra .demo[data-demo="stats"] .st, .hero-extra .demo[data-demo="stats"] .st.wide { flex: 0 0 88%; scroll-snap-align: center; grid-column: auto; }
   }
 
   /* at-a-glance tiles (content.md: ":::demo stats") */
@@ -353,6 +350,34 @@
     .demo *, .demo *::before, .demo *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
     .rv { opacity: 1; transform: none; }
   }
+  /* big cards in the hero */
+  .hero-extra .demo, .hero-extra .demo[data-demo="labeling"], .hero-extra .demo[data-demo="pipeline"], .hero-extra .demo[data-demo="stats"] { display: block; padding: 28px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 30px; background: linear-gradient(160deg, rgba(58, 143, 196, .16), rgba(255, 255, 255, .025) 60%), #0a1117; box-shadow: 0 40px 100px -50px rgba(14, 107, 120, .55); margin: 0 0 20px; }
+  .big-h { margin: 0 0 22px; }
+  .big-hr { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .big-e { margin: 0 0 8px; font: 600 11.5px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+  .big-t { margin: 0 0 8px; font: 800 clamp(1.5rem, 3.2vw, 2.1rem)/1.12 var(--disp); letter-spacing: -.035em; color: var(--hi); }
+  .big-s { margin: 0; max-width: 64ch; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .hero-extra .demo .d-win { border: 1px solid var(--edge); border-radius: 20px; }
+  .stabs { display: flex; gap: 4px; width: fit-content; max-width: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 0 22px; padding: 4px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 999px; background: rgba(255, 255, 255, .04); }
+  .stabs::-webkit-scrollbar { display: none; }
+  .stab { flex: none; padding: 10px 18px; border: 0; border-radius: 999px; background: transparent; color: var(--soft); font: 600 14px/1 var(--sans); cursor: pointer; transition: background .25s, color .25s; }
+  .stab.on { background: rgba(92, 209, 191, .2); color: var(--hi); box-shadow: 0 0 0 1px rgba(92, 209, 191, .4) inset; }
+  .sp { display: none; }
+  .sp.on { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 30px; align-items: start; }
+  .sp .st, .sp .st.wide, .sp .st.k, .sp .st.w { padding: 0; border: 0; background: none; }
+  .sp-t { margin: 0; padding: 4px 0 4px 18px; border-left: 2px solid var(--teal); font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .snt { margin-top: 24px; padding: 14px 18px; border: 1px solid rgba(240, 183, 101, .4); border-radius: 16px; background: rgba(240, 183, 101, .08); font-size: 14.5px; line-height: 1.55; color: var(--soft); }
+  .snt strong { color: var(--gold); }
+  @media (max-width: 860px) { .sp.on { grid-template-columns: 1fr; gap: 18px; } }
+  @media (max-width: 560px) { .hero-extra .demo, .hero-extra .demo[data-demo="labeling"], .hero-extra .demo[data-demo="pipeline"], .hero-extra .demo[data-demo="stats"] { padding: 22px 18px; border-radius: 26px; } }
+  @media (max-width: 560px) {
+    .demo .d-pad { padding: 12px; }
+    .demo .d-card { padding: 14px 15px; }
+    .demo .d-review { font-size: 16px; min-height: 5.2em; }
+    .demo .d-why { min-height: 4.6em; font-size: 13.5px; }
+    .demo .d-cap { font-size: 12.5px; }
+    .demo .d-bar span { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -377,8 +402,8 @@
     </a>
     <a class="go ghost" href="https://github.com/Ghifariyadi/team-steam">View on GitHub</a>
   </div>
-  <div class="marquee" aria-hidden="true"><div class="mq-track" id="mq"></div></div>
   <div class="hero-extra" id="hero-extra" hidden></div>
+  <div class="marquee" aria-hidden="true"><div class="mq-track" id="mq"></div></div>
   <div class="ask" id="ask" hidden>
     <p class="ask-label">Research question</p>
     <p class="sr" id="ask-full"></p>
@@ -577,16 +602,33 @@ function initStats(root) {
       for (var i = 0; i < 90; i++) cells += '<i' + (i < n ? ' class="' + cls + '"' : '') + ' style="--k:' + i + '"></i>';
       return '<p class="wf-l" style="color:' + color + '">' + label + '</p><div class="wf">' + cells + '</div>';
     }
+    var PANELS = [
+      ['Language mix', '<div class="st wide"><p class="ey">Reviews per language</p><div class="big"><b>80%</b><span>of the reviews are not in English</span></div>' + bars + '</div>',
+        'Each bar is the number of reviews in one language, English in yellow. Most reviews are in other languages, so the codebook has to hold up outside English too.'],
+      ['Human agreement', kappaTile,
+        'Two annotators labeled the same 90 pilot reviews without seeing each other\u2019s labels. Accuracy is how often they matched. Kappa is the same check with the matches you would get by luck taken out.'],
+      ['Pilot labels', '<div class="st w"><p class="ey">Pilot: 90 reviews, human-labeled</p>' + waffle(9, 't', 'Toxicity: 9 of 90', '#f2c48a') + waffle(5, 'r', 'Irony: 5 of 90', '#9cc9e0') + '</div>',
+        'How many of the 90 pilot reviews a human marked yes. Only about 1 in 10 were positive, so raw accuracy alone can flatter a labeler that says \u201cno\u201d to everything. That is why kappa is reported too.']
+    ];
     host.innerHTML =
-      '<div class="st wide"><p class="ey">Language mix</p><div class="big"><b>80%</b><span>of the reviews are not in English</span></div>' + bars + '</div>' +
-      kappaTile +
-      '<div class="st w"><p class="ey">Pilot: 90 reviews, human-labeled</p>' + waffle(9, 't', 'Toxicity: 9 of 90', '#f2c48a') + waffle(5, 'r', 'Irony: 5 of 90', '#9cc9e0') + '</div>' +
-      '<div class="st nt wide"><p class="ey">Not tested yet</p><h4>Gemini on non-English reviews</h4><p>The codebook was checked almost only on English, but about 80% of the reviews are not. The agreement numbers above do not cover that part of the data yet.</p></div>';
-    var tile = [].slice.call(host.querySelectorAll('.st'));
+      '<div class="big-h"><p class="big-e">3 \u00b7 The data and the checks</p><p class="big-t">What is in the data, and do the humans agree?</p><p class="big-s">Pick a tab.</p></div>' +
+      '<div class="stabs" role="tablist">' + PANELS.map(function (p, i) { return '<button type="button" role="tab" class="stab' + (i === 0 ? ' on' : '') + '" aria-selected="' + (i === 0) + '">' + p[0] + '</button>'; }).join('') + '</div>' +
+      PANELS.map(function (p, i) { return '<div class="sp' + (i === 0 ? ' on' : '') + '" role="tabpanel"><div class="sp-v">' + p[1] + '</div><p class="sp-t">' + p[2] + '</p></div>'; }).join('') +
+      '<div class="snt"><strong>Not tested yet:</strong> Gemini on non-English reviews. The codebook was checked almost only on English, but about 80% of the reviews are not, so the agreement numbers do not cover that part yet.</div>';
+    var spEls = [].slice.call(host.querySelectorAll('.sp')), tbEls = [].slice.call(host.querySelectorAll('.stab')), shown = false, curP = 0;
     function fire(t) {
+      if (t._f) return;
+      t._f = 1;
       t.classList.add('on');
       if (t.classList.contains('k')) kappaLoop(t);
     }
+    function pick(i) {
+      curP = i;
+      spEls.forEach(function (el, k) { el.classList.toggle('on', k === i); });
+      tbEls.forEach(function (el, k) { el.classList.toggle('on', k === i); el.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+      if (shown) fire(spEls[i].querySelector('.st'));
+    }
+    tbEls.forEach(function (el, i) { el.addEventListener('click', function () { pick(i); }); });
     function kappaLoop(t) {
       var note = t.querySelector('.kn'), timer = null, tab = 'acc';
       var RMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -604,10 +646,11 @@ function initStats(root) {
       [].forEach.call(t.querySelectorAll('.kt-b'), function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-t')); }); });
       show('acc');
     }
+    function reveal() { shown = true; fire(spEls[curP].querySelector('.st')); }
     if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { fire(e.target); io.unobserve(e.target); } }); }, { threshold: 0.25 });
-      tile.forEach(function (t) { io.observe(t); });
-    } else tile.forEach(fire);
+      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { reveal(); io.disconnect(); } }, { threshold: 0.15 });
+      io.observe(host);
+    } else reveal();
   });
 }
 
@@ -627,7 +670,7 @@ function initPipeline(root) {
       ['Scale to all reviews', 'Gemini applies the final codebook to every review in the three games.',
         '<div class="v v4"><b class="cu" data-to="7365" data-dec="0">0</b><small>reviews labeled</small><em></em></div>']
     ];
-    host.innerHTML = '<div class="pl-top"><p class="pl-h">Step by step: the whole process</p><span class="pl-c" aria-hidden="true">1 / ' + STEPS.length + '</span></div>' +
+    host.innerHTML = '<div class="big-h"><div class="big-hr"><p class="big-e">1 \u00b7 The method</p><span class="pl-c" aria-hidden="true">1 / ' + STEPS.length + '</span></div><p class="big-t">Step by step: the whole process</p><p class="big-s">From a research question to 7,365 labeled reviews. Tap a step, or let it play.</p></div>' +
       '<div class="pl">' + STEPS.map(function (st, i) {
         return '<button type="button" class="pl-step" data-i="' + i + '"><span class="pl-n"><span>' + (i + 1) + '</span></span><strong>' + st[0] + '</strong><span class="pl-d">' + st[1] + '</span>' + st[2] + '</button>';
       }).join('') + '</div>' +
@@ -708,6 +751,7 @@ function initDemos(root) {
 
   [].forEach.call(root.querySelectorAll('.demo[data-demo="labeling"]'), function (host) {
     host.innerHTML =
+      '<div class="big-h"><p class="big-e">2 \u00b7 One example</p><p class="big-t">How we feed Gemini one review</p><p class="big-s">The review goes to the model together with the codebook. It answers each question with yes, no or uncertain and gives a reason. The human label is shown next to it for comparison.</p></div>' +
       '<div class="d-win"><div class="d-bar"><i></i><i></i><i></i><span>gemini-3.5-flash-lite \u00b7 temperature 0</span></div><div class="d-pad">' +
       '<div class="d-stage">' +
         '<div class="d-card" role="group" aria-label="Review"><p class="d-eyebrow">Review sent to the model</p><div class="d-meta"></div><p class="d-review d-caret"><span class="d-oq">\u201c</span><span class="d-t"></span><span class="d-cq"></span></p></div>' +
@@ -1010,7 +1054,13 @@ if (typeof document !== 'undefined') {
         }
       });
 
-      $('go').addEventListener('click', function (e) { e.preventDefault(); go(0); });
+      $('go').addEventListener('click', function (e) {
+        e.preventDefault();
+        var t = $('ask').hidden ? secs[0] : $('ask');
+        if (t === secs[0]) { go(0); return; }
+        var y = t.getBoundingClientRect().top + window.pageYOffset - 84;
+        if (smooth) glide(y, .075); else window.scrollTo({ top: y, behavior: jump });
+      });
       window.addEventListener('scroll', function () { armNudge(); if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
       window.addEventListener('scrollend', function () { if (locked) unlock(); });
       window.addEventListener('resize', function () { place(); spy(); });
