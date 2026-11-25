@@ -308,8 +308,8 @@
   .st .kx-h small { display: block; margin-top: 5px; font-size: 13px; line-height: 1.35; color: var(--soft); }
   .st .kx-k { opacity: 0; transform: translateY(8px); }
   .st .kx-k b { background: linear-gradient(135deg, #fff, var(--c)); -webkit-background-clip: text; background-clip: text; }
-  .st[data-s="3"] .kx-a { opacity: 0; transform: translateY(-8px); }
-  .st[data-s="3"] .kx-k { opacity: 1; transform: none; }
+  .st[data-tab="kappa"] .kx-a { opacity: 0; transform: translateY(-8px); }
+  .st[data-tab="kappa"] .kx-k { opacity: 1; transform: none; }
   .st .dg { display: flex; flex-wrap: wrap; gap: 4px; }
   .st .dg i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .08); transform: scale(.65); transition: background .4s calc(var(--k) * 9ms), box-shadow .4s calc(var(--k) * 9ms), transform .4s calc(var(--k) * 9ms); }
   .st[data-s="1"] .dg i.c, .st[data-s="1"] .dg i.b { background: var(--c); box-shadow: 0 0 8px var(--c); transform: none; }
@@ -544,7 +544,7 @@ function initStats(root) {
     }
     var CAP = {
       acc: 'Both annotators gave the same label on 87 of 89 toxicity reviews and on 82 of 83 irony reviews. Red dots are the reviews where they disagreed.',
-      s1: 'Start from the raw agreement: the same label on almost every review.',
+      s1: 'These are the same dots as the Accuracy tab: the raw agreement.',
       s2: 'But most reviews are a plain \u201cno\u201d for both, so most of that agreement would happen by luck anyway (grey).',
       s3: 'Kappa only counts what luck cannot explain (the coloured dots): 0.845 for toxicity and 0.903 for irony.'
     };
