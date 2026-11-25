@@ -680,7 +680,6 @@ function initStats(root) {
 function initResults(root) {
   [].forEach.call(root.querySelectorAll('.demo[data-demo="results"]'), function (host) {
     var GAME = [['Counter-Strike 2', 3017, 27.9, 32.9, 49.9], ['Grand Theft Auto V', 1944, 16.8, 19.7, 39.7], ['PUBG: BATTLEGROUNDS', 2402, 20.8, 19.4, 50.9]];
-    var LANG = [['Simplified Chinese', 2303, 50.2, 21.5], ['English', 1457, 42.9, 26.1], ['Russian', 1068, 49.3, 44.6], ['Turkish', 564, 49.5, 16.5], ['Portuguese (BR)', 406, 42.4, 11.3], ['Korean', 328, 49.1, 18.6], ['Spanish', 323, 35.6, 22.0], ['German', 192, 58.3, 42.7], ['Polish', 155, 52.9, 37.4]];
     function rows(list, withPrev) {
       return list.map(function (r, i) {
         return '<div class="rr"><div class="rr-n"><span>' + r[0] + '</span><small>' + r[1].toLocaleString('en-US') + ' reviews</small>' + (withPrev ? '<small class="pv">first pass ' + r[4].toFixed(1) + '%</small>' : '') + '</div>' +
@@ -690,19 +689,10 @@ function initResults(root) {
     host.innerHTML =
       '<div class="big-h"><p class="big-e">4 \u00b7 Results</p><p class="big-t">What Gemini found in all 7,365 reviews</p><p class="big-s">Share of reviews Gemini labeled yes. Toxicity is after the rule that cheating alone does not count. These are the model\u2019s labels, not checked against humans on this data yet.</p></div>' +
       '<div class="rs-top"><div class="rs-k"><b>22.7%</b><span>mention toxicity <small>(first pass: 47.5%)</small></span></div><div class="rs-k r"><b>25.0%</b><span>are ironic</span></div><div class="rs-k s"><b>7,363</b><span>labeled, 0 failed, 46 min</span></div></div>' +
-      '<div class="stabs" role="tablist"><button type="button" role="tab" class="stab on" aria-selected="true">By game</button><button type="button" role="tab" class="stab" aria-selected="false">By language</button></div>' +
       '<div class="rs-l"><span class="t" id="rs-lt">Toxicity yes, after the cheating rule</span><span class="r">Irony yes</span></div>' +
-      '<div class="rp on">' + rows(GAME, true) + '</div><div class="rp">' + rows(LANG) + '</div>' +
+      '<div class="rp on">' + rows(GAME, true) + '</div>' +
       '<p class="rs-n" id="rs-nt">Small grey text under each game is the first-pass toxicity rate, before the cheating rule.</p>';
-    var tabs = [].slice.call(host.querySelectorAll('.stab')), pans = [].slice.call(host.querySelectorAll('.rp')), shown = false;
-    function pick(i) {
-      tabs.forEach(function (t, k) { t.classList.toggle('on', k === i); t.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
-      pans.forEach(function (p, k) { p.classList.remove('sh'); p.classList.toggle('on', k === i); });
-      host.querySelector('#rs-lt').textContent = i ? 'Toxicity yes, first pass (before the cheating rule)' : 'Toxicity yes, after the cheating rule';
-      host.querySelector('#rs-nt').textContent = i ? 'Languages with at least 150 reviews. Toxicity here is the first pass, before the cheating rule. Rates outside English are Gemini\u2019s labels and have not been human-checked.' : 'Small grey text under each game is the first-pass toxicity rate, before the cheating rule.';
-      if (shown) requestAnimationFrame(function () { requestAnimationFrame(function () { pans[i].classList.add('sh'); }); });
-    }
-    tabs.forEach(function (t, i) { t.addEventListener('click', function () { pick(i); }); });
+    var shown = false;
     function reveal() { shown = true; host.querySelector('.rp.on').classList.add('sh'); }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { reveal(); io.disconnect(); } }, { threshold: 0.15 });
