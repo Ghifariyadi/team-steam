@@ -9,6 +9,8 @@ How it behaves
 - Re-running skips anything already stored (looked up by row index + a hash of game/review).
 - A review that still fails after the retries is logged, shown in the panel, and retried on re-run.
 - Empty reviews are skipped (no label is invented for them).
+- Labels always come from the ORIGINAL text. Non-English reviews also get an English translation
+  (column `translation_en`) that is only there for humans reading the panel / the CSV.
 """
 import hashlib
 import html
@@ -26,6 +28,8 @@ from google.genai import errors, types
 from IPython.display import HTML, Image, display
 
 RETRY_CODES = {429, 500, 503, 504}
+TRANSLATE_PROMPT = ("Translate the Steam review you are given into natural English. Keep slang, swearing and tone as they are. "
+                    "Do not soften, censor, explain or add anything. Output only the translation.")
 
 # --------------------------------------------------------------------------- panel styling
 _CSS = """
@@ -77,6 +81,8 @@ _CSS = """
 .sr-item{display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;background:var(--panel);border-radius:10px;padding:8px 12px;font-size:12px}
 .sr-game{font-size:10.5px;font-weight:700;letter-spacing:.05em;color:var(--tx2)}
 .sr-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-mid{min-width:0}
+.sr-tr{margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx2);font-size:11px;font-style:italic}
 .sr-badges{display:flex;gap:6px;font-size:11px;color:var(--tx2);white-space:nowrap}
 .sr-badges span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
 .sr-badges b{width:7px;height:7px;border-radius:50%;display:inline-block}
@@ -122,6 +128,11 @@ def _clean_row(row):
     return r
 
 
+def _lang(row):
+    v = row.get("language")
+    return v.strip().lower() if isinstance(v, str) and v.strip() else None
+
+
 def _review_ok(row):
     return isinstance(row["review"], str) and row["review"].strip() != ""
 
@@ -160,7 +171,7 @@ class LabelRun:
         self.err_path = f"{data_dir}/gemini_full_{tag}_errors.jsonl"     # failures, for the record
         self.labels_path = f"{data_dir}/gemini_labels_{tag}.csv"         # export()
 
-        self.jobs = [{"pos": pos, "idx": idx, "key": _key(idx, row), "game": row["game"], "row": _clean_row(row)}
+        self.jobs = [{"pos": pos, "idx": idx, "key": _key(idx, row), "game": row["game"], "lang": _lang(row), "row": _clean_row(row)}
                      for pos, (idx, row) in enumerate(df.iterrows())]
         if limit:
             self.jobs = self.jobs[:limit]
@@ -182,22 +193,13 @@ class LabelRun:
               f"{len(self.jobs) - already:,} to go")
 
     # ----- one request, with retries (silent: the panel shows the retry count)
-    def _label(self, row, max_retries=8):
+    def _call(self, contents, config, max_retries=8):
         for attempt in range(max_retries):
             try:
-                response = self.client.models.generate_content(
-                    model=self.model,
-                    contents=json.dumps(self.make_payload(row), ensure_ascii=False),
-                    config=types.GenerateContentConfig(
-                        system_instruction=self.system,
-                        temperature=self.temperature,
-                        response_mime_type="application/json",
-                        response_schema=self.schema,
-                    ),
-                )
+                response = self.client.models.generate_content(model=self.model, contents=contents, config=config)
                 if not response.text:
                     raise ValueError("empty response (blocked by a safety filter, or no text returned)")
-                return json.loads(response.text)
+                return response.text
             except errors.APIError as e:
                 if e.code not in RETRY_CODES or attempt == max_retries - 1:
                     raise
@@ -210,6 +212,24 @@ class LabelRun:
                 finally:
                     with self.net_lock:
                         self.net["waiting"] -= 1
+
+    def _label(self, row):
+        text = self._call(
+            json.dumps(self.make_payload(row), ensure_ascii=False),
+            types.GenerateContentConfig(
+                system_instruction=self.system, temperature=self.temperature,
+                response_mime_type="application/json", response_schema=self.schema))
+        return json.loads(text)
+
+    def _translate(self, review):
+        text = self._call(
+            review,
+            types.GenerateContentConfig(system_instruction=TRANSLATE_PROMPT, temperature=0))
+        return " ".join(text.split())
+
+    @staticmethod
+    def _needs_translation(job):
+        return job["lang"] not in (None, "english")
 
     # ----- bookkeeping for the panel
     def _reset_state(self):
@@ -296,7 +316,8 @@ class LabelRun:
 
         feed = "".join(
             f'<div class="sr-item"><div class="sr-game">{_SHORT.get(e["game"], e["game"][:6])}</div>'
-            f'<div class="sr-txt">{html.escape(" ".join(str(e["_review"]).split())[:140])}</div>'
+            f'<div class="sr-mid"><div class="sr-txt">{html.escape(" ".join(str(e["_review"]).split())[:140])}</div>'
+            + (f'<div class="sr-tr">EN · {html.escape(e["translation_en"][:140])}</div>' if e.get("translation_en") else "") + '</div>'
             f'<div class="sr-badges">{_badge("toxicity", e.get("harm_mention"))}{_badge("irony", e.get("irony"))}</div></div>'
             for e in self.recent) or '<div class="sr-note">Waiting for the first results…</div>'
 
@@ -338,7 +359,25 @@ class LabelRun:
             if not _review_ok(row):
                 res = {"ok": True, "entry": {"status": "skipped_empty"}}
             else:
-                res = {"ok": True, "entry": {"status": "ok", **self._label(row)}}
+                tr = {}
+                th = None
+                if self._needs_translation(job):          # translate while the label request is running
+                    def run_tr():
+                        try:
+                            tr["text"] = self._translate(row["review"])
+                        except Exception as e:             # a failed translation never costs us the label
+                            tr["error"] = f"{type(e).__name__}: {e}"
+                    th = threading.Thread(target=run_tr, daemon=True)
+                    th.start()
+                label = self._label(row)
+                if th:
+                    th.join()
+                entry = {"status": "ok", "language": job["lang"], **label}
+                if self._needs_translation(job):
+                    entry["translation_en"] = tr.get("text")
+                    if "error" in tr:
+                        entry["translation_error"] = tr["error"][:200]
+                res = {"ok": True, "entry": entry}
         except Exception as e:
             res = {"ok": False, "error": f"{type(e).__name__}: {e}"}
         res["job"] = job
@@ -390,7 +429,7 @@ class LabelRun:
         y_cols = y_leg + 44
         y_latest = y_cols + 16 + 150
         n_feed = len(self.recent)
-        H = y_latest + 24 + max(n_feed, 1) * 40 + (30 if self.state["skipped"] else 0) + 24
+        H = y_latest + 24 + max(n_feed, 1) * 52 + (30 if self.state["skipped"] else 0) + 24
 
         fig = Figure(figsize=(W / 100, H / 100), dpi=100, facecolor=C["surface"])
         ax = fig.add_axes([0, 0, 1, 1])
@@ -403,8 +442,8 @@ class LabelRun:
             ax.add_patch(p)
             return p
 
-        def text(x, y, t, size=9, color=C["tx"], weight="normal", ha="left"):
-            ax.text(x, y, t, fontsize=size, color=color, fontweight=weight, ha=ha, va="baseline")
+        def text(x, y, t, size=9, color=C["tx"], weight="normal", ha="left", style="normal"):
+            ax.text(x, y, t, fontsize=size, color=color, fontweight=weight, ha=ha, va="baseline", fontstyle=style)
 
         def bar(x, y, w, h, frac):
             base = box(x, y, w, h, C["panel"], r=h)
@@ -513,11 +552,14 @@ class LabelRun:
         if not self.recent:
             text(M, y_latest + 30, "No new reviews labeled in this run.", 8.5, C["tx2"])
         for i, e in enumerate(self.recent):
-            y = y_latest + 14 + i * 40
-            box(M, y, IW, 32, C["panel"], r=10)
+            y = y_latest + 14 + i * 52
+            box(M, y, IW, 44, C["panel"], r=10)
             text(M + 14, y + 20, _SHORT.get(e["game"], e["game"][:6]), 7, C["tx2"], weight="bold")
             review = " ".join(str(e["_review"]).split())
             text(M + 70, y + 20, review if len(review) <= 105 else review[:105] + "…", 8)
+            tr = " ".join(str(e.get("translation_en") or "").split())
+            if tr:
+                text(M + 70, y + 35, "EN · " + (tr if len(tr) <= 100 else tr[:100] + "…"), 7.5, C["tx2"], style="italic")
             bx = W - M - 14
             for label, v in (("irony", e.get("irony")), ("toxicity", e.get("harm_mention"))):
                 t = f"{label} {v}"
@@ -581,7 +623,7 @@ class LabelRun:
         ])
         labels = pd.DataFrame([self.results[j["key"]] for j in self.jobs if j["key"] in self.results])
         out = labels.merge(meta, on="key")
-        cols = ["key", "idx", "game", "recommendation", "review", "status",
+        cols = ["key", "idx", "game", "language", "recommendation", "review", "translation_en", "status",
                 "harm_mention", "harm_reason", "irony", "irony_reason",
                 "gender_age", "gender_age_reason", "model"]
         out = out[[c for c in cols if c in out.columns]]
