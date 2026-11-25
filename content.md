@@ -23,6 +23,8 @@ Richard, Josh, Ghif
 
 We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity mentions, irony, and references to gender or age. Gemini does the labeling from a written codebook, and two human annotators check the codebook first. The full run is still in progress, so this page reports the design and the validation so far, not final results.
 
+:::demo labeling
+
 > How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?
 
 ## Question and motivation | Question
@@ -64,8 +66,6 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - The project codebook is the system prompt. Each review goes in a separate request with its game and its Recommended / Not recommended flag.
 - Output is structured JSON: `harm_mention` (yes, no, uncertain), `irony` (yes, no, uncertain), `gender_age` (none, gender, age, both, uncertain), and a short English reason for each.
 - The run uses 8 parallel requests, retries on temporary Google errors (429, 500, 503, 504) with backoff, and saves every finished label right away. A re-run skips what is already saved.
-
-:::demo labeling
 
 ### Comparisons
 - Gemini labels against the human annotators on the pilot cases.

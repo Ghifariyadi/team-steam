@@ -169,7 +169,9 @@
   }
 
   /* labeling demo (content.md: ":::demo labeling") */
-  .demo { --hit: #2b78d0; --unc: #d8591a; --neg: #6d6d6d; margin: 28px 0; }
+  .hero-extra { margin: 0 0 36px; }
+  .demo { --good: #0aac23; --crit: #dc3c3d; --warn: #fbb315; margin: 28px 0; }
+  .hero-extra .demo { margin: 0; }
   .demo .d-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 14px; }
   @media (max-width: 760px) { .demo .d-stage { grid-template-columns: 1fr; } }
   .demo .d-card { background: rgba(255, 255, 255, .62); border: 1px solid var(--edge); border-radius: 14px; padding: 16px 18px; min-width: 0; }
@@ -177,6 +179,7 @@
   .demo .d-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
   .demo .d-tag { font-size: 12px; line-height: 1.4; border: 1px solid var(--edge); border-radius: 999px; padding: 2px 10px; color: var(--soft); }
   .demo .d-review { font-size: 17px; line-height: 1.5; min-height: 6em; margin: 0; overflow-wrap: anywhere; }
+  .demo .d-oq, .demo .d-cq { color: var(--soft); }
   .demo .d-review.d-caret::after { content: ""; display: inline-block; width: 2px; height: 1.05em; background: var(--ink); margin-left: 2px; vertical-align: -.15em; animation: blink 1s steps(1) infinite; }
   .demo mark { background: linear-gradient(rgba(251, 179, 21, .55), rgba(251, 179, 21, .55)) 0 88% / 100% 55% no-repeat; color: inherit; padding: 0 2px; animation: d-mark .6s ease-out both; }
   .demo .d-rows { display: grid; }
@@ -185,18 +188,26 @@
   .demo .d-box { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--edge); display: grid; place-items: center; margin-top: 2px; transition: background .25s, border-color .25s; }
   .demo .d-row.busy .d-box { border-color: var(--ink); }
   .demo .d-row.busy .d-box::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--edge); border-top-color: var(--ink); animation: d-spin .7s linear infinite; }
-  .demo .d-row.done .d-box { background: var(--ink); border-color: var(--ink); }
+  .demo .d-row.done .d-box { border-color: transparent; }
+  .demo .d-row.ok .d-box { background: var(--good); }
+  .demo .d-row.bad .d-box { background: var(--crit); }
+  .demo .d-row.unc .d-box { background: var(--warn); }
   .demo .d-box svg { width: 16px; height: 16px; display: none; }
   .demo .d-row.done .d-box svg { display: block; }
-  .demo .d-box path { stroke: #f0f0ef; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; }
+  .demo .d-box path { stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; stroke-dashoffset: 30; display: none; }
+  .demo .d-row.unc .d-box path { stroke: #161616; }
+  .demo .d-row.ok .d-box .p-ok, .demo .d-row.bad .d-box .p-bad, .demo .d-row.unc .d-box .p-unc { display: inline; }
   .demo .d-row.done .d-box path { animation: d-draw .35s ease-out forwards; }
   .demo .d-q { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
   .demo .d-q strong { font-weight: 600; font-size: 15px; }
   .demo .d-q code { font: 500 12px/1 var(--mono); color: var(--soft); background: none; padding: 0; }
-  .demo .d-verdict { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 13px; border: 1px solid var(--edge); border-radius: 999px; padding: 2px 11px 2px 9px; opacity: 0; transform: scale(.9); transition: opacity .3s, transform .3s; margin-left: auto; }
-  .demo .d-verdict i { width: 9px; height: 9px; border-radius: 50%; background: var(--neg); display: inline-block; }
-  .demo .d-verdict.hit i { background: var(--hit); }
-  .demo .d-verdict.unc i { background: var(--unc); }
+  .demo .d-verdict { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 13px; border: 1px solid var(--edge); border-radius: 999px; padding: 2px 11px; opacity: 0; transform: scale(.9); transition: opacity .3s, transform .3s; margin-left: auto; }
+  .demo .d-verdict.ok { border-color: var(--good); }
+  .demo .d-verdict.bad { border-color: var(--crit); }
+  .demo .d-verdict.unc { border-color: var(--warn); }
+  .demo .d-verdict .g { font-weight: 700; }
+  .demo .d-verdict.ok .g { color: #0a8a1d; }
+  .demo .d-verdict.bad .g { color: var(--crit); }
   .demo .d-row.done .d-verdict { opacity: 1; transform: none; }
   .demo .d-why { margin: 6px 0 0; font-size: 14px; line-height: 1.5; color: var(--soft); min-height: 3em; }
   .demo .d-human { margin: 4px 0 0; font: 500 12px/1.4 var(--mono); color: var(--soft); min-height: 1.4em; }
@@ -229,6 +240,7 @@
   <p class="byline" id="byline" hidden></p>
   <h1 id="title">Loading…</h1>
   <p class="lede" id="lede" hidden></p>
+  <div class="hero-extra" id="hero-extra" hidden></div>
   <div class="ask" id="ask" hidden>
     <p class="ask-label">Research question</p>
     <p class="sr" id="ask-full"></p>
@@ -380,7 +392,7 @@ function render(md) {
     nav.push({ id: id, title: sec.title, short: sec.short });
     html += '<section id="' + id + '"><h2>' + inline(sec.title) + '</h2>' + blocks(sec.lines) + '</section>';
   });
-  return { title: title, byline: introParas[0] || '', lede: introParas[1] || '', question: question, nav: nav, html: html };
+  return { title: title, byline: introParas[0] || '', lede: introParas[1] || '', extra: introParas.length > 2 ? blocks(introParas.slice(2).join('\n\n').split('\n')) : '', question: question, nav: nav, html: html };
 }
 /*MD-END*/
 
@@ -406,7 +418,7 @@ function initDemos(root) {
   [].forEach.call(root.querySelectorAll('.demo[data-demo="labeling"]'), function (host) {
     host.innerHTML =
       '<div class="d-stage">' +
-        '<div class="d-card" role="group" aria-label="Review"><p class="d-eyebrow">Review sent to the model</p><div class="d-meta"></div><p class="d-review d-caret"></p></div>' +
+        '<div class="d-card" role="group" aria-label="Review"><p class="d-eyebrow">Review sent to the model</p><div class="d-meta"></div><p class="d-review d-caret"><span class="d-oq">\u201c</span><span class="d-t"></span><span class="d-cq"></span></p></div>' +
         '<div class="d-card" role="group" aria-label="Labels"><p class="d-eyebrow">Codebook checklist</p><div class="d-rows"></div></div>' +
       '</div>' +
       '<div class="d-ctl"><button class="d-btn d-toggle" type="button">Pause</button><button class="d-btn d-replay" type="button">Replay</button>' +
@@ -415,14 +427,14 @@ function initDemos(root) {
       '<div class="sr" aria-live="polite"></div>';
 
     var q = function (s) { return host.querySelector(s); };
-    var reviewEl = q('.d-review'), meta = q('.d-meta'), rowsEl = q('.d-rows'), live = q('.sr'), dotsEl = q('.d-dots');
+    var reviewEl = q('.d-review'), textEl = q('.d-t'), closeEl = q('.d-cq'), meta = q('.d-meta'), rowsEl = q('.d-rows'), live = q('.sr'), dotsEl = q('.d-dots');
     var paused = false, visible = true, runId = 0, current = 0;
 
     var rowEls = QUESTIONS.map(function (qq) {
       var r = document.createElement('div');
       r.className = 'd-row';
-      r.innerHTML = '<div class="d-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>' +
-        '<div><div class="d-q"><strong>' + qq.name + '</strong><code>' + qq.key + '</code><span class="d-verdict"><i></i><span class="vt"></span></span></div>' +
+      r.innerHTML = '<div class="d-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="p-ok" d="M5 12.5l4.5 4.5L19 7"/><path class="p-bad" d="M6.5 6.5l11 11M17.5 6.5l-11 11"/><path class="p-unc" d="M9.5 9a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1.9-1.1 1.8M12 17.5v.1"/></svg></div>' +
+        '<div><div class="d-q"><strong>' + qq.name + '</strong><code>' + qq.key + '</code><span class="d-verdict"><span class="g"></span><span class="vt"></span></span></div>' +
         '<p class="d-why"></p><p class="d-human"></p></div>';
       rowsEl.appendChild(r);
       return r;
@@ -461,12 +473,12 @@ function initDemos(root) {
     function reset(ex) {
       meta.innerHTML = '';
       [ex.game, ex.rec].forEach(function (t) { var s = document.createElement('span'); s.className = 'd-tag'; s.textContent = t; meta.appendChild(s); });
-      reviewEl.textContent = '';
+      textEl.textContent = ''; closeEl.textContent = '';
       reviewEl.classList.add('d-caret');
       rowEls.forEach(function (r) {
         r.className = 'd-row';
         r.querySelector('.d-why').textContent = ''; r.querySelector('.d-human').textContent = ''; r.querySelector('.vt').textContent = '';
-        r.querySelector('.d-verdict').className = 'd-verdict';
+        r.querySelector('.d-verdict').className = 'd-verdict'; r.querySelector('.g').textContent = '';
       });
       live.textContent = '';
     }
@@ -476,15 +488,16 @@ function initDemos(root) {
       dotEls.forEach(function (d, k) { d.setAttribute('aria-current', k === i ? 'true' : 'false'); });
       reset(ex);
       if (!(await wait(300, id))) return;
-      if (!(await typeInto(reviewEl, ex.text, id, 22))) return;
+      if (!(await typeInto(textEl, ex.text, id, 22))) return;
       reviewEl.classList.remove('d-caret');
+      closeEl.textContent = '\u201d';
       if (ex.hl) {
         var at = ex.text.indexOf(ex.hl);
         if (at >= 0) {
-          reviewEl.textContent = '';
-          reviewEl.appendChild(document.createTextNode(ex.text.slice(0, at)));
-          var m = document.createElement('mark'); m.textContent = ex.hl; reviewEl.appendChild(m);
-          reviewEl.appendChild(document.createTextNode(ex.text.slice(at + ex.hl.length)));
+          textEl.textContent = '';
+          textEl.appendChild(document.createTextNode(ex.text.slice(0, at)));
+          var m = document.createElement('mark'); m.textContent = ex.hl; textEl.appendChild(m);
+          textEl.appendChild(document.createTextNode(ex.text.slice(at + ex.hl.length)));
         }
       }
       if (!(await wait(700, id))) return;
@@ -493,8 +506,10 @@ function initDemos(root) {
         var row = rowEls[k], res = ex.out[k];   // [gemini, human, reason]
         row.classList.add('busy');
         if (!(await wait(850, id))) return;
-        row.classList.remove('busy'); row.classList.add('done');
-        row.querySelector('.d-verdict').className = 'd-verdict ' + (res[0] === 'yes' ? 'hit' : res[0] === 'uncertain' ? 'unc' : '');
+        var kind = res[0] === 'yes' ? 'ok' : res[0] === 'uncertain' ? 'unc' : 'bad';
+        row.classList.remove('busy'); row.classList.add('done', kind);
+        row.querySelector('.d-verdict').className = 'd-verdict ' + kind;
+        row.querySelector('.g').textContent = kind === 'ok' ? '\u2713 ' : kind === 'bad' ? '\u2717 ' : '? ';
         row.querySelector('.vt').textContent = 'Gemini: ' + res[0];
         said.push(QUESTIONS[k].key + ': ' + res[0]);
         live.textContent = said.join('. ');
@@ -558,6 +573,7 @@ if (typeof document !== 'undefined') {
       if (d.title) { document.title = d.title; $('title').textContent = d.title; $('brand').textContent = d.title; }
       if (d.byline) { $('byline').innerHTML = inline(d.byline); $('byline').hidden = false; }
       if (d.lede) { $('lede').innerHTML = inline(d.lede); $('lede').hidden = false; }
+      if (d.extra) { $('hero-extra').innerHTML = d.extra; $('hero-extra').hidden = false; initDemos($('hero-extra')); }
       if (d.question) {
         $('ask').hidden = false;
         $('ask-full').textContent = d.question;
