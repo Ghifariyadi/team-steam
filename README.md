@@ -1,245 +1,107 @@
-# Final project: [working title]
+# Irony and toxicity in Steam reviews
 
-Use this repository for your COMPSS 211A team project. Replace the bracketed
-prompts as your project develops. A reader should eventually be able to use
-this README to reproduce your work and use the project website to understand
-your question, evidence, interpretation, and limitations.
+Final project for COMPSS 211A (UC Berkeley). Website: **https://ghifariyadi.github.io/team-steam/**
 
 ## Project overview
 
-- **Research question:** [What are you trying to learn?]
-- **Team members:** [Names]
-- **Unit of analysis:** [What does one row or document represent?]
-- **Data source:** [Where do the data come from?]
-- **Main result:** [Complete this after the analysis.]
-- **Important limitation:** [Complete this as soon as you identify one.]
+- **Research question:** How often do Steam reviews of Counter-Strike 2, PUBG and GTA V mention toxicity or use irony, and can Gemini label them reliably from a written codebook?
+- **Team members:** Richard, Josh, Ghif
+- **Unit of analysis:** One Steam game review
+- **Data source:** KieranPoc's Kaggle Steam reviews dataset (`weighted_score_above_08.csv`), loaded with `kagglehub`. We keep three games: 7,365 reviews (7,363 have text and get a label). About 80% are not in English.
+- **Main result:** Gemini flags toxicity in **22.7%** of the reviews (after a rule that cheating complaints alone are not toxic) and irony in **25.0%**. Our first pass, without that rule, gave 47.5% for toxicity, and most of those were complaints about cheaters. Counter-Strike 2 has the most irony (32.9%).
+- **Important limitation:** These are Gemini's labels. We checked the codebook with two human annotators on a 90-review pilot (Cohen's kappa 0.845 for toxicity, 0.903 for irony), but we have not checked the full-run labels against humans, and not at all on non-English reviews. The cheating rule was written after we saw the first-pass results.
 
 ## Start here
 
-One teammate creates the repository from this template with **Use this
-template** on
-[macss-berkeley/compss-211a-project-template](https://github.com/macss-berkeley/compss-211a-project-template),
-then invites the other teammates as collaborators. The team should have only
-one shared project repository.
+Needs [`uv`](https://docs.astral.sh/uv/) and Python 3.13.
 
-Every teammate then:
+```bash
+uv sync --frozen
+```
 
-1. accepts the GitHub invitation;
-2. clones the repository with GitHub Desktop;
-3. opens the complete repository folder in VS Code;
-4. opens a terminal in that folder and runs:
+Then select the `.venv` environment as the Python interpreter and notebook kernel in VS Code.
 
-   ```bash
-   uv sync --frozen
-   ```
+Copy `.env.example` to `.env` and fill in one of the two backends:
 
-5. selects the `.venv` environment as the Python interpreter and notebook
-   kernel in VS Code.
+- **AI Studio:** `GEMINI_API_KEY=...`
+- **Vertex AI:** see **[docs/vertex-ai-setup.md](docs/vertex-ai-setup.md)** for the step-by-step setup.
 
-Use `uv sync --frozen --all-groups` only if your project needs the larger NLP
-packages used in the optional course materials. Ask the instructional team
-before adding a package or changing the environment files.
+Never commit `.env`.
 
-## What goes where?
+## What goes where
 
 ```text
 .
-├── README.md        project question, run order, and main findings
-├── docs/            final project website published with GitHub Pages
-├── notebooks/       exploration, analysis, figures, and explanations
-├── scripts/         repeated tasks that should run the same way each time
-├── data/            permitted small data files or data-access instructions
-├── pyproject.toml   readable Python and package requirements
-└── uv.lock          exact versions used by the team
+├── README.md        this file
+├── index.html       the project website (GitHub Pages)
+├── content.md       the text of the website; edit this to change the page
+├── notebooks/       analysis, in run order (below)
+├── scripts/         labeling code the notebooks call
+├── prompts/         the codebook and the cheating rule sent to Gemini
+├── data/            human labels, Gemini labels and caches
+├── docs/            setup notes (Vertex AI)
+├── pyproject.toml   Python and package requirements
+└── uv.lock          exact versions
 ```
 
-### Start in a notebook
+## Run order
 
-For most of this project, a notebook is the right place to work. Use a
-notebook when you are:
+1. `notebooks/kappa_test.ipynb` measures how well the two human annotators agree on the 90-review pilot (`data/blind_labelling_annotator_1.csv` and `_2.csv`).
+2. `notebooks/scale_up.ipynb` loads the dataset, tests Gemini on 10 reviews, and labels all reviews (first pass). Its last cells add the toxicity re-label summary. Output: `data/gemini_labels_gemini-3.5-flash-lite.csv`. Every finished label is cached in `data/gemini_full_*.jsonl`, so a re-run skips what is saved and costs nothing.
+3. `notebooks/harm_recheck.ipynb` re-asks Gemini about the 3,499 reviews labeled toxic, with the full codebook plus the cheating rule (`prompts/cheating_rule.txt`). Output: `data/gemini_harm_recheck_gemini-3.5-flash-lite.csv` and `.jsonl`. It does not change the first-pass files. Set `SAMPLE = 100` for a quick test, `None` for all.
+4. The website numbers come from the two CSVs above and are written into `index.html` and `content.md`.
 
-- exploring unfamiliar data;
-- trying a method for the first time;
-- inspecting tables, plots, or individual texts;
-- combining code, results, and written interpretation;
-- preparing an analysis that a reader should follow step by step.
+Scripts: `scripts/steam_labeling.py` runs the labeling (parallel requests, retries, cache). `scripts/harm_recheck.py` runs the toxicity re-check.
 
-Give notebooks numbered names so their order is visible, for example:
+### Prompts
 
-```text
-notebooks/01_explore_data.ipynb
-notebooks/02_prepare_text.ipynb
-notebooks/03_analyze_text.ipynb
-notebooks/04_make_figures.ipynb
-```
-
-Not every project needs four notebooks. Use only the files that make your work
-easier to understand.
-
-### Move a repeated task into a script
-
-A script is an ordinary Python file ending in `.py`. Create one when a step is
-settled and you need to run it the same way more than once. Good candidates
-include downloading data, cleaning raw files, or producing final tables and
-figures.
-
-For example:
-
-```text
-scripts/download_data.py
-scripts/prepare_data.py
-scripts/make_final_figures.py
-```
-
-Run a script from the repository folder:
-
-```bash
-uv run python scripts/prepare_data.py
-```
-
-Do not turn code into a script merely because it looks more professional. A
-short, readable notebook is better than a script nobody on the team
-understands. When you do create a script, first make the code work in a
-notebook, simplify it, and make sure another teammate can explain what it does.
-
-## Suggested project workflow
-
-A simple notebook-first workflow is:
-
-1. explore the data in `notebooks/01_explore_data.ipynb`;
-2. document the data source and sharing limits below;
-3. test cleaning and analysis steps in small notebook cells;
-4. move only stable, repeated tasks into `scripts/`;
-5. restart each important notebook and run it from top to bottom;
-6. record the final run order in this README;
-7. build the web report in `docs/index.md` from results you have verified.
-
-### Current run order
-
-Replace this example with your actual files:
-
-1. `[data-access step or script]`
-2. `[preparation notebook or script]`
-3. `[analysis notebook]`
-4. `[figure or table step]`
-
-## Working together with GitHub
-
-Do not do substantial project work directly on `main`. For each small task:
-
-1. switch to `main` in GitHub Desktop and **Fetch origin**;
-2. pull any new commits;
-3. create a short branch named for the task, such as `document-data-source` or
-   `add-first-figure`;
-4. make one focused change;
-5. inspect the changed files in GitHub Desktop;
-6. commit with a message that describes the result;
-7. publish the branch and open a pull request;
-8. ask a teammate to review it;
-9. merge only after the reviewer understands and approves the change;
-10. switch back to `main` and pull the merged commit.
-
-### Notebook rule
-
-Only one person should edit a particular notebook at a time. Before editing:
-
-- tell the team which notebook you are taking;
-- pull the latest `main` and create a branch;
-- keep the change focused and merge it promptly;
-- restart the notebook and run all cells before requesting review;
-- tell the team when the notebook is available again.
-
-Notebook files contain code, prose, outputs, and metadata, so simultaneous
-edits can produce conflicts that are hard to resolve safely. If a notebook
-conflict occurs, work with the other author and rerun the final notebook. Do
-not blindly choose “ours” or “theirs.”
-
-## Team agreements
-
-Complete this section during the repository-setup lab.
-
-- **Who may merge pull requests?** [Decision]
-- **Who currently owns each notebook?** [Decision]
-- **Where will the team record tasks?** [Decision]
-- **How will the team review code it did not write?** [Decision]
-- **What is the next task, and who owns it?** [Decision]
+- `prompts/codebook_exact.txt` is the system prompt for the first pass.
+- `prompts/cheating_rule.txt` is added after the full codebook in the second pass. The codebook itself is unchanged.
 
 ## Data and privacy
 
-- **Source and access method:** [URL, API, archive, or other source]
-- **Coverage:** [Dates, filters, sample, and exclusions]
-- **What may be committed:** [Small public files, derived files, or none]
-- **What must stay outside GitHub:** [Restricted, identifying, or large files]
-- **How a new reader can obtain or reconstruct the data:** [Instructions]
-
-Never commit passwords, API keys, tokens, `.env` files, private data, or files
-you do not have permission to share. The template ignores `data/raw/` and
-`data/private/`, but a `.gitignore` rule is not a substitute for checking every
-commit.
+- **Source and access method:** Kaggle dataset above, collected from the Steam reviews API, loaded with `kagglehub`.
+- **Coverage:** Counter-Strike 2 (3,017), PUBG: BATTLEGROUNDS (2,404), Grand Theft Auto V (1,944).
+- **What is committed:** the human pilot labels and Gemini's labels (review text, labels and short reasons). User IDs are not included.
+- **What stays out of GitHub:** `.env`, API keys, Google Cloud credentials, anything in `data/raw/` or `data/private/`.
+- **How to rebuild the data:** run `scale_up.ipynb`. It downloads the Kaggle file itself.
+- A yes label means the review text says it, not that the reviewer did it or that the event happened.
 
 ## Results and interpretation
 
-Complete this section as the analysis develops.
+| Game | Reviews | Toxicity, first pass | Toxicity, with cheating rule | Irony |
+|---|---:|---:|---:|---:|
+| Counter-Strike 2 | 3,017 | 49.9% | 27.9% | 32.9% |
+| Grand Theft Auto V | 1,944 | 39.7% | 16.8% | 19.7% |
+| PUBG: BATTLEGROUNDS | 2,402 | 50.9% | 20.8% | 19.4% |
+| All three | 7,363 | 47.5% | 22.7% | 25.0% |
 
-- **Main finding:** [Result with the relevant unit, count, or metric]
-- **Evidence:** [Notebook, figure, or table that supports it]
-- **Validation:** [Check, baseline, comparison, or inspected examples]
-- **Limitations:** [Where the evidence or method can fail]
-- **Strongest claim supported:** [A bounded conclusion]
-- **Claim not supported:** [A tempting conclusion the project cannot make]
+- **Evidence:** `notebooks/scale_up.ipynb` and `notebooks/harm_recheck.ipynb`.
+- **Validation:** Two annotators labeled 90 reviews blind (kappa above). Gemini matched the human label on 9 of 10 trial reviews for toxicity and 10 of 10 for irony, but those were all human-positive cases and the codebook was tuned on them, so this is a best case, not an accuracy estimate.
+- **Strongest claim supported:** On these three games, with this codebook and rule, Gemini labels about a fifth of reviews as toxic and a quarter as ironic.
+- **Claim not supported:** That Gemini is accurate on non-English reviews, or that 22.7% describes Steam as a whole.
 
 ## Final project website
 
-The website is your final written product and the surface your team will
-present from. You do not need to write a separate report or create a separate
-slide deck.
-
-Start with `docs/index.md`. The template asks for:
-
-- the research question and why it matters;
-- the data source, unit of analysis, coverage, and ethical considerations;
-- methods explained in clear language;
-- findings supported by readable figures or tables;
-- interpretation, limitations, and claims the evidence does not support;
-- reproducibility information and a link to the repository;
-- references.
-
-This is a web report, not a web-design assignment. Use the provided Markdown
-template and simple theme. You are graded on the quality of the research,
-evidence, interpretation, reproducibility, and communication—not on custom
-HTML, CSS, or JavaScript.
-
-### Publish with GitHub Pages
-
-1. Edit `docs/index.md` and save public-safe figures in `docs/assets/`.
-2. Push the finished work to `main` through the normal branch and pull-request
-   workflow.
-3. On GitHub, open **Settings → Pages**.
-4. Choose **Deploy from a branch**, select `main`, and select the `/docs`
-   folder.
-5. Open the published URL and check every section, image, and link.
-
-GitHub Pages sites are public. Do not publish restricted data, identifying
-information, credentials, or material you do not have permission to share.
-If the topic or data cannot be discussed safely on a public page, contact the
-instructional team early for a sanitized or offline alternative.
-
-Before presenting, print or export the website to PDF. This is only an
-archival copy and offline backup; it is not a separate report.
+The site is `index.html`, which reads `content.md` and renders it. To change the text, edit `content.md` and push to `main`. GitHub Pages updates in 1 to 2 minutes. The site is public, so do not put restricted data or credentials in either file.
 
 ## Before submitting
 
 - [ ] Every teammate can clone and open the repository.
 - [ ] `uv sync --frozen` creates the supported environment.
-- [ ] The README gives the actual run order.
+- [x] The README gives the actual run order.
 - [ ] Important notebooks run from top to bottom in a fresh kernel.
-- [ ] Scripts can be run from the repository folder with their documented
-      command.
-- [ ] The website includes the required research, evidence, interpretation,
-      limitation, reproducibility, and reference sections.
+- [ ] Scripts can be run from the repository folder with their documented command.
+- [ ] The website includes the required research, evidence, interpretation, limitation, reproducibility, and reference sections.
 - [ ] Figures and reported values match the notebooks and scripts.
 - [ ] The GitHub Pages URL works in a signed-out browser.
 - [ ] A PDF snapshot of the website is ready as a presentation backup.
-- [ ] The data source, exclusions, and sharing limits are documented.
+- [x] The data source, exclusions, and sharing limits are documented.
 - [ ] No credentials, restricted data, or accidental large files are present.
 - [ ] The final contribution of each team member is recorded.
+
+### Project to-do
+
+- [ ] Check Gemini against a human on a random sample of the full run, including non-English reviews.
+- [ ] Decide whether to keep or drop the gender and age label (the website still mentions it in the question and the intro).
+- [ ] Have a teammate read the 161 non-cheating reviews that changed in the re-check (see `data/gemini_harm_recheck_*.csv`, where `harm_mention_v2` is `no` and the review does not mention cheating).
