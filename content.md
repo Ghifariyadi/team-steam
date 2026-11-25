@@ -25,6 +25,8 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 
 :::demo labeling
 
+:::demo stats
+
 > How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?
 
 ## Question and motivation | Question
