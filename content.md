@@ -86,19 +86,19 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 ## Findings
 
 - **Gemini labeled every review.** 7,363 of the 7,365 reviews got a label with no failures. The other 2 were empty and skipped. The run took 46 minutes.
-- **Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%** (of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.
+- **Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%** (1,669 and 1,843 of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. The re-check turned 1,829 of the 3,499 to no and left 1,669 as yes, and 1 as uncertain. About 1,670 of those changes were reviews that mention cheating. The other 161 were reviews without cheating that Gemini no longer counted as toxic on the second look, often single-word or joke reviews. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.
 - **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity with the cheating rule, Counter-Strike 2 is highest (27.9%), then PUBG (20.8%) and GTA V (16.8%). The first pass put PUBG and Counter-Strike 2 level near 50%, so the cheating rule moved PUBG the most.
-- **In the first pass, reviews that do not recommend the game were flagged for toxicity more often:** 65.3% of the 2,369 "Not recommended" reviews, against 39.1% of the 4,994 "Recommended" ones. We have not recomputed this with the cheating rule. This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
+- **Reviews that do not recommend the game are flagged for toxicity more often:** 28.4% of the 2,369 "Not recommended" reviews, against 19.9% of the 4,994 "Recommended" ones. In the first pass the gap was larger (65.3% against 39.1%). This is an association between Gemini's labels and the recommendation flag, not evidence of cause.
 - **These labels are Gemini's, and they are not checked against humans on this data yet.** The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot's 10% toxicity rate cannot be compared with the full-run rate.
 - **Human agreement on the pilot is high.** Toxicity kappa is 0.845 and irony kappa is 0.903. This was measured before the cheating rule was added.
 - **Gemini matched the human label on 9 of 10 trial reviews for toxicity and on 10 of 10 for irony.** The trial reviews were all human-positive and the codebook was tuned on the same cases, so this is a best case and not an accuracy estimate.
 
 | Game | Reviews labeled | Toxicity yes, first pass | Toxicity yes, with cheating rule | Irony yes |
 |---|---:|---:|---:|---:|
-| Counter-Strike 2 | 3,017 | 1,505 (49.9%) | 27.9% | 993 (32.9%) |
-| Grand Theft Auto V | 1,944 | 772 (39.7%) | 16.8% | 383 (19.7%) |
-| PUBG: BATTLEGROUNDS | 2,402 | 1,222 (50.9%) | 20.8% | 467 (19.4%) |
-| All three | 7,363 | 3,499 (47.5%) | 22.7% | 1,843 (25.0%) |
+| Counter-Strike 2 | 3,017 | 1,505 (49.9%) | 843 (27.9%) | 993 (32.9%) |
+| Grand Theft Auto V | 1,944 | 772 (39.7%) | 326 (16.8%) | 383 (19.7%) |
+| PUBG: BATTLEGROUNDS | 2,402 | 1,222 (50.9%) | 500 (20.8%) | 467 (19.4%) |
+| All three | 7,363 | 3,499 (47.5%) | 1,669 (22.7%) | 1,843 (25.0%) |
 Table: Table 1. Gemini's labels by game. "Yes" counts only yes answers, not uncertain ones.
 
 | Check | N | Agreement | Cohen's kappa |
