@@ -25,6 +25,52 @@ TYPES = ["identity_attack", "personal_insult", "threat", "profanity", "sexual_ha
 GROUPS = ["none", "ethnicity_nationality", "gender", "sexuality", "religion", "age", "disability", "other"]
 TARGETS = ["teammate", "opponent", "player_general", "nationality_group", "developer", "other"]
 
+# Plain-English names for the tables (the codes above are only what Gemini returns)
+TYPE_LABELS = {
+    "identity_attack": "Attack on who someone is (nationality, gender, etc.)",
+    "personal_insult": "Insult at a person (skill, brain, character)",
+    "threat": "Threat or wishing harm",
+    "profanity": "Swearing, not aimed at anyone",
+    "sexual_harassment": "Sexual harassment",
+    "griefing_trolling": "Griefing or trolling",
+    "toxic_community": "Toxic community in general",
+    "other": "Other",
+}
+TARGET_LABELS = {
+    "player_general": "Players in general",
+    "nationality_group": "A nationality or group",
+    "developer": "The developer",
+    "teammate": "Teammates",
+    "opponent": "Opponents",
+    "other": "Other",
+}
+GROUP_LABELS = {
+    "ethnicity_nationality": "Ethnicity or nationality",
+    "gender": "Gender",
+    "sexuality": "Sexuality",
+    "religion": "Religion",
+    "age": "Age",
+    "disability": "Disability",
+    "other": "Other group",
+    "none": "(not an identity attack)",
+}
+
+
+def examples(sub, n=2, max_len=60, seed=3):
+    """Pick up to n short, readable examples from a table of evidence rows.
+    English quotes come first. Other languages are shown with their English meaning."""
+    sub = sub[sub["quote"].str.len().between(4, max_len)].drop_duplicates("quote")
+    if sub.empty:
+        return ""
+    eng = sub[sub["language"] == "english"]
+    pick = eng.sample(min(n, len(eng)), random_state=seed) if len(eng) >= n else pd.concat(
+        [eng, sub.drop(eng.index).sample(min(n - len(eng), len(sub) - len(eng)), random_state=seed)])
+    out = []
+    for _, r in pick.iterrows():
+        out.append(f'"{r["quote"]}"' if r["language"] == "english" else f'"{r["quote"]}" ({r["meaning_en"]})')
+    return "  |  ".join(out)
+
+
 SCHEMA = {
     "type": "object",
     "properties": {
