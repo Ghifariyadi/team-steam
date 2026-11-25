@@ -85,6 +85,7 @@
   .mq-track span:nth-child(5n) { color: var(--soft); }
 
   .ask { text-align: left; margin-top: 28px; padding: 22px 26px 20px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 22px; background: linear-gradient(160deg, rgba(58, 143, 196, .2), rgba(255, 255, 255, .03) 62%), #0a1117; animation: rise .8s var(--ease) .4s both; }
+  .hero-extra .ask { margin: 0 0 18px; }
   .ask-label { margin: 0 0 10px; font: 600 11.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
   .ask-text { margin: 0; min-height: 3.6em; font: 500 clamp(1.1rem, 2.2vw, 1.5rem)/1.45 var(--disp); letter-spacing: -.015em; color: var(--hi); }
   .caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -.18em; background: var(--teal); animation: blink 1.05s steps(1) infinite; }
@@ -514,7 +515,7 @@ function initDemos(root) {
             ['no', 'no', 'There is no identifiable ironic mechanism present.']] },
     { game: 'Counter-Strike 2', rec: 'Recommended',
       text: 'get ready to be cursed by angry iranians and becoming deaf from bad microphones and also annoyed by hackers. i give it addicting shiet out of 10',
-      hl: 'iranians',
+      hl: 'angry iranians',
       out: [['yes', 'yes', 'The review explicitly mentions hackers, which counts as cheating complaints under toxicity.'],
             ['yes', 'yes', 'The reviewer recommends a game they describe as causing deafness, curses, and hacker annoyance, calling it addicting shiet.']] }
   ];
@@ -681,6 +682,8 @@ if (typeof document !== 'undefined') {
       if (d.lede) { $('lede').innerHTML = inline(d.lede); $('lede').hidden = false; }
       if (d.extra) { $('hero-extra').innerHTML = d.extra; $('hero-extra').hidden = false; initDemos($('hero-extra')); }
       if (d.question) {
+        var lab = $('hero-extra').querySelector('.demo[data-demo="labeling"]');
+        if (lab) lab.parentNode.insertBefore($('ask'), lab.nextSibling);
         $('ask').hidden = false;
         $('ask-full').textContent = d.question;
         setTimeout(function () { typeInto($('ask-typed'), d.question); }, reduce ? 0 : 700);
