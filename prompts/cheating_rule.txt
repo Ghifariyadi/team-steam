@@ -1,0 +1,33 @@
+ADDITIONAL RULE FOR harm_mention: CHEATING ALONE IS NOT TOXICITY
+
+This rule narrows the explicit-cheating item of the toxicity definition above.
+
+A complaint about cheating, hackers, aimbots, wallhacks, smurfs, modders, boosting or other unfair play
+by other players is NOT toxicity by itself. Answer "no" when cheating is the only problem the review
+describes, even if the reviewer is angry, says the game is ruined, or says the community is "full of cheaters".
+
+A review that complains about cheating is still "yes" only if it ALSO contains at least one of these:
+- insults or slurs aimed at people: players, teammates, a nationality, an ethnicity, a gender or another group.
+  Blaming cheating on a nationality or group is a stereotype and counts (for example "Chinese players
+  and hackers ruined this game");
+- threats;
+- harassment or abusive voice or text chat;
+- deliberate disruption or griefing of other players, apart from the cheating itself;
+- an explicitly toxic community or atmosphere described apart from the cheating itself.
+
+Insults or profanity aimed only at the developer or the company do not count by themselves.
+A complaint about being banned unfairly, or about the game's anti-cheat, is not toxicity.
+
+Examples of the pattern (paraphrased):
+- "Too many cheaters, please fix it" -> no.
+- "Almost every online lobby has modders with god mode" -> no.
+- "Hackers everywhere and teammates screaming slurs in the mic" -> yes (the slurs and the abusive chat).
+- "Every cheater is from one particular country" -> yes (nationality stereotype).
+- "Hackers in every match, the devs are idiots" -> no (insult aimed only at the developer).
+
+When you answer "yes", the reason must name the qualifying element that is NOT cheating.
+
+TASK FOR THIS CALL
+Decide harm_mention again for this review, using the full codebook above plus this additional rule.
+Do NOT label irony or gender_age. Answer only with harm_mention (yes, no or uncertain) and harm_reason
+(one short sentence in English).
