@@ -260,31 +260,31 @@
   .st .lr .fl.en { background: #f6d365; }
   .st .lr .ct { text-align: right; font: 500 12.5px/1 var(--mono); color: #d3dee4; font-variant-numeric: tabular-nums; }
   .st.on .lr .fl { width: var(--w); }
-  .st .kr { position: relative; display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
-  .st .kr svg { flex: none; }
-  .st .kc { position: absolute; left: 0; top: 0; width: 112px; height: 112px; display: grid; place-items: center; }
-  .st .kc b { font: 800 23px/1 var(--disp); letter-spacing: -.03em; color: var(--hi); font-variant-numeric: tabular-nums; }
-  .st .kt strong { display: block; font: 700 17px/1.2 var(--sans); color: var(--hi); }
-  .st .kt small { display: block; margin: 3px 0 9px; font-size: 13.5px; line-height: 1.4; color: var(--soft); }
   .st .chip { display: inline-block; padding: 3px 10px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px; background: rgba(255, 255, 255, .05); font: 500 12px/1.4 var(--mono); color: #cfdbe2; }
-  .st .kd { margin-bottom: 22px; }
-  .st .kd-h { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 12px; }
-  .st .kd-h b { font: 800 46px/1 var(--disp); letter-spacing: -.04em; background: linear-gradient(135deg, #fff, #c4e3f0); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
-  .st .kd-h strong { display: block; font: 700 16px/1.2 var(--sans); color: var(--hi); }
-  .st .kd-h small { display: block; font-size: 13px; color: var(--soft); }
-  .st .kd-h .chip { margin-left: auto; }
+  .st .kx { margin-bottom: 20px; }
+  .st .kx-h { display: grid; margin-bottom: 12px; min-height: 66px; }
+  .st .kx-h > span { grid-area: 1 / 1; transition: opacity .5s, transform .5s; }
+  .st .kx-h b { display: block; font: 800 46px/1 var(--disp); letter-spacing: -.04em; background: linear-gradient(135deg, #fff, #c4e3f0); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+  .st .kx-h small { display: block; margin-top: 5px; font-size: 13px; line-height: 1.35; color: var(--soft); }
+  .st .kx-k { opacity: 0; transform: translateY(8px); }
+  .st .kx-k b { background: linear-gradient(135deg, #fff, var(--c)); -webkit-background-clip: text; background-clip: text; }
+  .st[data-s="3"] .kx-a { opacity: 0; transform: translateY(-8px); }
+  .st[data-s="3"] .kx-k { opacity: 1; transform: none; }
   .st .dg { display: flex; flex-wrap: wrap; gap: 4px; }
-  .st .dg i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .08); transition: background .3s calc(var(--k) * 14ms), box-shadow .3s calc(var(--k) * 14ms), transform .3s calc(var(--k) * 14ms); transform: scale(.6); }
-  .st.on .dg i { background: var(--c); box-shadow: 0 0 8px var(--c); transform: none; }
-  .st.on .dg i.x { background: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
-  .st .kn { margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
-  .st .ring { transition: stroke-dasharray 1.6s var(--ease); }
-  .st .wf-l { margin: 0 0 8px; font-size: 13px; font-weight: 700; }
-  .st .wf { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin-bottom: 18px; }
-  .st .wf i { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, .08); opacity: 0; transition: opacity .3s calc(var(--k) * 12ms), background .3s; }
-  .st.on .wf i { opacity: 1; }
-  .st.on .wf i.t { background: #e9a04f; box-shadow: 0 0 10px rgba(233, 160, 79, .7); }
-  .st.on .wf i.r { background: #4a9be8; box-shadow: 0 0 10px rgba(74, 155, 232, .7); }
+  .st .dg i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .08); transform: scale(.65); transition: background .4s calc(var(--k) * 9ms), box-shadow .4s calc(var(--k) * 9ms), transform .4s calc(var(--k) * 9ms); }
+  .st[data-s="1"] .dg i.c, .st[data-s="1"] .dg i.b { background: var(--c); box-shadow: 0 0 8px var(--c); transform: none; }
+  .st[data-s="2"] .dg i.b, .st[data-s="3"] .dg i.b { background: var(--c); box-shadow: 0 0 10px var(--c); transform: none; }
+  .st[data-s="2"] .dg i.c, .st[data-s="3"] .dg i.c { background: #3d4f5c; box-shadow: none; transform: none; }
+  .st[data-s="1"] .dg i.x, .st[data-s="2"] .dg i.x, .st[data-s="3"] .dg i.x { background: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; transform: none; }
+  .st[data-s="3"] .dg i.b { animation: kpulse 1.4s ease-in-out infinite; }
+  @keyframes kpulse { 50% { transform: scale(1.35); } }
+  .st .kl { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 14px; font-size: 12px; color: var(--soft); }
+  .st .kl span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 0; }
+  .st .kl .l1::before { background: #5cd1bf; }
+  .st .kl .l2::before { background: #3d4f5c; }
+  .st .kl .l3::before { background: #ff6b6b; }
+  .st .kn { min-height: 5.6em; margin: 0 0 10px; font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+  .st .kf { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--dim); }
   .st.nt h4 { margin: 0 0 8px; font: 800 26px/1.1 var(--disp); letter-spacing: -.02em; color: var(--gold); }
   .st.nt p { margin: 0 0 10px; font-size: 15px; color: var(--soft); }
   @media (prefers-reduced-motion: reduce) {
@@ -487,26 +487,27 @@ function initStats(root) {
       var w = (l[2] / max * 100).toFixed(1);
       return '<div class="lr"><span class="nm">' + l[0] + (l[1] ? '<em>' + l[1] + '</em>' : '') + '</span><span class="tr"><span class="fl' + (i === 1 ? ' en' : '') + '" style="--w:' + w + '%;--c:' + RAMP[i] + ';--dl:' + (i * 70) + 'ms"></span></span><span class="ct">' + l[2].toLocaleString('en-US') + '</span></div>';
     }).join('');
-    var KAPPA = (new URLSearchParams(location.search).get('k') || 'a').toLowerCase();
-    var C = 2 * Math.PI * 44;
-    /* [label, color, n reviews, n agree, percent, kappa, positions of disagreements] */
-    var AGREE = [['Toxicity', '#5cd1bf', 89, 87, 97.8, 0.845, [31, 64]], ['Irony', '#e9a04f', 83, 82, 98.8, 0.903, [47]]];
-    function gauge(r) {
-      return '<div class="kr"><svg width="112" height="112" viewBox="0 0 104 104" aria-hidden="true"><defs><linearGradient id="kg-' + r[0] + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + r[1] + '"/><stop offset="1" stop-color="#7fb8d6"/></linearGradient></defs>' +
-        '<circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>' +
-        '<circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="1.2 6.5" transform="scale(.8) translate(13 13)"/>' +
-        '<circle class="ring" data-d="' + (C * r[4] / 100).toFixed(1) + '" cx="52" cy="52" r="44" fill="none" stroke="url(#kg-' + r[0] + ')" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ' + C.toFixed(1) + '" transform="rotate(-90 52 52)" style="filter:drop-shadow(0 0 6px ' + r[1] + '99)"/></svg>' +
-        '<div class="kc"><b><span class="cu" data-to="' + r[4] + '">0.0</span>%</b></div>' +
-        '<div class="kt"><strong>' + r[0] + '</strong><small>' + r[3] + ' of ' + r[2] + ' reviews labeled the same by both annotators</small><span class="chip">kappa ' + r[5].toFixed(3) + '</span></div></div>';
-    }
-    function dots(r) {
+    /* Chance-corrected agreement, from data/blind_labelling_annotator_*.csv (cleaned yes/no):
+       [label, color, n, agree, % agree, kappa, chance share, dots expected by luck, dots beyond luck, dots disagreed] */
+    var AGREE = [['Toxicity', '#5cd1bf', 89, 87, 97.8, 0.845, 85.5, 76, 11, 2], ['Irony', '#e9a04f', 83, 82, 98.8, 0.903, 87.6, 73, 9, 1]];
+    function kx(r) {
       var d = '';
-      for (var i = 0; i < r[2]; i++) d += '<i' + (r[6].indexOf(i) > -1 ? ' class="x"' : '') + ' style="--k:' + i + ';--c:' + r[1] + '"></i>';
-      return '<div class="kd"><div class="kd-h"><b><span class="cu" data-to="' + r[4] + '">0.0</span>%</b><span><strong>' + r[0] + '</strong><small>' + r[3] + ' of ' + r[2] + ' reviews agree</small></span><span class="chip">kappa ' + r[5].toFixed(3) + '</span></div><div class="dg" role="img" aria-label="' + r[3] + ' of ' + r[2] + ' reviews agree">' + d + '</div></div>';
+      for (var i = 0; i < r[2]; i++) d += '<i class="' + (i < r[7] ? 'c' : i < r[7] + r[8] ? 'b' : 'x') + '" style="--k:' + i + '"></i>';
+      return '<div class="kx" style="--c:' + r[1] + '"><div class="kx-h">' +
+        '<span class="kx-a"><b>' + r[4].toFixed(1) + '%</b><small>' + r[0] + ': same label on ' + r[3] + ' of ' + r[2] + '</small></span>' +
+        '<span class="kx-k"><b>' + r[5].toFixed(3) + '</b><small>' + r[0] + ' kappa \u2248 ' + r[8] + ' \u00f7 (' + r[8] + ' + ' + r[9] + ')</small></span></div>' +
+        '<div class="dg" role="img" aria-label="' + r[0] + ': ' + r[3] + ' of ' + r[2] + ' reviews agree, kappa ' + r[5].toFixed(3) + '">' + d + '</div></div>';
     }
-    var kappaTile = KAPPA === 'b'
-      ? '<div class="st k b"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(dots).join('') + '<p class="kn">Each dot is one pilot review. Red dots are the reviews where the annotators disagreed.</p></div>'
-      : '<div class="st k"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(gauge).join('') + '</div>';
+    var STAGES = [
+      'Two annotators labeled the same pilot reviews.',
+      'They gave the same label on almost every review.',
+      'But most reviews are a plain \u201cno\u201d for both, so roughly 85 to 88% of that agreement would happen by luck (grey).',
+      'Kappa only counts what luck cannot explain, the teal and red dots. For toxicity they matched on 11 of those 13, so kappa is about 0.85.'
+    ];
+    var kappaTile = '<div class="st k"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(kx).join('') +
+      '<div class="kl"><span class="l1">agreed beyond luck</span><span class="l2">agreed, luck would give this</span><span class="l3">disagreed</span></div>' +
+      '<p class="kn" aria-live="polite"></p>' +
+      '<p class="kf">Dots show proportions, not single reviews. Luck is the agreement you would expect if both annotators used their own yes/no rates at random.</p></div>';
     function waffle(n, cls, label, color) {
       var cells = '';
       for (var i = 0; i < 90; i++) cells += '<i' + (i < n ? ' class="' + cls + '"' : '') + ' style="--k:' + i + '"></i>';
@@ -520,12 +521,15 @@ function initStats(root) {
     var tile = [].slice.call(host.querySelectorAll('.st'));
     function fire(t) {
       t.classList.add('on');
-      [].forEach.call(t.querySelectorAll('.ring'), function (r) { r.setAttribute('stroke-dasharray', r.getAttribute('data-d') + ' ' + C.toFixed(1)); });
-      [].forEach.call(t.querySelectorAll('.cu'), function (el) {
-        var to = parseFloat(el.getAttribute('data-to')), t0 = null;
-        function tick(ts) { if (t0 === null) t0 = ts; var p = Math.min(1, (ts - t0) / 1400); el.textContent = (to * (1 - Math.pow(1 - p, 3))).toFixed(1); if (p < 1) requestAnimationFrame(tick); }
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.textContent = to.toFixed(1); else requestAnimationFrame(tick);
-      });
+      if (t.classList.contains('k')) kappaLoop(t);
+    }
+    function kappaLoop(t) {
+      var note = t.querySelector('.kn'), RMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var PLAN = [[0, 900], [1, 2400], [2, 3600], [3, 5200]];
+      function set(i) { t.setAttribute('data-s', i); note.textContent = STAGES[i]; }
+      if (RMq) { set(3); return; }
+      var k = 0;
+      (function step() { set(PLAN[k][0]); var ms = PLAN[k][1]; k = (k + 1) % PLAN.length; setTimeout(step, ms); })();
     }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { fire(e.target); io.unobserve(e.target); } }); }, { threshold: 0.25 });
