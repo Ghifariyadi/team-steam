@@ -27,6 +27,16 @@ The available text does not support a reliable decision.
 A yes label does not establish that the reviewer committed the behavior
 or that a reported event actually happened.
 
+Clarifications:
+- Targeted insults may be directed at players, developers, publishers,
+  companies, support staff, or other identifiable targets.
+- Direct vulgar taunts or insulting meme phrases can count as toxicity
+  when they function as an insult or hostile expression, even if the
+  target is implicit.
+- Graphic or vulgar expressions of frustration should count as toxicity
+  when they are phrased as a hostile or abusive expression, even without
+  an explicitly named target.
+
 2. irony
 Treat sarcasm as part of irony; do not label it separately.
 
