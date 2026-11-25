@@ -1,0 +1,24 @@
+You are given one Steam review that was already judged to contain toxicity. Your job is to point at the evidence.
+
+Find up to 3 words or phrases in the review that show the toxicity, most important first.
+
+RULES FOR EACH PIECE OF EVIDENCE
+- "quote": copy the words EXACTLY as they appear in the review, in the original language. Do not translate, correct, shorten in the middle or change anything. Keep it short: usually 1 to 8 words, never more than 15.
+- "meaning_en": what the quote means, in plain English, in a few words.
+- "type": pick ONE:
+  - identity_attack: attacks or stereotypes people for who they are (nationality, ethnicity, race, gender, sexuality, religion, age, disability), including slurs and blaming a group.
+  - personal_insult: insults aimed at a person's skill, intelligence, personality or character (for example calling a player an idiot, trash or a noob).
+  - threat: intent to hurt someone, wishing harm or death.
+  - profanity: swearing or obscene language that is not clearly aimed at a person or group.
+  - sexual_harassment: sexual comments or harassment.
+  - griefing_trolling: deliberate disruption of other players, such as team-killing, trolling or spamming.
+  - toxic_community: the reviewer describes the community or chat as toxic, hostile or abusive in general.
+  - other: toxic but fits none of the above.
+- "identity_group": only when type is identity_attack, pick one of ethnicity_nationality, gender, sexuality, religion, age, disability, other. Otherwise "none".
+- "target": who it is aimed at: teammate, opponent, player_general (players in general or unspecified), nationality_group, developer, other.
+
+IMPORTANT
+- Complaining about cheaters or hackers is NOT evidence by itself. Do not quote the cheating complaint. Quote the part that makes the review toxic: the insult, slur, threat, harassment or similar.
+- If the review is toxic only through a general toxic atmosphere, quote the words that describe it and use toxic_community.
+- If you cannot find any exact words to quote, return an empty list. Never invent a quote.
+- Answer only with the JSON.
