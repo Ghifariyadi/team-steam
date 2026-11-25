@@ -17,7 +17,7 @@ HOW TO EDIT THIS FILE (the website reads it automatically)
 - Anything in a comment like this one is hidden on the website.
 -->
 
-# Irony, gender and toxicity in Steam reviews
+# Irony and toxicity in Steam reviews
 
 Richard, Josh, Ghif
 
@@ -39,7 +39,6 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 ### Key terms
 - **Toxicity mention (`harm_mention`):** The review reports, condemns, endorses or expresses insults, threats, discrimination, deliberate disruption, explicit cheating complaints or a toxic community. Bugs, pricing complaints and profanity alone do not count.
 - **Irony (`irony`):** A supported ironic reading, including sarcasm: the literal evaluation contrasts with the intended one, or a described outcome mismatches the expectation. Humor or exaggeration alone does not count.
-- **Gender or age (`gender_age`):** An explicit reference to gender or age, including stereotypes, discrimination or self-identification. Identity is never inferred from names, playtime or writing style.
 
 ## Data
 
@@ -89,9 +88,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 |---|---:|---:|---:|
 | Human vs human, toxicity | 89 | 97.8% | 0.845 |
 | Human vs human, irony | 83 | 98.8% | 0.903 |
-| Gemini vs human, toxicity (trial) | 10 | 90% | not computed |
-| Gemini vs human, irony (trial) | 10 | 100% | not computed |
-Table: Table 1. Agreement checks so far. Human pairs count the pilot reviews both annotators labeled. The Gemini trial is a non-random sample.
+Table: Table 1. Agreement checks so far. Human pairs count the pilot reviews both annotators labeled.
 
 ## Interpretation
 

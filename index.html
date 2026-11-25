@@ -260,11 +260,25 @@
   .st .lr .fl.en { background: #f6d365; }
   .st .lr .ct { text-align: right; font: 500 12.5px/1 var(--mono); color: #d3dee4; font-variant-numeric: tabular-nums; }
   .st.on .lr .fl { width: var(--w); }
-  .st .kr { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .st .kr { position: relative; display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
   .st .kr svg { flex: none; }
-  .st .kr .ring { transition: stroke-dasharray 1.6s var(--ease); }
-  .st .kr b { display: block; font: 800 40px/1 var(--disp); letter-spacing: -.03em; color: var(--hi); }
-  .st .kr small { font-size: 14px; color: var(--soft); }
+  .st .kc { position: absolute; left: 0; top: 0; width: 112px; height: 112px; display: grid; place-items: center; }
+  .st .kc b { font: 800 23px/1 var(--disp); letter-spacing: -.03em; color: var(--hi); font-variant-numeric: tabular-nums; }
+  .st .kt strong { display: block; font: 700 17px/1.2 var(--sans); color: var(--hi); }
+  .st .kt small { display: block; margin: 3px 0 9px; font-size: 13.5px; line-height: 1.4; color: var(--soft); }
+  .st .chip { display: inline-block; padding: 3px 10px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px; background: rgba(255, 255, 255, .05); font: 500 12px/1.4 var(--mono); color: #cfdbe2; }
+  .st .kd { margin-bottom: 22px; }
+  .st .kd-h { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 12px; }
+  .st .kd-h b { font: 800 46px/1 var(--disp); letter-spacing: -.04em; background: linear-gradient(135deg, #fff, #c4e3f0); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+  .st .kd-h strong { display: block; font: 700 16px/1.2 var(--sans); color: var(--hi); }
+  .st .kd-h small { display: block; font-size: 13px; color: var(--soft); }
+  .st .kd-h .chip { margin-left: auto; }
+  .st .dg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .st .dg i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .08); transition: background .3s calc(var(--k) * 14ms), box-shadow .3s calc(var(--k) * 14ms), transform .3s calc(var(--k) * 14ms); transform: scale(.6); }
+  .st.on .dg i { background: var(--c); box-shadow: 0 0 8px var(--c); transform: none; }
+  .st.on .dg i.x { background: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
+  .st .kn { margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+  .st .ring { transition: stroke-dasharray 1.6s var(--ease); }
   .st .wf-l { margin: 0 0 8px; font-size: 13px; font-weight: 700; }
   .st .wf { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin-bottom: 18px; }
   .st .wf i { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, .08); opacity: 0; transition: opacity .3s calc(var(--k) * 12ms), background .3s; }
@@ -473,12 +487,26 @@ function initStats(root) {
       var w = (l[2] / max * 100).toFixed(1);
       return '<div class="lr"><span class="nm">' + l[0] + (l[1] ? '<em>' + l[1] + '</em>' : '') + '</span><span class="tr"><span class="fl' + (i === 1 ? ' en' : '') + '" style="--w:' + w + '%;--c:' + RAMP[i] + ';--dl:' + (i * 70) + 'ms"></span></span><span class="ct">' + l[2].toLocaleString('en-US') + '</span></div>';
     }).join('');
-    function ring(k, color, label) {
-      var C = 276.5;
-      return '<div class="kr"><svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true"><circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>' +
-        '<circle class="ring" data-d="' + (C * k).toFixed(1) + '" cx="52" cy="52" r="44" fill="none" stroke="' + color + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ' + C + '" transform="rotate(-90 52 52)"/></svg>' +
-        '<div><b>' + k.toFixed(3) + '</b><small>' + label + '</small></div></div>';
+    var KAPPA = (new URLSearchParams(location.search).get('k') || 'a').toLowerCase();
+    var C = 2 * Math.PI * 44;
+    /* [label, color, n reviews, n agree, percent, kappa, positions of disagreements] */
+    var AGREE = [['Toxicity', '#5cd1bf', 89, 87, 97.8, 0.845, [31, 64]], ['Irony', '#e9a04f', 83, 82, 98.8, 0.903, [47]]];
+    function gauge(r) {
+      return '<div class="kr"><svg width="112" height="112" viewBox="0 0 104 104" aria-hidden="true"><defs><linearGradient id="kg-' + r[0] + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + r[1] + '"/><stop offset="1" stop-color="#7fb8d6"/></linearGradient></defs>' +
+        '<circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>' +
+        '<circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="1.2 6.5" transform="scale(.8) translate(13 13)"/>' +
+        '<circle class="ring" data-d="' + (C * r[4] / 100).toFixed(1) + '" cx="52" cy="52" r="44" fill="none" stroke="url(#kg-' + r[0] + ')" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ' + C.toFixed(1) + '" transform="rotate(-90 52 52)" style="filter:drop-shadow(0 0 6px ' + r[1] + '99)"/></svg>' +
+        '<div class="kc"><b><span class="cu" data-to="' + r[4] + '">0.0</span>%</b></div>' +
+        '<div class="kt"><strong>' + r[0] + '</strong><small>' + r[3] + ' of ' + r[2] + ' reviews labeled the same by both annotators</small><span class="chip">kappa ' + r[5].toFixed(3) + '</span></div></div>';
     }
+    function dots(r) {
+      var d = '';
+      for (var i = 0; i < r[2]; i++) d += '<i' + (r[6].indexOf(i) > -1 ? ' class="x"' : '') + ' style="--k:' + i + ';--c:' + r[1] + '"></i>';
+      return '<div class="kd"><div class="kd-h"><b><span class="cu" data-to="' + r[4] + '">0.0</span>%</b><span><strong>' + r[0] + '</strong><small>' + r[3] + ' of ' + r[2] + ' reviews agree</small></span><span class="chip">kappa ' + r[5].toFixed(3) + '</span></div><div class="dg" role="img" aria-label="' + r[3] + ' of ' + r[2] + ' reviews agree">' + d + '</div></div>';
+    }
+    var kappaTile = KAPPA === 'b'
+      ? '<div class="st k b"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(dots).join('') + '<p class="kn">Each dot is one pilot review. Red dots are the reviews where the annotators disagreed.</p></div>'
+      : '<div class="st k"><p class="ey">Do the two human annotators agree?</p>' + AGREE.map(gauge).join('') + '</div>';
     function waffle(n, cls, label, color) {
       var cells = '';
       for (var i = 0; i < 90; i++) cells += '<i' + (i < n ? ' class="' + cls + '"' : '') + ' style="--k:' + i + '"></i>';
@@ -486,13 +514,18 @@ function initStats(root) {
     }
     host.innerHTML =
       '<div class="st wide"><p class="ey">Language mix</p><div class="big"><b>80%</b><span>of the reviews are not in English</span></div>' + bars + '</div>' +
-      '<div class="st k"><p class="ey">Human agreement (Cohen\u2019s kappa)</p>' + ring(0.845, '#5cd1bf', 'toxicity, 89 reviews') + ring(0.903, '#e9a04f', 'irony, 83 reviews') + '</div>' +
+      kappaTile +
       '<div class="st w"><p class="ey">Pilot: 90 reviews, human-labeled</p>' + waffle(9, 't', 'Toxicity: 9 of 90', '#f2c48a') + waffle(5, 'r', 'Irony: 5 of 90', '#9cc9e0') + '</div>' +
       '<div class="st nt wide"><p class="ey">Not tested yet</p><h4>Gemini on non-English reviews</h4><p>The codebook was checked almost only on English, but about 80% of the reviews are not. The agreement numbers above do not cover that part of the data yet.</p></div>';
     var tile = [].slice.call(host.querySelectorAll('.st'));
     function fire(t) {
       t.classList.add('on');
-      [].forEach.call(t.querySelectorAll('.ring'), function (r) { r.setAttribute('stroke-dasharray', r.getAttribute('data-d') + ' 276.5'); });
+      [].forEach.call(t.querySelectorAll('.ring'), function (r) { r.setAttribute('stroke-dasharray', r.getAttribute('data-d') + ' ' + C.toFixed(1)); });
+      [].forEach.call(t.querySelectorAll('.cu'), function (el) {
+        var to = parseFloat(el.getAttribute('data-to')), t0 = null;
+        function tick(ts) { if (t0 === null) t0 = ts; var p = Math.min(1, (ts - t0) / 1400); el.textContent = (to * (1 - Math.pow(1 - p, 3))).toFixed(1); if (p < 1) requestAnimationFrame(tick); }
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.textContent = to.toFixed(1); else requestAnimationFrame(tick);
+      });
     }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { fire(e.target); io.unobserve(e.target); } }); }, { threshold: 0.25 });
