@@ -38,7 +38,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - **Gender and age mentions are unverified.** ++ They are what players say about themselves, and nobody checks them.
 :::
 
-:::more Motivation and key terms
+:::more Full details: Motivation and key terms
 ### Social-science motivation
 - Players use game reviews to report harassment, cheating and toxic communities, so reviews are a public record of how multiplayer spaces feel to the people in them.
 - Irony and sarcasm can reverse what a review says. A "10/10" can be a complaint, so a recommendation and its text do not always agree.
@@ -65,7 +65,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - **Privacy.** ++ User IDs are left out and only short public review text is shown as examples.
 :::
 
-:::more Data in detail
+:::more Full details: Data in detail
 - **Source:** KieranPoc's Kaggle Steam reviews dataset (`weighted_score_above_08.csv`)
 - **Provenance:** Collected via the Steam reviews API
 - **Unit of analysis:** One Steam game review
@@ -79,7 +79,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - A yes label means the text says it, not that the reviewer did it or that the event happened
 :::
 
-:::more Methods in detail
+:::more Full details: Methods in detail
 #### Preprocessing
 1. Load the dataset and keep the three games (7,365 reviews).
 2. Keep each review in its original language. Labels come from the original text, never from a translation.
@@ -119,7 +119,7 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 - **The two human annotators agreed a lot.** ++ Kappa is 0.85 for toxicity and 0.90 for irony on the 90-review pilot.
 :::
 
-:::more Findings in detail
+:::more Full details: Findings in detail
 - **Gemini labeled every review.** 7,363 of the 7,365 reviews got a label with no failures. The other 2 were empty and skipped. The run took 46 minutes.
 - **Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%** (1,669 and 1,843 of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. The re-check turned 1,829 of the 3,499 to no and left 1,669 as yes, and 1 as uncertain. About 1,670 of those changes were reviews that mention cheating. The other 161 were reviews without cheating that Gemini no longer counted as toxic on the second look, often single-word or joke reviews. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.
 - **Counter-Strike 2 has the most irony.** 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity with the cheating rule, Counter-Strike 2 is highest (27.9%), then PUBG (20.8%) and GTA V (16.8%). The first pass put PUBG and Counter-Strike 2 level near 50%, so the cheating rule moved PUBG the most.
@@ -151,7 +151,7 @@ Table: Table 2. Agreement between the two human annotators on the pilot reviews 
 - **Toxic communities and recommendations are linked, not proven to cause each other.** ++ Reviewers who dislike a game may also be more likely to complain about other players.
 :::
 
-:::more What the evidence does not support
+:::more Full details: What the evidence does not support
 - That Gemini is accurate on non-English reviews. That has not been tested yet.
 - That 22.7% of Steam reviews mention toxicity. That is Gemini's rate on these three games, and it has not been validated. It depends on the cheating rule: the first pass without it gave 47.5%.
 - How common toxicity, irony or gender talk is on Steam in general.
@@ -168,7 +168,7 @@ Table: Table 2. Agreement between the two human annotators on the pilot reviews 
 - **Three games only.** ++ The results do not cover Steam as a whole.
 :::
 
-:::more All limitations
+:::more Full details: All limitations
 - The pilot is small (90 reviews, about 10% positive), so the kappa values are rough.
 - The codebook was checked almost only on English reviews, but about 80% of the data is not English.
 - The Gemini trial used only human-positive reviews and the codebook was tuned on the same cases.
@@ -181,7 +181,7 @@ Table: Table 2. Agreement between the two human annotators on the pilot reviews 
 
 ## Appendix
 
-:::more Reproducibility
+:::more Full details: Reproducibility
 - **Repository:** [team-steam on GitHub](https://github.com/Ghifariyadi/team-steam)
 - **Environment:** Run `uv sync --frozen` from the repository folder
 - **Run order:** `notebooks/kappa_test.ipynb` (human agreement), then `notebooks/scale_up.ipynb` (10-review trial, then the full run; the plumbing is in `scripts/steam_labeling.py`)
@@ -194,7 +194,7 @@ uv sync --frozen
 ```
 :::
 
-:::more References
+:::more Full details: References
 1. Kowert, R. (2020). Dark participation in games.
 2. Van Hee, C., Lefever, E., and Hoste, V. (2018). SemEval-2018 Task 3: Irony detection in English tweets.
 3. KieranPoc. Steam reviews dataset, Kaggle.
