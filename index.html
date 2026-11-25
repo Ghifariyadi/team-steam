@@ -402,8 +402,8 @@
     </a>
     <a class="go ghost" href="https://github.com/Ghifariyadi/team-steam">View on GitHub</a>
   </div>
-  <div class="hero-extra" id="hero-extra" hidden></div>
   <div class="marquee" aria-hidden="true"><div class="mq-track" id="mq"></div></div>
+  <div class="hero-extra" id="hero-extra" hidden></div>
   <div class="ask" id="ask" hidden>
     <p class="ask-label">Research question</p>
     <p class="sr" id="ask-full"></p>
@@ -597,18 +597,11 @@ function initStats(root) {
       '<div class="kl"><span class="l1">agreed beyond luck</span><span class="l2">agreed, luck would give this</span><span class="l3">disagreed</span></div>' +
       '<p class="kn" aria-live="polite"></p>' +
       '<p class="kf">Dots show proportions, not single reviews. Luck is the agreement you would expect if both annotators used their own yes/no rates at random.</p></div>';
-    function waffle(n, cls, label, color) {
-      var cells = '';
-      for (var i = 0; i < 90; i++) cells += '<i' + (i < n ? ' class="' + cls + '"' : '') + ' style="--k:' + i + '"></i>';
-      return '<p class="wf-l" style="color:' + color + '">' + label + '</p><div class="wf">' + cells + '</div>';
-    }
     var PANELS = [
       ['Language mix', '<div class="st wide"><p class="ey">Reviews per language</p><div class="big"><b>80%</b><span>of the reviews are not in English</span></div>' + bars + '</div>',
         'Each bar is the number of reviews in one language, English in yellow. Most reviews are in other languages, so the codebook has to hold up outside English too.'],
       ['Human agreement', kappaTile,
-        'Two annotators labeled the same 90 pilot reviews without seeing each other\u2019s labels. Accuracy is how often they matched. Kappa is the same check with the matches you would get by luck taken out.'],
-      ['Pilot labels', '<div class="st w"><p class="ey">Pilot: 90 reviews, human-labeled</p>' + waffle(9, 't', 'Toxicity: 9 of 90', '#f2c48a') + waffle(5, 'r', 'Irony: 5 of 90', '#9cc9e0') + '</div>',
-        'How many of the 90 pilot reviews a human marked yes. Only about 1 in 10 were positive, so raw accuracy alone can flatter a labeler that says \u201cno\u201d to everything. That is why kappa is reported too.']
+        'Two annotators labeled the same 90 pilot reviews without seeing each other\u2019s labels. Accuracy is how often they matched. Kappa is the same check with the matches you would get by luck taken out.']
     ];
     host.innerHTML =
       '<div class="big-h"><p class="big-e">3 \u00b7 The data and the checks</p><p class="big-t">What is in the data, and do the humans agree?</p><p class="big-s">Pick a tab.</p></div>' +
