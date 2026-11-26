@@ -176,6 +176,31 @@
   .lang.en .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
   .lang b { text-align: right; font: 500 12px/1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
 
+  /* what: one review at a time */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .tab { display: inline-flex; align-items: center; gap: 10px; padding: 10px 15px; border: 1px solid var(--line2); border-radius: 99px; background: rgba(255, 255, 255, .03); color: var(--mut); font: 500 14px/1 var(--sans); cursor: pointer; transition: background .25s, border-color .25s, color .25s; }
+  .tab b { font: 500 12px/1 var(--mono); color: var(--dim); transition: color .25s; }
+  .tab:hover { color: var(--tx); border-color: rgba(255, 255, 255, .3); }
+  .tab[aria-selected="true"] { color: #fff; background: rgba(255, 138, 76, .12); border-color: rgba(255, 138, 76, .55); }
+  .tab[aria-selected="true"] b { color: var(--org); }
+  .tx { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(28px, 6vw, 80px); margin-top: 38px; }
+  .txn { font: 560 clamp(3.6rem, 7vw, 5.6rem)/.95 var(--sans); letter-spacing: -.06em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 60px rgba(255, 138, 76, .35); }
+  .txn small { margin-left: .05em; font-size: .36em; font-weight: 500; letter-spacing: -.02em; }
+  .txl .bar2 { grid-template-columns: minmax(0, 1fr); margin-top: 18px; }
+  .txl .bar2 .tr i { transition-duration: .8s; transition-delay: 0s; }
+  .txl p { margin: 16px 0 0; max-width: 24ch; font-size: 14.5px; line-height: 1.55; color: var(--mut); }
+  .txr { display: flex; flex-direction: column; justify-content: space-between; gap: 28px; min-height: 270px; }
+  .qt { margin: 0; font: 500 clamp(1.45rem, 2.8vw, 2.3rem)/1.32 var(--sans); letter-spacing: -.03em; color: #868c98; transition: opacity .3s var(--out), transform .3s var(--out), filter .3s var(--out); }
+  .qt.sw { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  .qt mark { color: #fff; padding: .02em .14em; margin: 0 -.14em; border-radius: .22em; background: linear-gradient(rgba(255, 138, 76, .34), rgba(255, 138, 76, .34)) no-repeat 0 0 / 0% 100%; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-size .9s var(--out) .3s; }
+  .qt.on mark { background-size: 100% 100%; }
+  .qm { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  .qs { font: 400 12.5px/1.6 var(--mono); color: var(--dim); }
+  .qs b { font-weight: 500; color: var(--mut); }
+  .qn { display: flex; align-items: center; gap: 10px; flex: none; }
+  .qn span { min-width: 40px; text-align: center; font: 500 12px/1 var(--mono); color: var(--dim); }
+  .qn .arr { width: 38px; height: 38px; font-size: 15px; }
+
   /* method slider */
   .slider { display: flex; gap: 14px; margin-top: clamp(40px, 6vw, 64px); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab; outline: none; }
   .slider::-webkit-scrollbar { display: none; }
@@ -296,6 +321,8 @@
     .game { grid-template-columns: 1fr; gap: 8px; }
     .win .bd { grid-template-columns: 1fr; } .col { min-height: 0; padding: 18px; } .col + .col { border-left: 0; border-top: 1px solid var(--line); }
     .hlg { grid-template-columns: 1fr; gap: 34px; }
+    .tx { grid-template-columns: 1fr; gap: 26px; } .txr { min-height: 0; }
+    .qm { flex-direction: column; align-items: flex-start; }
     .lis { grid-template-columns: 1fr; }
     .rv, .wd, .tile { filter: none; }
   }
@@ -489,8 +516,22 @@
       <article class="tile w6 rv" style="--d:.1s">
         <span class="no">04 · WHAT</span>
         <h3>Most toxic reviews <span class="gor">insult other players.</span></h3>
-        <div class="types" id="types"></div>
-        <p class="small" style="margin-top:8px">Share of the 1,669 toxic reviews with each type; a review can have several. Examples are real review text, picked as the clearest. Types are Gemini’s labels, and some phrases are jokes or sarcasm.</p>
+        <div class="tabs" id="ttabs" role="tablist" aria-label="Type of toxicity"></div>
+        <div class="tx" id="tx">
+          <div class="txl">
+            <div class="txn"><span id="txp" data-count="48.5" data-dec="1">48.5</span><small>%</small></div>
+            <div class="bar2 or"><span class="tr"><i id="txb" style="--w:.485"></i></span></div>
+            <p id="txd">of the 1,669 toxic reviews. Aimed at other players.</p>
+          </div>
+          <div class="txr">
+            <blockquote class="qt" id="qt" aria-live="polite"></blockquote>
+            <div class="qm">
+              <div class="qs" id="qs"></div>
+              <div class="qn"><button class="arr" id="qprev" type="button" aria-label="Previous example">←</button><span id="qc">1 / 2</span><button class="arr" id="qnext" type="button" aria-label="Next example">→</button></div>
+            </div>
+          </div>
+        </div>
+        <p class="small" style="margin-top:30px;max-width:78ch">The highlighted words are the phrases Gemini quoted as its reason. In translated reviews, the highlight in the English text is our match to Gemini’s quote in the original language. Shares are of the 1,669 toxic reviews, and a review can have several types. Examples are real reviews picked as the clearest, and some phrases are jokes or sarcasm.</p>
       </article>
     </div>
   </div>
@@ -576,12 +617,6 @@
   /* ---------- data (numbers are the ones on the original site) ---------- */
   var LANGS = [['Simplified Chinese', 2304], ['English', 1457], ['Russian', 1068], ['Turkish', 564], ['Portuguese (BR)', 406], ['Korean', 329]];
   var GAMES = [['Counter-Strike 2', 3017, 27.9, 32.9], ['Grand Theft Auto V', 1944, 16.8, 19.7], ['PUBG: BATTLEGROUNDS', 2402, 20.8, 19.4]];
-  var TYPES = [
-    ['Insult at a person', 'aimed at other players', 48.5, [['A bunch of no-life cunts whom nobody likes', 'Polish, translated'], ['retards and fucking amoebas who have 500 ping', 'Polish, translated']]],
-    ['Racism and discrimination', '88% nationality or ethnicity', 25.9, [['get ready to be cursed by angry iranians', 'from the human-labeled pilot'], ['This game is so much fun when those motherfucking Russians aren’t around.', 'Turkish, translated'], ['those little monkeys don’t know how to play normally', 'Ukrainian, translated']]],
-    ['Swearing', 'curse words', 20.1, [['FUCKING TEAMKILLER', ''], ['Fuck you Rockstar. Fuck. You.', '']]],
-    ['Threat or wishing harm', 'wishing someone dead or sick', 6.2, [['wishes you dead', ''], ['may you die a slow and painful disease, guys', 'French, translated']]]
-  ];
   var MAXL = LANGS[0][1];
   var GCOUNT = [['Counter-Strike 2', 3017], ['PUBG', 2404], ['Grand Theft Auto V', 1944]];
 
@@ -596,10 +631,6 @@
   var b2 = function (cls, v, d) { return '<div class="bar2 ' + cls + '"><span class="tr"><i style="--w:' + (v / 100).toFixed(4) + ';--d:' + d + 's"></i></span><b>' + v.toFixed(1) + '%</b></div>'; };
   $('games').innerHTML = GAMES.map(function (g, i) {
     return '<div class="game"><div><b class="n">' + g[0] + '</b><small>' + g[1].toLocaleString('en-US') + ' reviews</small></div><div class="gbars">' + b2('or', g[2], .5 + i * .12) + b2('', g[3], .65 + i * .12) + '</div></div>';
-  }).join('');
-  $('types').innerHTML = TYPES.map(function (r, i) {
-    return '<div class="ty"><div class="hd"><b>' + r[0] + '</b><span>' + r[1] + '</span></div>' + b2('or', r[2], .5 + i * .12) + '<div class="exs">' +
-      r[3].map(function (q) { return '<div class="ex">“' + esc(q[0]) + '”' + (q[1] ? '<small>' + q[1] + '</small>' : '') + '</div>'; }).join('') + '</div></div>';
   }).join('');
 
   /* ---------- words rise out of a blur; one statement is scrubbed by scroll ---------- */
@@ -705,6 +736,65 @@
     var p = clamp(window.scrollY / (window.innerHeight * 0.55)), e = ease(p), small = window.innerWidth < 900;
     win.style.transform = 'rotateX(' + lerp(small ? 8 : 16, 0, e).toFixed(2) + 'deg) scale(' + lerp(.94, 1, e).toFixed(3) + ')';
   }
+
+  /* ---------- what: one review at a time, the toxic words highlighted ---------- */
+  (function () {
+    var QT = [
+      { n: 'Insult at a person', p: 48.5, d: 'of the 1,669 toxic reviews. Aimed at other players.', ex: [
+        { t: 'First up are the trolls. [[A bunch of no-life cunts]] whom nobody likes…', l: 'Polish, translated', o: 'Banda zjebów bez życia' },
+        { t: '…gameplay with retards and [[fucking amoebas]] who have 500 ping and can’t speak English', l: 'Polish, translated', o: 'pierdolonymi amebami' }] },
+      { n: 'Racism and discrimination', p: 25.9, d: 'of the 1,669 toxic reviews. 88% of these target nationality or ethnicity.', ex: [
+        { t: 'This game is so much fun when those [[motherfucking Russians]] aren’t around.', l: 'Turkish, translated', o: 'Orospu cocu ruslar' },
+        { t: '…[[those little monkeys don’t know how to play]] normally and behave very aggressively.', l: 'Ukrainian, translated', o: 'ті мавпочки не вміють грати' },
+        { t: '[[the chinese ruined this game]]', l: 'English' }] },
+      { n: 'Swearing', p: 20.1, d: 'of the 1,669 toxic reviews. Curse words.', ex: [
+        { t: '*I shoot 10 year old teammate accidently* Me: sorry Kid: [[FUCKING TEAMKILLER]]', l: 'English' },
+        { t: '[[Fuck you Rockstar. Fuck. You.]]', l: 'English, aimed at the developer' }] },
+      { n: 'Threat or wishing harm', p: 6.2, d: 'of the 1,669 toxic reviews. Wishing someone dead or sick.', ex: [
+        { t: '…an ace during a round where your teammate [[wishes you dead]] and the russians on the opposing team type in your IP address in the chat.', l: 'English' },
+        { t: '…smurfs who come back in full force every time there’s a sale ([[may you die a slow and painful disease]], guys)…', l: 'French, translated', o: 'puissiez-vous crever d’une maladie lente et douloureuse' }] }
+    ];
+    var tabs = $('ttabs'), qt = $('qt'), qs = $('qs'), qc = $('qc'), txp = $('txp'), txb = $('txb'), txd = $('txd');
+    if (!tabs) return;
+    var cur = { t: 0, i: 0 }, shown = false, tw = 0;
+    tabs.innerHTML = QT.map(function (x, k) { return '<button class="tab" type="button" role="tab" data-k="' + k + '" aria-selected="' + (k === 0) + '">' + esc(x.n) + '<b>' + x.p.toFixed(1) + '%</b></button>'; }).join('');
+    var mark = function (t) { return esc(t).replace(/\[\[(.*?)\]\]/g, '<mark>$1</mark>'); };
+    function apply() {
+      var T = QT[cur.t], e = T.ex[cur.i];
+      qt.innerHTML = '“' + mark(e.t) + '”';
+      qs.innerHTML = '<b>' + esc(e.l) + '</b>' + (e.o ? '<br>Gemini quoted: ' + esc(e.o) : '');
+      qc.textContent = (cur.i + 1) + ' / ' + T.ex.length;
+      qt.classList.remove('sw');
+      if (shown) requestAnimationFrame(function () { requestAnimationFrame(function () { qt.classList.add('on'); }); });
+    }
+    function show(anim) {
+      qt.classList.remove('on');
+      if (anim && !reduce) { qt.classList.add('sw'); setTimeout(apply, 280); } else apply();
+    }
+    function setType(k) {
+      cur.t = k; cur.i = 0;
+      [].forEach.call(tabs.children, function (b, j) { b.setAttribute('aria-selected', j === k); });
+      var T = QT[k]; txd.textContent = T.d; txb.style.setProperty('--w', (T.p / 100).toFixed(4));
+      cancelAnimationFrame(tw);
+      var from = parseFloat(txp.textContent) || 0, t0 = null;
+      (function f(t) { if (t0 === null) t0 = t; var q = 1 - Math.pow(1 - clamp((t - t0) / 700), 3); txp.textContent = (from + (T.p - from) * q).toFixed(1); if (q < 1) tw = requestAnimationFrame(f); })(performance.now());
+      show(true);
+    }
+    var step = function (d) { var n = QT[cur.t].ex.length; cur.i = (cur.i + d + n) % n; show(true); };
+    tabs.addEventListener('click', function (e) { var b = e.target.closest('.tab'); if (b) setType(+b.getAttribute('data-k')); });
+    $('qprev').addEventListener('click', function () { step(-1); });
+    $('qnext').addEventListener('click', function () { step(1); });
+    var sx = null;
+    qt.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') sx = e.clientX; });
+    qt.addEventListener('pointerup', function (e) { if (sx === null) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); });
+    apply();
+    var tx = $('tx');
+    var reveal = function () { shown = true; setTimeout(function () { qt.classList.add('on'); }, 450); };
+    if ('IntersectionObserver' in window && !reduce) {
+      var qio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { qio.disconnect(); reveal(); } }); }, { threshold: 0.5 });
+      qio.observe(tx);
+    } else { shown = true; qt.classList.add('on'); }
+  })();
 
   /* ---------- method slider: arrows, drag with a mouse, progress ---------- */
   (function () {
