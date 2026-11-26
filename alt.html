@@ -64,7 +64,8 @@
   section { position: relative; }
   .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 40px); }
   .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 22px; font: 500 12.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
-  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--line2); }
+  .eyebrow::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 2px; background: conic-gradient(from 210deg, var(--blu), var(--org), var(--blu)); box-shadow: 0 0 14px rgba(110, 168, 255, .55); transform: rotate(45deg) scale(0); transition: transform .9s cubic-bezier(.34, 1.56, .64, 1) .15s; }
+  .eyebrow.in::before { transform: rotate(45deg) scale(1); }
   h1, h2 { margin: 0; font-weight: 560; letter-spacing: -.045em; line-height: 1.02; }
   h1 { font-size: clamp(2.9rem, 8.6vw, 6.9rem); }
   h2 { font-size: clamp(2rem, 5vw, 3.8rem); max-width: 18ch; }
@@ -129,8 +130,11 @@
   /* statement */
   .statement { margin: 0; font: 560 clamp(1.8rem, 4.4vw, 3.5rem)/1.14 var(--sans); letter-spacing: -.04em; max-width: 24ch; }
   .statement .sw { transition: opacity .3s linear; }
-  .rq { margin: 40px 0 0; padding: 4px 0 4px 20px; border-left: 2px solid var(--line2); max-width: 62ch; font-size: 15px; line-height: 1.65; color: var(--mut); }
-  .rq b { display: block; margin-bottom: 6px; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .rq { position: relative; margin: 40px 0 0; padding: 22px 26px 24px; max-width: 64ch; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012)); font-size: 16px; line-height: 1.65; color: #c9cdd6; overflow: hidden; }
+  .rq::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(110, 168, 255, .8), rgba(255, 138, 76, .8), transparent); transform: scaleX(0); transition: transform 1.6s var(--out) .3s; }
+  .rq.in::before { transform: none; }
+  .rq b { display: flex; align-items: center; gap: 8px; width: max-content; margin-bottom: 14px; padding: 5px 10px 5px 9px; border: 1px solid var(--line2); border-radius: 7px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
+  .rq b::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--blu); box-shadow: 0 0 10px var(--blu); }
 
   /* bento */
   .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: clamp(40px, 6vw, 64px); }
@@ -216,6 +220,7 @@
 
   /* learned + limits */
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: clamp(40px, 6vw, 64px); }
+  .two > .tile { grid-column: auto; }
   .lis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 clamp(24px, 4vw, 48px); margin-top: 22px; }
   .lis .li { padding: 22px 0 6px; }
   .tile.solo { margin-top: clamp(40px, 6vw, 64px); }
@@ -223,6 +228,7 @@
   .tt + .li { margin-top: 22px; }
   .li .ic { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 600 13px/1 var(--sans); margin-top: 1px; }
   .li .ic.y { background: rgba(110, 168, 255, .16); color: var(--blu); } .li .ic.w { background: rgba(255, 138, 76, .16); color: var(--org); }
+  .li .ic.g { background: rgba(61, 220, 151, .16); color: var(--grn); } .li .ic.r { background: rgba(255, 107, 107, .16); color: var(--red); }
   .li h4 { margin: 0 0 6px; font: 560 1.12rem/1.25 var(--sans); letter-spacing: -.02em; }
   .li p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--mut); max-width: none; }
   .tile .tt { display: block; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
@@ -250,11 +256,6 @@
   .in .st .ic { transform: none; }
   .logo i { animation: spin 14s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .eyebrow::before { width: 0; transition: width 1.1s var(--out) .1s; }
-  .eyebrow.in::before { width: 22px; }
-  .rq { position: relative; border-left: 0; padding-left: 22px; }
-  .rq::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--line2); transform: scaleY(0); transform-origin: top; transition: transform 1.4s var(--out) .3s; }
-  .rq.in::before { transform: none; }
   .btn.w { position: relative; overflow: hidden; }
   .btn.w::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .85), transparent); transform: skewX(-18deg); animation: shine 6s ease-in-out infinite; }
   @keyframes shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
@@ -491,6 +492,25 @@
         <div class="li"><span class="ic y">✓</span><div><h4>Counting is not explaining.</h4><p>We can say how many reviews mention toxicity. We cannot say what causes it.</p></div></div>
       </div>
     </article>
+
+    <p class="eyebrow rv" style="margin-top:clamp(70px,10vw,120px)">Implication</p>
+    <h2 data-split style="max-width:22ch"><span class="grad">Complaining is fine. </span><span class="gor">Attacking people is not.</span></h2>
+    <p class="sub rv" style="--d:.2s;max-width:44em">If a platform like Steam wanted review guidelines, our labels suggest where the line could go. This is a suggestion from our data, not something we tested.</p>
+    <div class="two">
+      <article class="tile rv" style="--d:.05s">
+        <span class="tt">Could stay allowed</span>
+        <div class="li"><span class="ic g">✓</span><div><h4>Criticizing the game.</h4><p>Bugs, price, design. Most “Not recommended” reviews are not toxic: 71.6% of them were not flagged.</p></div></div>
+        <div class="li"><span class="ic g">✓</span><div><h4>Reporting cheaters.</h4><p>On its own, a cheating complaint is not toxic. Counting it as toxic roughly doubled our toxicity rate.</p></div></div>
+        <div class="li"><span class="ic g">✓</span><div><h4>Swearing at the game.</h4><p>Profanity alone does not count in our codebook. It counts when it is aimed at people.</p></div></div>
+      </article>
+      <article class="tile rv" style="--d:.15s">
+        <span class="tt">Where the line could go</span>
+        <div class="li"><span class="ic r">×</span><div><h4>Insults aimed at other players.</h4><p>The biggest type: 48.5% of the toxic reviews.</p></div></div>
+        <div class="li"><span class="ic r">×</span><div><h4>Attacks on nationality or ethnicity.</h4><p>25.9% of the toxic reviews, and 88% of those target nationality or ethnicity.</p></div></div>
+        <div class="li"><span class="ic r">×</span><div><h4>Threats and wishing harm.</h4><p>Rarer, 6.2% of the toxic reviews: wishing someone dead or sick.</p></div></div>
+      </article>
+    </div>
+    <p class="small rv">Shares are of the 1,669 toxic reviews, from Gemini’s labels. We did not test whether guidelines like these would reduce toxicity, and the labels are not checked against humans yet.</p>
   </div>
 </section>
 
