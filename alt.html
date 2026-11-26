@@ -213,6 +213,23 @@
   .arr:hover:not(:disabled) { background: rgba(255, 255, 255, .09); border-color: rgba(255, 255, 255, .3); transform: translateY(-1px); }
   .arr:disabled { opacity: .3; cursor: default; }
 
+  /* recommendation cards */
+  .slider.rec .tile.sl { display: flex; flex-direction: column; flex-basis: min(560px, 88%); min-height: 600px; }
+  .rb { margin-top: 24px; }
+  .rl { display: flex; align-items: center; gap: 8px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .rl::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--dim); }
+  .rl.g { color: var(--grn); } .rl.g::before { background: var(--grn); box-shadow: 0 0 10px var(--grn); }
+  .tile .rb p { margin: 10px 0 0; max-width: none; font-size: 16.5px; line-height: 1.5; color: #e2e5ea; }
+  .ind { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+  .ind li { position: relative; padding-left: 16px; font-size: 14.5px; line-height: 1.55; color: var(--mut); }
+  .ind li::before { content: ""; position: absolute; left: 0; top: .66em; width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .3); }
+  .rx { margin-top: auto; padding-top: 26px; font: 500 1.08rem/1.45 var(--sans); letter-spacing: -.02em; color: #8e94a0; }
+  .rx mark { color: #fff; padding: .02em .14em; margin: 0 -.14em; border-radius: .22em; background: rgba(255, 138, 76, .3); }
+  .rx small { display: block; margin-top: 9px; font: 400 12px/1.4 var(--mono); letter-spacing: 0; color: var(--dim); }
+  .leave { display: flex; gap: 12px; align-items: flex-start; margin-top: 22px; padding: 16px 18px; max-width: 70ch; border-radius: 14px; background: rgba(61, 220, 151, .06); font-size: 14.5px; line-height: 1.55; color: #d6d9df; }
+  .leave i { flex: none; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; background: rgba(61, 220, 151, .16); color: var(--grn); font: 600 12px/1 var(--sans); font-style: normal; }
+  .leave b { font-weight: 560; color: var(--tx); }
+
   /* headline numbers */
   .hlg { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 80px); margin-top: 6px; }
   .hn { font: 560 clamp(4.4rem, 11.5vw, 9rem)/.92 var(--sans); letter-spacing: -.065em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 80px rgba(255, 138, 76, .42); }
@@ -344,7 +361,7 @@
 <header class="nav" id="nav">
   <a class="logo" href="#top"><i></i><span>Steam reviews study</span></a>
   <nav class="links" id="links" aria-label="Sections">
-    <a href="#question">Question</a><a href="#data">Data</a><a href="#method">Method</a><a href="#findings">Findings</a><a href="#interpretation">Interpretation</a><a href="#limits">Limitations</a>
+    <a href="#question">Question</a><a href="#data">Data</a><a href="#method">Method</a><a href="#findings">Findings</a><a href="#interpretation">Interpretation</a><a href="#limits">Limitations</a><a href="#steam">For Steam</a>
   </nav>
   <div class="nr">
     <a class="btn hide-s hide-m" href="alt-detail.html" title="Every number, rule and caveat on one page">Full details</a>
@@ -549,25 +566,6 @@
         <div class="li"><span class="ic y">✓</span><div><h4>Counting is not explaining.</h4><p>We can say how many reviews mention toxicity. We cannot say what causes it.</p></div></div>
       </div>
     </article>
-
-    <p class="eyebrow rv" style="margin-top:clamp(70px,10vw,120px)">Implication</p>
-    <h2 data-split style="max-width:22ch"><span class="grad">Complaining is fine. </span><span class="gor">Attacking people is not.</span></h2>
-    <p class="sub rv" style="--d:.2s;max-width:44em">If a platform like Steam wanted review guidelines, our labels suggest where the line could go. This is a suggestion from our data, not something we tested.</p>
-    <div class="two">
-      <article class="tile rv" style="--d:.05s">
-        <span class="tt">Could stay allowed</span>
-        <div class="li"><span class="ic g">✓</span><div><h4>Criticizing the game.</h4><p>Bugs, price, design. Most “Not recommended” reviews are not toxic: 71.6% of them were not flagged.</p></div></div>
-        <div class="li"><span class="ic g">✓</span><div><h4>Reporting cheaters.</h4><p>On its own, a cheating complaint is not toxic. Counting it as toxic roughly doubled our toxicity rate.</p></div></div>
-        <div class="li"><span class="ic g">✓</span><div><h4>Swearing at the game.</h4><p>Profanity alone does not count in our codebook. It counts when it is aimed at people.</p></div></div>
-      </article>
-      <article class="tile rv" style="--d:.15s">
-        <span class="tt">Where the line could go</span>
-        <div class="li"><span class="ic r">×</span><div><h4>Insults aimed at other players.</h4><p>The biggest type: 48.5% of the toxic reviews.</p></div></div>
-        <div class="li"><span class="ic r">×</span><div><h4>Attacks on nationality or ethnicity.</h4><p>25.9% of the toxic reviews, and 88% of those target nationality or ethnicity.</p></div></div>
-        <div class="li"><span class="ic r">×</span><div><h4>Threats and wishing harm.</h4><p>Rarer, 6.2% of the toxic reviews: wishing someone dead or sick.</p></div></div>
-      </article>
-    </div>
-    <p class="small rv">Shares are of the 1,669 toxic reviews, from Gemini’s labels. We did not test whether guidelines like these would reduce toxicity, and the labels are not checked against humans yet.</p>
   </div>
 </section>
 
@@ -583,6 +581,52 @@
         <div class="li"><span class="ic w">!</span><div><h4>The cheating rule came after the first results.</h4><p>So 22.7% is not a blind result. And it covers three games from one filtered file, not all of Steam.</p></div></div>
       </div>
     </article>
+  </div>
+</section>
+
+<!-- RECOMMENDATION -->
+<section class="pad" id="steam" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow rv">Recommendation for Steam</p>
+    <h2 data-split style="max-width:22ch"><span class="grad">What Steam could do </span><span class="gor">next.</span></h2>
+    <p class="sub rv" style="--d:.2s;max-width:46em;text-align:left;margin-left:0">We know game communities tend to be toxic. But racism and insulting someone’s identity cannot be justified. Here are four patterns from our data that Steam could turn into guidelines, with the reason and the indicators behind each label.</p>
+    <div class="slider rec" id="rslider" tabindex="0" role="region" aria-label="Four patterns and a suggested guideline for each. Scroll sideways or use the arrows.">
+      <article class="tile sl rv" style="--d:0.05s">
+        <span class="no">PATTERN 01 · 48.5% OF TOXIC REVIEWS</span>
+        <h3>Insults aimed at other players</h3>
+        <div class="rb"><span class="rl g">Suggested guideline</span><p>Criticize the play, not the person. Name-calling aimed at a player should be removable.</p></div>
+        <div class="rb"><span class="rl">Why we labeled it toxic</span><ul class="ind"><li>Words that attack a person’s skill, intelligence or character, like idiot, trash or worse.</li><li>The target is a person. In 71% of these reviews Gemini marked players in general, and in 10% a teammate.</li></ul></div>
+        <div class="rx">“First up are the trolls. <mark>A bunch of no-life cunts</mark> whom nobody likes…”<small>Polish, translated</small></div>
+      </article>
+      <article class="tile sl rv" style="--d:0.15s">
+        <span class="no">PATTERN 02 · 25.9% OF TOXIC REVIEWS</span>
+        <h3>Attacks on someone’s identity</h3>
+        <div class="rb"><span class="rl g">Suggested guideline</span><p>No attacks on who someone is: nationality, ethnicity, race, gender, sexuality, religion, age or disability. That includes blaming a whole nationality for cheating.</p></div>
+        <div class="rb"><span class="rl">Why we labeled it toxic</span><ul class="ind"><li>A group word together with a slur, an insult or a blame. Complaining about cheating alone does not count, but blaming it on a nationality does.</li><li>In 88% of these reviews the group is a nationality or ethnicity, and 81% are aimed at a nationality group.</li></ul></div>
+        <div class="rx">“This game is so much fun when those <mark>motherfucking Russians</mark> aren’t around.”<small>Turkish, translated</small></div>
+      </article>
+      <article class="tile sl rv" style="--d:0.25s">
+        <span class="no">PATTERN 03 · 20.1% OF TOXIC REVIEWS</span>
+        <h3>Swearing</h3>
+        <div class="rb"><span class="rl g">Suggested guideline</span><p>Swearing alone should stay allowed, especially at the game or the developer. It becomes a problem when it is aimed at a person.</p></div>
+        <div class="rb"><span class="rl">Why we labeled it toxic</span><ul class="ind"><li>Obscene language that is not clearly aimed at a person or a group.</li><li>This is the weakest pattern. 41% of these reviews swear at the developer, which our own rule says is not toxic on its own. 48% are aimed at players in general.</li></ul></div>
+        <div class="rx">“*I shoot 10 year old teammate accidently* Me: sorry Kid: <mark>FUCKING TEAMKILLER</mark>”<small>English</small></div>
+      </article>
+      <article class="tile sl rv" style="--d:0.35s">
+        <span class="no">PATTERN 04 · 6.2% OF TOXIC REVIEWS</span>
+        <h3>Threats and wishing harm</h3>
+        <div class="rb"><span class="rl g">Suggested guideline</span><p>Threats and wishing someone dead or sick should be removable.</p></div>
+        <div class="rb"><span class="rl">Why we labeled it toxic</span><ul class="ind"><li>Words that say or wish harm on someone, like dying, cancer or a painful disease.</li><li>The rarest of the four, and 60% of these reviews are aimed at players in general.</li></ul></div>
+        <div class="rx">“…smurfs who come back in full force every time there’s a sale (<mark>may you die a slow and painful disease</mark>, guys)…”<small>French, translated</small></div>
+      </article>
+    </div>
+    <div class="slc rv">
+      <div class="pg" aria-hidden="true"><i id="rpgf"></i></div>
+      <button class="arr" id="rprev" type="button" aria-label="Previous pattern">←</button>
+      <button class="arr" id="rnext" type="button" aria-label="Next pattern">→</button>
+    </div>
+    <div class="leave rv"><i>✓</i><span><b>What to leave alone:</b> criticizing the game, bug and price complaints, and reports of cheaters on their own. Most “Not recommended” reviews (71.6%) were not flagged as toxic.</span></div>
+    <p class="small rv">Shares are of the 1,669 toxic reviews, and a review can have several types. Gemini used eight types. The other four are smaller or are not a behavior a guideline can target: reviews that describe a toxic community (11.1%), other (7.8%), sexual harassment (1.0%) and griefing or trolling (0.8%). These are suggestions from our data. We did not test whether guidelines like these reduce toxicity, and the labels are not checked against humans yet.</p>
   </div>
 </section>
 
@@ -796,9 +840,9 @@
     } else { shown = true; qt.classList.add('on'); }
   })();
 
-  /* ---------- method slider: arrows, drag with a mouse, progress ---------- */
-  (function () {
-    var sl = $('slider'), prev = $('prev'), next = $('next'), pgf = $('pgf');
+  /* ---------- sliders (method steps, recommendations): arrows, drag with a mouse, progress ---------- */
+  function slider(sid, pid, nid, fid) {
+    var sl = $(sid), prev = $(pid), next = $(nid), pgf = $(fid);
     if (!sl) return;
     var cards = [].slice.call(sl.children);
     var step = function () { return cards[1].offsetLeft - cards[0].offsetLeft; };
@@ -816,7 +860,9 @@
     window.addEventListener('pointermove', function (e) { if (down) sl.scrollLeft = s0 - (e.clientX - sx); });
     window.addEventListener('pointerup', function () { if (!down) return; down = false; sl.classList.remove('drag'); });
     upd();
-  })();
+  }
+  slider('slider', 'prev', 'next', 'pgf');
+  slider('rslider', 'rprev', 'rnext', 'rpgf');
 
   /* ---------- nav, progress, spotlight ---------- */
   var nav = $('nav'), prog = $('prog'), links = [].slice.call($('links').children), ticking = false;
