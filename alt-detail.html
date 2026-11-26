@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08090a">
+<meta name="color-scheme" content="dark">
+<title>Full details · Irony and toxicity in Steam reviews</title>
+<meta name="description" content="Every number, rule and caveat behind the Steam reviews study: data, method, findings, interpretation, limitations and how to reproduce it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090a; --panel: #0f1011; --elev: #151618; --line: rgba(255, 255, 255, .08); --line2: rgba(255, 255, 255, .16);
+    --tx: #f4f5f6; --mut: #959aa6; --dim: #666b76;
+    --org: #ff8a4c; --blu: #6ea8ff; --grn: #3ddc97; --red: #ff6b6b;
+    --sans: "Geist", "Inter", -apple-system, "SF Pro Display", system-ui, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --ease: cubic-bezier(.2, .8, .2, 1); --out: cubic-bezier(.16, 1, .3, 1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--tx); font: 400 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; }
+  ::selection { background: rgba(110, 168, 255, .35); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mono { font-family: var(--mono); }
+
+  /* ambient background: grid that fades out, slow drifting light */
+  .bgfx { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .bgfx::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px); background-size: 64px 64px; -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%); mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%); }
+  .bgfx i { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .5; will-change: transform; }
+  .bgfx i:nth-child(1) { width: 620px; height: 620px; left: 8%; top: -240px; background: #2547a8; animation: d1 26s ease-in-out infinite; }
+  .bgfx i:nth-child(2) { width: 520px; height: 520px; right: 4%; top: -180px; background: #b2481a; opacity: .38; animation: d2 31s ease-in-out infinite; }
+  @keyframes d1 { 50% { transform: translate(120px, 70px) scale(1.12); } }
+  @keyframes d2 { 50% { transform: translate(-110px, 90px) scale(.9); } }
+
+  /* nav */
+  .nav { position: fixed; inset: 0 0 auto 0; z-index: 50; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 clamp(16px, 3vw, 36px); border-bottom: 1px solid transparent; transition: background .4s, border-color .4s; }
+  .nav.s { background: rgba(8, 9, 10, .72); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); border-bottom-color: var(--line); }
+  .logo { display: flex; align-items: center; gap: 10px; font: 600 15px/1 var(--sans); letter-spacing: -.01em; text-decoration: none; white-space: nowrap; min-width: 0; }
+  .logo i { flex: none; width: 18px; height: 18px; border-radius: 6px; background: conic-gradient(from 210deg, var(--blu), var(--org), var(--blu)); box-shadow: 0 0 18px rgba(110, 168, 255, .45); }
+  .logo span { overflow: hidden; text-overflow: ellipsis; }
+  .links { display: flex; gap: 4px; }
+  .links a { padding: 8px 13px; border-radius: 8px; color: var(--mut); font: 500 14px/1 var(--sans); text-decoration: none; transition: color .2s, background .2s; }
+  .links a:hover, .links a.on { color: var(--tx); background: rgba(255, 255, 255, .06); }
+  .nr { display: flex; gap: 8px; align-items: center; flex: none; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 17px; border-radius: 9px; border: 1px solid var(--line2); background: rgba(255, 255, 255, .03); color: var(--tx); font: 500 14px/1 var(--sans); text-decoration: none; transition: background .25s, border-color .25s, transform .25s var(--ease); }
+  .btn:hover { background: rgba(255, 255, 255, .09); border-color: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+  .btn.w { background: #f4f5f6; color: #0b0c0d; border-color: transparent; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 8px 30px -8px rgba(255, 255, 255, .35); font-weight: 600; }
+  .btn.w:hover { background: #fff; transform: translateY(-1px); }
+  .btn i { font-style: normal; transition: transform .3s var(--ease); } .btn:hover i { transform: translateX(3px); }
+  .btn.lg { padding: 14px 22px; font-size: 15px; border-radius: 11px; }
+  .prog { position: fixed; top: 0; left: 0; height: 2px; width: 100%; z-index: 60; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--blu), var(--org)); }
+
+  /* reveal: fade up out of a blur */
+  .rv { opacity: 0; transform: translateY(26px); filter: blur(8px); transition: opacity 1s var(--out), transform 1s var(--out), filter 1s var(--out); transition-delay: var(--d, 0s); }
+  .in .rv, .rv.in { opacity: 1; transform: none; filter: none; }
+  .wd { display: inline-block; opacity: 0; transform: translateY(.5em); filter: blur(10px); transition: opacity .9s var(--out), transform .9s var(--out), filter .9s var(--out); transition-delay: calc(var(--i) * 45ms + var(--b, 0s)); }
+  .in .wd { opacity: 1; transform: none; filter: none; }
+
+  /* layout */
+  section { position: relative; }
+  .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 40px); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 22px; font: 500 12.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--line2); }
+  h1, h2 { margin: 0; font-weight: 560; letter-spacing: -.045em; line-height: 1.02; }
+  h1 { font-size: clamp(2.9rem, 8.6vw, 6.9rem); }
+  h2 { font-size: clamp(2rem, 5vw, 3.8rem); max-width: 18ch; }
+  .grad { background: linear-gradient(180deg, #fff 25%, rgba(255, 255, 255, .5)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .gor { background: linear-gradient(100deg, #ffb27d, var(--org) 55%, #ff5d5d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { margin: 24px 0 0; max-width: 34em; font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.55; color: var(--mut); }
+  .sub b { color: var(--tx); font-weight: 500; }
+  .small { margin: 22px 0 0; max-width: 62ch; font-size: 14.5px; line-height: 1.65; color: var(--dim); }
+  .pad { padding: clamp(84px, 12vw, 150px) 0; }
+
+  /* hero */
+  .hero { padding-top: clamp(100px, 12vw, 132px); text-align: center; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 7px 8px 7px 14px; border: 1px solid var(--line2); border-radius: 99px; background: rgba(255, 255, 255, .04); font: 500 13px/1 var(--sans); color: var(--mut); text-decoration: none; transition: border-color .3s, background .3s; }
+  .pill:hover { border-color: rgba(255, 255, 255, .32); background: rgba(255, 255, 255, .07); }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--grn); animation: ping 2.4s var(--ease) infinite; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, .55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(61, 220, 151, 0); } }
+  .pill b { color: var(--tx); font-weight: 500; }
+  .pill em { font-style: normal; padding: 5px 9px; border-radius: 99px; background: rgba(255, 255, 255, .08); color: var(--tx); font-size: 12px; }
+  .hero h1 { margin: 22px auto 0; max-width: 15ch; font-size: clamp(2.5rem, 7.2vw, 5.8rem); line-height: 1.04; }
+  .hero .sub { margin-left: auto; margin-right: auto; text-wrap: balance; }
+  .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
+
+  /* product window */
+  .stagewin { margin-top: clamp(44px, 6vw, 64px); perspective: 1700px; }
+  .win { position: relative; max-width: 1020px; margin: 0 auto; border: 1px solid var(--line2); border-radius: 16px; background: linear-gradient(180deg, #101214, #0b0c0e); text-align: left; box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 60px 160px -30px rgba(70, 110, 220, .38), 0 30px 80px -40px rgba(255, 138, 76, .3); transform-origin: 50% 0; will-change: transform; overflow: hidden; }
+  .win::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent); }
+  .win .bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line); font: 400 12px/1 var(--mono); color: var(--dim); }
+  .win .bar i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #2a2c30; }
+  .win .bar span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .win .bar em { margin-left: auto; flex: none; display: inline-flex; gap: 7px; align-items: center; font-style: normal; color: var(--grn); }
+  .win .bar em::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--grn); }
+  .win .bd { display: grid; grid-template-columns: 1fr 1.1fr; }
+  .col { padding: 22px 24px 26px; min-height: 270px; }
+  .col + .col { border-left: 1px solid var(--line); background: rgba(255, 255, 255, .015); }
+  .lbl { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .tag { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line2); font: 500 11.5px/1 var(--mono); letter-spacing: 0; text-transform: none; color: var(--mut); }
+  .tag.g { color: var(--grn); border-color: rgba(61, 220, 151, .35); }
+  .rev { font: 400 clamp(1.3rem, 2.8vw, 1.9rem)/1.3 var(--sans); letter-spacing: -.02em; }
+  .code { font: 400 13.5px/1.75 var(--mono); color: #c7ccd6; white-space: pre-wrap; min-height: 9.5em; }
+  .code .k { color: #8aa7ff; } .code .s { color: #7ee2b8; } .code .c { color: var(--dim); }
+  .caret::after { content: ""; display: inline-block; width: 7px; height: 1.05em; margin-left: 2px; vertical-align: -.18em; background: var(--blu); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .match { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; opacity: 0; transform: translateY(8px); transition: opacity .8s var(--out), transform .8s var(--out); }
+  .match.on { opacity: 1; transform: none; }
+  .win .ft { display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); font: 400 12px/1 var(--mono); color: var(--dim); }
+
+  /* marquee */
+  .mqwrap { margin-top: clamp(56px, 8vw, 90px); text-align: center; }
+  .mqwrap p { margin: 0 0 22px; font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+  .mq { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); }
+  .mq div { display: flex; width: max-content; gap: 64px; padding-right: 64px; animation: mq 46s linear infinite; font: 500 22px/1 var(--sans); letter-spacing: -.02em; color: #4d525c; white-space: nowrap; }
+  .mq span:nth-child(2n) { color: #6a7080; }
+  @keyframes mq { to { transform: translateX(-50%); } }
+
+  /* stats strip */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat { padding: 34px 28px; }
+  .stat + .stat { border-left: 1px solid var(--line); }
+  .stat b { display: block; font: 560 clamp(2.2rem, 5vw, 3.8rem)/1 var(--sans); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+  .stat span { display: block; margin-top: 10px; font: 400 14px/1.4 var(--sans); color: var(--mut); }
+
+  /* statement */
+  .statement { margin: 0; font: 560 clamp(1.8rem, 4.4vw, 3.5rem)/1.14 var(--sans); letter-spacing: -.04em; max-width: 24ch; }
+  .statement .sw { transition: opacity .3s linear; }
+  .rq { margin: 40px 0 0; padding: 4px 0 4px 20px; border-left: 2px solid var(--line2); max-width: 62ch; font-size: 15px; line-height: 1.65; color: var(--mut); }
+  .rq b { display: block; margin-bottom: 6px; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+
+  /* bento */
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: clamp(40px, 6vw, 64px); }
+  .tile { position: relative; grid-column: span 3; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .012)); overflow: hidden; transition: border-color .4s, opacity 1s var(--out), transform 1s var(--out), filter 1s var(--out); }
+  .tile.w4 { grid-column: span 4; } .tile.w2 { grid-column: span 2; } .tile.w6 { grid-column: span 6; }
+  .tile::before { content: ""; position: absolute; inset: 0; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .075), transparent 60%); opacity: 0; transition: opacity .4s; pointer-events: none; }
+  .tile:hover { border-color: var(--line2); } .tile:hover::before { opacity: 1; }
+  .tile > * { position: relative; }
+  .tile h3 { margin: 0; font: 560 1.45rem/1.15 var(--sans); letter-spacing: -.03em; }
+  .tile p { margin: 8px 0 0; max-width: 38ch; font-size: 15px; line-height: 1.55; color: var(--mut); }
+  .tile .no { display: block; margin-bottom: 38px; font: 500 12px/1 var(--mono); letter-spacing: .1em; color: var(--dim); }
+  .rules { display: grid; gap: 10px; margin-top: 26px; }
+  .rule { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(0, 0, 0, .25); font: 400 14.5px/1.35 var(--sans); }
+  .rule .ic { flex: none; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; font: 600 12px/1 var(--sans); }
+  .rule .ic.y { background: rgba(61, 220, 151, .16); color: var(--grn); } .rule .ic.n { background: rgba(255, 107, 107, .16); color: var(--red); }
+  .rule span.t { flex: 1; color: #d6d9df; } .rule em { font: 500 12px/1 var(--mono); font-style: normal; color: var(--dim); }
+  .big2 { margin-top: 30px; font: 560 clamp(3rem, 6vw, 4.6rem)/1 var(--sans); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+  .big2 small { font-size: .38em; letter-spacing: -.02em; color: var(--mut); font-weight: 500; margin-left: 4px; }
+  .meter { margin-top: 18px; height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--blu), var(--grn)); transform: scaleX(0); transform-origin: left; transition: transform 2.2s var(--out) .4s; box-shadow: 0 0 20px rgba(61, 220, 151, .5); }
+  .in .meter i { transform: none; }
+  .meta { margin-top: 12px; display: flex; justify-content: space-between; gap: 8px; font: 400 12px/1.3 var(--mono); color: var(--dim); }
+  .rings { display: flex; gap: 26px; margin-top: 22px; flex-wrap: wrap; }
+  .ring { position: relative; width: 112px; height: 112px; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 7; }
+  .ring .t { stroke: rgba(255, 255, 255, .08); }
+  .ring .f { stroke: url(#rg); stroke-linecap: round; stroke-dasharray: 301.6; stroke-dashoffset: 301.6; transition: stroke-dashoffset 2.2s var(--out) .4s; filter: drop-shadow(0 0 7px rgba(110, 168, 255, .55)); }
+  .in .ring .f { stroke-dashoffset: calc(301.6 * (1 - var(--k))); }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font: 560 1.5rem/1 var(--sans); letter-spacing: -.03em; }
+  .rings small { display: block; text-align: center; margin-top: 8px; font: 500 11.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .langs { margin-top: 22px; display: grid; gap: 10px; }
+  .lang { display: grid; grid-template-columns: 112px minmax(0, 1fr) 46px; align-items: center; gap: 12px; font-size: 13.5px; color: var(--mut); }
+  #gcount .lang { grid-template-columns: 150px minmax(0, 1fr) 46px; }
+  .lang .tr { height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+  .lang .tr i, .bar2 .tr i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, #4a7bd8, var(--blu)); transform: scaleX(0); transform-origin: left; transition: transform 1.8s var(--out) var(--d, 0s); box-shadow: 0 0 14px rgba(110, 168, 255, .4); }
+  .in .lang .tr i, .in .bar2 .tr i { transform: scaleX(var(--w)); }
+  .lang.en .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
+  .lang b { text-align: right; font: 500 12px/1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
+
+  /* headline numbers */
+  .hlg { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 80px); margin-top: 6px; }
+  .hn { font: 560 clamp(4.4rem, 11.5vw, 9rem)/.92 var(--sans); letter-spacing: -.065em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 80px rgba(255, 138, 76, .42); }
+  .hn.bl { color: var(--tx); text-shadow: 0 0 80px rgba(110, 168, 255, .35); }
+  .hlg p { margin-top: 16px; max-width: 30ch; font-size: 16px; }
+  .hlg .bar2 { grid-template-columns: minmax(0, 1fr); margin-top: 22px; }
+  .hlg .bar2 .tr { height: 10px; border-radius: 10px; }
+  .hlg .bar2.bl .tr i { background: linear-gradient(90deg, #4a7bd8, var(--blu)); }
+  .note { display: flex; gap: 12px; align-items: flex-start; margin: 30px 0 0; padding: 14px 16px; max-width: 62ch; border: 1px solid rgba(255, 138, 76, .28); border-radius: 12px; background: rgba(255, 138, 76, .06); font-size: 14.5px; line-height: 1.55; color: #d6d9df; }
+  .note i { flex: none; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; background: rgba(255, 138, 76, .16); color: var(--org); font: 600 12px/1 var(--sans); font-style: normal; }
+  .note b { font-weight: 560; color: var(--tx); }
+
+  /* finding tiles */
+  .bar2 { display: grid; grid-template-columns: minmax(0, 1fr) 54px; align-items: center; gap: 14px; }
+  .bar2 .tr { height: 8px; border-radius: 8px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+  .bar2.or .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
+  .bar2 b { text-align: right; font: 500 12.5px/1 var(--mono); font-variant-numeric: tabular-nums; }
+  .game { padding: 20px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 10px 28px; align-items: start; }
+  #games { margin-top: 24px; }
+  .game b.n { display: block; font: 560 1.15rem/1.2 var(--sans); letter-spacing: -.02em; }
+  .game small { display: block; margin-top: 4px; font: 400 12px/1.3 var(--mono); color: var(--dim); }
+  .gbars { display: grid; gap: 10px; padding-top: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 8px; font: 500 12px/1 var(--mono); color: var(--mut); }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 8px; background: var(--blu); } .legend i.o { background: var(--org); }
+  .vsb { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; align-items: end; }
+  .vcol b { display: block; font: 560 clamp(2.2rem, 4.2vw, 3.2rem)/1 var(--sans); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+  .vcol.hot b { color: var(--org); }
+  .vcol .pl { position: relative; margin-top: 16px; height: 150px; border-radius: 10px; background: rgba(255, 255, 255, .04); overflow: hidden; }
+  .vcol .pl i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--h) * 1%); transform: scaleY(0); transform-origin: bottom; transition: transform 1.8s var(--out) .4s; background: linear-gradient(180deg, #4a7bd8, rgba(110, 168, 255, .25)); }
+  .vcol.hot .pl i { background: linear-gradient(180deg, var(--org), rgba(255, 138, 76, .22)); box-shadow: 0 0 40px rgba(255, 138, 76, .35); }
+  .in .vcol .pl i { transform: none; }
+  .vcol span { display: block; margin-top: 12px; font-size: 13.5px; line-height: 1.4; color: var(--mut); }
+  .vcol small { display: block; margin-top: 2px; font: 400 11.5px/1.3 var(--mono); color: var(--dim); }
+  .types { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; margin-top: 26px; }
+  .ty { padding: 20px 0; border-top: 1px solid var(--line); }
+  .ty .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .ty .hd b { font: 560 1.1rem/1.2 var(--sans); letter-spacing: -.02em; }
+  .ty .hd span { font: 400 12px/1.3 var(--mono); color: var(--dim); text-align: right; }
+  .ty .bar2 { margin-top: 12px; }
+  .exs { margin-top: 12px; display: grid; gap: 7px; }
+  .ex { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(0, 0, 0, .28); font: 400 12.5px/1.45 var(--mono); color: #c7ccd6; overflow-wrap: anywhere; }
+  .ex small { display: block; margin-top: 3px; font: 400 11px/1.3 var(--sans); color: var(--dim); }
+
+  /* learned + limits */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: clamp(40px, 6vw, 64px); }
+  .lis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 clamp(24px, 4vw, 48px); margin-top: 22px; }
+  .lis .li { padding: 22px 0 6px; }
+  .tile.solo { margin-top: clamp(40px, 6vw, 64px); }
+  .li { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .tt + .li { margin-top: 22px; }
+  .li .ic { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 600 13px/1 var(--sans); margin-top: 1px; }
+  .li .ic.y { background: rgba(110, 168, 255, .16); color: var(--blu); } .li .ic.w { background: rgba(255, 138, 76, .16); color: var(--org); }
+  .li h4 { margin: 0 0 6px; font: 560 1.12rem/1.25 var(--sans); letter-spacing: -.02em; }
+  .li p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--mut); max-width: none; }
+  .tile .tt { display: block; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+
+  /* close */
+  .closer { text-align: center; }
+  .closer h2 { margin: 0 auto; max-width: 16ch; }
+  .closer .cta { margin-top: 34px; }
+  .term { max-width: 640px; margin: 44px auto 0; border: 1px solid var(--line2); border-radius: 14px; background: #0b0c0e; text-align: left; overflow: hidden; }
+  .term .bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--line); font: 400 12px/1 var(--mono); color: var(--dim); }
+  .term .bar i { width: 9px; height: 9px; border-radius: 50%; background: #2a2c30; }
+  .term .bar span { margin-left: 6px; }
+  .term .bar button { margin-left: auto; padding: 6px 10px; border: 1px solid var(--line2); border-radius: 7px; background: transparent; color: var(--mut); font: 500 11.5px/1 var(--mono); cursor: pointer; transition: color .2s, border-color .2s; }
+  .term .bar button:hover { color: var(--tx); border-color: rgba(255, 255, 255, .35); }
+  .term pre { margin: 0; padding: 18px 20px; font: 400 13.5px/1.8 var(--mono); color: #c7ccd6; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .term pre .p { color: var(--dim); user-select: none; } .term pre .c { color: var(--dim); }
+  footer { margin-top: clamp(70px, 10vw, 120px); padding: 28px clamp(18px, 4vw, 40px) 70px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font: 400 12.5px/1.5 var(--mono); color: var(--dim); }
+  footer a { color: var(--mut); }
+
+
+  /* every piece of content gets a motion of its own */
+  .st { opacity: 0; transform: translateY(16px); transition: opacity .9s var(--out), transform .9s var(--out); transition-delay: calc(var(--k, 0) * 90ms + .25s); }
+  .in .st { opacity: 1; transform: none; }
+  .st .ic { transform: scale(.3) rotate(-25deg); transition: transform .8s cubic-bezier(.34, 1.56, .64, 1); transition-delay: calc(var(--k, 0) * 90ms + .55s); }
+  .in .st .ic { transform: none; }
+  .logo i { animation: spin 14s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .eyebrow::before { width: 0; transition: width 1.1s var(--out) .1s; }
+  .eyebrow.in::before { width: 22px; }
+  .rq { position: relative; border-left: 0; padding-left: 22px; }
+  .rq::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--line2); transform: scaleY(0); transform-origin: top; transition: transform 1.4s var(--out) .3s; }
+  .rq.in::before { transform: none; }
+  .btn.w { position: relative; overflow: hidden; }
+  .btn.w::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .85), transparent); transform: skewX(-18deg); animation: shine 6s ease-in-out infinite; }
+  @keyframes shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
+  .pill { position: relative; overflow: hidden; }
+  .pill::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent); animation: shine2 7s ease-in-out infinite; }
+  @keyframes shine2 { 0%, 60% { left: -40%; } 100% { left: 130%; } }
+  .win::after { content: ""; position: absolute; inset: 0; border-radius: 16px; pointer-events: none; box-shadow: inset 0 0 70px rgba(110, 168, 255, .09); animation: glowp 5s ease-in-out infinite; }
+  @keyframes glowp { 50% { box-shadow: inset 0 0 90px rgba(255, 138, 76, .12); } }
+  .tile { transition: border-color .4s, transform .5s var(--out), opacity 1s var(--out), filter 1s var(--out); }
+  .tile.in:hover { transform: translateY(-3px); }
+  .stat b, .big2 span { transition: color .4s; } .stat:hover b { color: #fff; }
+  .term pre .tl { display: block; }
+  .term .bar i { animation: blinkdot 3s ease-in-out infinite; } .term .bar i:nth-child(2) { animation-delay: .4s; } .term .bar i:nth-child(3) { animation-delay: .8s; }
+  @keyframes blinkdot { 50% { background: #5a5f69; } }
+  footer { opacity: 0; transform: translateY(14px); transition: opacity 1.2s var(--out), transform 1.2s var(--out); } footer.in { opacity: 1; transform: none; }
+
+  @media (max-width: 1120px) { .btn.hide-m { display: none; } }
+  @media (max-width: 900px) {
+    .links { display: none; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat { padding: 26px 18px; } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .bento { grid-template-columns: 1fr; }
+    .tile, .tile.w4, .tile.w2, .tile.w6 { grid-column: auto; padding: 22px; }
+    .two { grid-template-columns: 1fr; }
+    .types { grid-template-columns: 1fr; }
+    .game { grid-template-columns: 1fr; gap: 8px; }
+    .win .bd { grid-template-columns: 1fr; } .col { min-height: 0; padding: 18px; } .col + .col { border-left: 0; border-top: 1px solid var(--line); }
+    .hlg { grid-template-columns: 1fr; gap: 34px; }
+    .lis { grid-template-columns: 1fr; }
+    .rv, .wd, .tile { filter: none; }
+  }
+  @media (max-width: 560px) { .btn.hide-s { display: none; } .nr .btn { padding: 9px 13px; } .cta .btn.lg { width: 100%; justify-content: center; } .lang { grid-template-columns: 104px minmax(0, 1fr) 44px; } .pill { font-size: 12px; } .pill b { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .rv, .wd, .caps p.on, .match { opacity: 1; transform: none; filter: none; }
+    .lang .tr i, .bar2 .tr i { transform: scaleX(var(--w)); } .meter i { transform: none; } .ring .f { stroke-dashoffset: calc(301.6 * (1 - var(--k))); } .vcol .pl i { transform: none; }
+    .win { transform: none !important; }
+    .st, .st .ic, footer { opacity: 1; transform: none; }
+  }
+
+  /* ---------- detail page ---------- */
+  .dhead { padding: clamp(110px, 13vw, 150px) 0 clamp(40px, 6vw, 64px); }
+  .dhead h1 { font-size: clamp(2.3rem, 6vw, 4.6rem); max-width: 18ch; }
+  .dhead .cta { justify-content: flex-start; }
+  .dl { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+  .toc { position: sticky; top: 84px; display: grid; gap: 2px; }
+  .toc b { display: block; margin: 0 0 12px 13px; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .toc a { padding: 9px 13px; border-radius: 8px; color: var(--mut); font: 500 14px/1.2 var(--sans); text-decoration: none; transition: color .2s, background .2s; }
+  .toc a:hover, .toc a.on { color: var(--tx); background: rgba(255, 255, 255, .06); }
+  .toc a span { margin-right: 10px; font: 400 12px var(--mono); color: var(--dim); }
+  .doc section { padding: 0 0 clamp(64px, 9vw, 110px); scroll-margin-top: 84px; }
+  .doc h2 { font-size: clamp(1.9rem, 4vw, 3rem); max-width: 20ch; }
+  .lede { margin: 20px 0 0; max-width: 60ch; font-size: clamp(1.05rem, 1.8vw, 1.2rem); line-height: 1.6; color: #c9cdd6; }
+  .doc .rq { max-width: 64ch; }
+  .doc h3.sh { margin: 44px 0 0; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  ol.items { list-style: none; margin: 18px 0 0; padding: 0; counter-reset: it; }
+  ol.items > li { counter-increment: it; position: relative; padding: 22px 0 22px 52px; border-top: 1px solid var(--line); font-size: 15.5px; line-height: 1.7; color: var(--mut); max-width: 74ch; }
+  ol.items > li::before { content: counter(it, decimal-leading-zero); position: absolute; left: 0; top: 24px; font: 500 12px/1.6 var(--mono); color: var(--dim); }
+  ol.items.warn > li::before { color: var(--org); }
+  ol.items b { color: var(--tx); font-weight: 560; }
+  ol.items code, .lede code, .doc p code { padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, .07); font: 400 .88em var(--mono); color: #d6d9df; }
+  .tbw { margin-top: 26px; border: 1px solid var(--line); border-radius: 16px; overflow-x: auto; background: rgba(255, 255, 255, .02); }
+  table.tb { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+  .tb th { padding: 14px 16px; text-align: right; font: 500 11.5px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--dim); border-bottom: 1px solid var(--line2); }
+  .tb td { white-space: nowrap; padding: 14px 16px; text-align: right; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; color: #d6d9df; }
+  .tb th:first-child, .tb td:first-child { text-align: left; }
+  .tb tr.sum td { font-weight: 560; color: var(--tx); background: rgba(255, 255, 255, .03); }
+  .tb td.hi { color: var(--org); }
+  .cap { margin: 10px 4px 0; font: 400 12.5px/1.5 var(--mono); color: var(--dim); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 28px; }
+  .fl { position: relative; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, .025); }
+  .fl:not(:last-child)::after { content: "→"; position: absolute; right: -17px; top: 50%; transform: translateY(-50%); z-index: 2; width: 24px; text-align: center; color: var(--dim); font: 400 16px var(--mono); }
+  .fl small { display: block; font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .fl b { display: block; margin-top: 12px; font: 560 1.9rem/1 var(--sans); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .fl span { display: block; margin-top: 8px; font-size: 13px; line-height: 1.4; color: var(--mut); }
+  .fl.hot b { color: var(--org); }
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 28px; }
+  .cmp .tile { padding: 26px; grid-column: auto; }
+  .cmp .hn { font-size: clamp(3.6rem, 8vw, 6rem); margin-top: 6px; }
+  .cmp p { max-width: 36ch; margin-top: 12px; }
+  .cmp .hn.gr { color: #9aa0ab; text-shadow: none; }
+  .cmp .tag { margin-bottom: 10px; display: inline-block; }
+  .doc .term { margin: 28px 0 0; max-width: 680px; }
+  .doc p.small { max-width: 64ch; }
+  @media (max-width: 900px) {
+    .dl { grid-template-columns: minmax(0, 1fr); gap: 0; } .toc, .doc { min-width: 0; }
+    .toc { position: sticky; top: 60px; z-index: 40; display: flex; gap: 4px; margin: 0 calc(-1 * clamp(18px, 4vw, 40px)) 28px; padding: 10px clamp(18px, 4vw, 40px); overflow-x: auto; background: rgba(8, 9, 10, .85); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+    .toc::-webkit-scrollbar { display: none; }
+    .toc b { display: none; } .toc a { flex: none; white-space: nowrap; padding: 8px 12px; } .toc a span { display: none; }
+    .doc section { scroll-margin-top: 130px; }
+    ol.items > li { padding-left: 40px; }
+    .flow { grid-template-columns: 1fr 1fr; } .fl:nth-child(2)::after { display: none; }
+    .cmp { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"><i></i><i></i></div>
+<div class="prog" id="prog" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#top"><i></i><span>Steam reviews study</span></a>
+  <div class="nr">
+    <a class="btn hide-s" href="alt.html">← Summary</a>
+    <a class="btn w" href="https://github.com/Ghifariyadi/team-steam">GitHub <i>↗</i></a>
+  </div>
+</header>
+
+<main id="top">
+<section class="dhead" style="padding-bottom:clamp(40px,6vw,64px)">
+  <div class="wrap">
+    <p class="eyebrow rv">Full details · backup</p>
+    <h1 data-split data-b=".1"><span class="grad">Irony and toxicity </span><span class="gor">in Steam reviews</span></h1>
+    <p class="sub rv" style="--d:.5s;max-width:46em">Every number, rule and caveat behind the summary, in the same order. Richard, Josh and Ghif, COMPSS 211A.</p>
+    <div class="cta rv" style="--d:.65s">
+      <a class="btn w lg" href="alt.html">← Back to the summary</a>
+      <a class="btn lg" href="https://github.com/Ghifariyadi/team-steam">Code and data</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="dl">
+  <nav class="toc" id="toc" aria-label="Sections">
+    <b>On this page</b>
+    <a href="#question"><span>01</span>Research question</a>
+    <a href="#data"><span>02</span>Data</a>
+    <a href="#method"><span>03</span>Method</a>
+    <a href="#findings"><span>04</span>Findings</a>
+    <a href="#interpretation"><span>05</span>Interpretation</a>
+    <a href="#limits"><span>06</span>Limitations</a>
+    <a href="#reproduce"><span>07</span>Reproduce</a>
+  </nav>
+
+  <div class="doc">
+
+  <!-- 01 -->
+  <section id="question">
+    <p class="eyebrow rv">01 · Research question</p>
+    <h2 data-split><span class="grad">Why look at Steam reviews?</span></h2>
+    <p class="lede rv">Steam reviews are a public record of how multiplayer games feel to play: players use them to report harassment, cheating and toxic communities. Irony can flip what a review says, so we ask how toxicity and irony show up in 7,365 reviews of Counter-Strike 2, PUBG and GTA V, and whether the toxic ones recommend the game less.</p>
+    <p class="rq rv" style="margin-top:30px"><b>Research question</b>How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?</p>
+    <ol class="items rv">
+      <li>Players use game reviews to report harassment, cheating and toxic communities, so reviews are a public record of how multiplayer spaces feel to the people in them.</li>
+      <li>Irony and sarcasm can reverse what a review says. A “10/10” can be a complaint, so a recommendation and its text do not always agree.</li>
+      <li>Gender and age references show up in reviews as stereotypes, exclusion and self-description. They are what players say about themselves, and nobody verifies them.</li>
+      <li><b>Toxicity mention (<code>harm_mention</code>).</b> The review reports, condemns, endorses or expresses insults, threats, discrimination, deliberate disruption or a toxic community. A cheating complaint counts only when it also has one of these. Bugs, pricing complaints and profanity alone do not count.</li>
+      <li><b>Irony (<code>irony</code>).</b> A supported ironic reading, including sarcasm: the literal evaluation contrasts with the intended one, or a described outcome mismatches the expectation. Humor or exaggeration alone does not count.</li>
+    </ol>
+  </section>
+
+  <!-- 02 -->
+  <section id="data">
+    <p class="eyebrow rv">02 · Data</p>
+    <h2 data-split><span class="grad">7,365 reviews, three games.</span></h2>
+    <p class="lede rv">About 80% of the reviews are not in English. Each review stays in its original language, and labels come from the original text, never from a translation.</p>
+    <ol class="items rv">
+      <li><b>Source.</b> KieranPoc’s Kaggle Steam reviews dataset (<code>weighted_score_above_08.csv</code>), collected through the Steam reviews API and loaded with <code>kagglehub</code>. The file is already filtered to reviews with a weighted score above 0.8, so it is a subset and not every review. Each row is one review. We keep three games: Counter-Strike 2 (3,017), PUBG: BATTLEGROUNDS (2,404) and Grand Theft Auto V (1,944), 7,365 reviews in total.</li>
+      <li><b>Preparation.</b> Empty reviews are skipped (2 of them) instead of getting an invented label, which leaves 7,363 labeled reviews. For readers, non-English reviews are also translated into English in a separate column (<code>translation_en</code>), and that translation is never sent for labeling.</li>
+    </ol>
+    <div class="bento" style="margin-top:28px">
+      <article class="tile rv">
+        <span class="tt">Reviews per game</span>
+        <div class="langs" id="gcount" role="img" aria-label="Reviews per game: Counter-Strike 2 3,017, PUBG 2,404, Grand Theft Auto V 1,944"></div>
+      </article>
+      <article class="tile rv" style="--d:.1s">
+        <span class="tt">Reviews per language, top six</span>
+        <div class="langs" id="langs" role="img" aria-label="Reviews per language: Simplified Chinese 2,304, English 1,457, Russian 1,068, Turkish 564, Brazilian Portuguese 406, Korean 329"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section id="method">
+    <p class="eyebrow rv">03 · Method</p>
+    <h2 data-split><span class="grad">Three passes, plus a human pilot.</span></h2>
+    <p class="lede rv">Gemini labels each review from a written codebook. The toxic ones get a second check with one added rule, that cheating alone is not toxic, and a third pass that quotes the toxic words. Two humans labeled a 90-review pilot to test the codebook.</p>
+    <div class="flow rv">
+      <div class="fl"><small>Pass 1 · label</small><b>7,363</b><span>reviews labeled by Gemini</span></div>
+      <div class="fl hot"><small>Pass 2 · cheating rule</small><b>3,499</b><span>first-pass toxic reviews re-checked</span></div>
+      <div class="fl"><small>Pass 3 · toxic words</small><b>1,669</b><span>still-toxic reviews, words quoted</span></div>
+      <div class="fl"><small>Human pilot</small><b>90</b><span>reviews, two annotators, blind</span></div>
+    </div>
+    <ol class="items rv" style="margin-top:34px">
+      <li><b>First pass: labeling.</b> <code>gemini-3.5-flash-lite</code> through Vertex AI at temperature 0. The project codebook is the system prompt, and each review goes in its own request with its game and its Recommended / Not recommended flag. The answer is structured JSON: <code>harm_mention</code>, <code>irony</code> and <code>gender_age</code>, each with a short English reason. The run uses 8 parallel requests, retries on temporary Google errors, and saves every finished label right away, so a re-run skips what is already done. It took 46 minutes.</li>
+      <li><b>Second pass: the cheating rule.</b> The 3,499 reviews labeled toxic in the first pass go back to Gemini with the full codebook plus one added rule, that a cheating complaint alone is not toxicity. Reviews first labeled no are not re-asked, since a narrower rule can only turn a yes into a no. The first-pass labels are kept unchanged and the second pass is saved in separate files.</li>
+      <li><b>Third pass: the toxic words.</b> On the 1,669 reviews still toxic, Gemini quotes up to 3 exact words or phrases that make the review toxic, and gives each a type (insult, identity attack, threat, swearing, sexual harassment, griefing or trolling, toxic community, other), the identity group if it is an identity attack, and who it is aimed at. The types follow common schemes: the Perspective API attributes, Risch and Krestel (2020), and the Fair Play Alliance and ADL framework for online games (2020). A quote counts only if it appears word for word in the review: 96.2% did, and the rest are left out. 1,620 reviews got at least one quote; 49 got none (7 requests failed and the others returned no quote). This pass is saved in separate files too.</li>
+      <li><b>Human pilot.</b> 90 reviews (30 per game), labeled blind by two annotators, with about 10% positive cases. Only 1 of the 90 is not in English. We measured Cohen’s kappa between the two annotators to see whether the codebook can be applied the same way by different people.</li>
+      <li><b>Trial and next check.</b> A 10-review trial gave Gemini only reviews where a human had marked toxicity or irony as yes, then compared its labels with the human ones. The next check is a stratified sample of non-English reviews, labeled by a human who reads the language, to test Gemini outside English.</li>
+      <li><b>Ethics.</b> User IDs are left out and only short public review text is shown as examples. Identity claims in reviews are unverified. A yes label means the text says it, not that the reviewer did it or that the event happened.</li>
+    </ol>
+  </section>
+
+  <!-- 04 -->
+  <section id="findings">
+    <p class="eyebrow rv">04 · Findings</p>
+    <h2 data-split><span class="grad">What Gemini’s labels show.</span></h2>
+    <p class="lede rv">Gemini flagged toxicity in 22.7% of the 7,363 labeled reviews and irony in 25.0%. Counter-Strike 2 has the most of both. Most toxic reviews insult other players, and reviews that do not recommend the game are toxic more often.</p>
+
+    <h3 class="sh rv">The cheating rule, in numbers</h3>
+    <div class="cmp">
+      <article class="tile rv">
+        <span class="tag">First pass</span>
+        <div class="hn gr"><span>47.5%</span></div>
+        <p>of 7,363 reviews labeled toxic (3,499). Most only complained about cheaters or hackers.</p>
+      </article>
+      <article class="tile rv" style="--d:.1s">
+        <span class="tag" style="color:var(--org);border-color:rgba(255,138,76,.4)">With the cheating rule</span>
+        <div class="hn"><span>22.7%</span></div>
+        <p>1,669 reviews stay toxic. 1,829 flip to not toxic and 1 becomes uncertain.</p>
+      </article>
+    </div>
+
+    <ol class="items rv" style="margin-top:30px">
+      <li><b>Gemini labeled every review.</b> 7,363 of the 7,365 reviews got a label with no failures. The other 2 were empty and skipped. The run took 46 minutes.</li>
+      <li><b>Gemini flagged toxicity in 22.7% of the reviews and irony in 25.0%</b> (1,669 and 1,843 of 7,363). Our first pass flagged toxicity in 47.5% (3,499 reviews), but most of those only complained about cheaters or hackers. We then added one rule to the codebook, that cheating alone is not toxic, and Gemini re-checked those 3,499 reviews. Cheating counts only when the review also has insults, slurs, nationality stereotypes, threats, harassment or deliberate disruption. The re-check turned 1,829 of the 3,499 to no and left 1,669 as yes, and 1 as uncertain. About 1,670 of those changes were reviews that mention cheating. The other 161 were reviews without cheating that Gemini no longer counted as toxic on the second look, often single-word or joke reviews. Irony was not re-checked. Uncertain answers were rare in the first pass: 12 for toxicity and 96 for irony.</li>
+      <li><b>Counter-Strike 2 has the most irony.</b> 32.9% of its reviews are labeled ironic, against about 19% for GTA V and PUBG. On toxicity with the cheating rule, Counter-Strike 2 is highest (27.9%), then PUBG (20.8%) and GTA V (16.8%). The first pass put PUBG and Counter-Strike 2 level near 50%, so the cheating rule moved PUBG the most.</li>
+      <li><b>Reviews that do not recommend the game are flagged for toxicity more often:</b> 28.4% of the 2,369 “Not recommended” reviews, against 19.9% of the 4,994 “Recommended” ones. In the first pass the gap was larger (65.3% against 39.1%). This is an association between Gemini’s labels and the recommendation flag, not evidence of cause.</li>
+      <li><b>These labels are Gemini’s, and they are not checked against humans on this data yet.</b> The human pilot reviews are much shorter (median 28 characters, against 137 in the full data) and only 9 of the 90 appear in the 7,365, so the pilot’s 10% toxicity rate cannot be compared with the full-run rate.</li>
+      <li><b>Human agreement on the pilot is high.</b> Toxicity kappa is 0.845 and irony kappa is 0.903. This was measured before the cheating rule was added.</li>
+      <li><b>Gemini matched the human label on 9 of 10 trial reviews for toxicity and on 10 of 10 for irony.</b> The trial reviews were all human-positive and the codebook was tuned on the same cases, so this is a best case and not an accuracy estimate.</li>
+    </ol>
+
+    <div class="tbw rv"><table class="tb">
+      <thead><tr><th>Game</th><th>Reviews labeled</th><th>Toxicity yes, first pass</th><th>Toxicity yes, with cheating rule</th><th>Irony yes</th></tr></thead>
+      <tbody>
+        <tr><td>Counter-Strike 2</td><td>3,017</td><td>1,505 (49.9%)</td><td class="hi">843 (27.9%)</td><td>993 (32.9%)</td></tr>
+        <tr><td>Grand Theft Auto V</td><td>1,944</td><td>772 (39.7%)</td><td class="hi">326 (16.8%)</td><td>383 (19.7%)</td></tr>
+        <tr><td>PUBG: BATTLEGROUNDS</td><td>2,402</td><td>1,222 (50.9%)</td><td class="hi">500 (20.8%)</td><td>467 (19.4%)</td></tr>
+        <tr class="sum"><td>All three</td><td>7,363</td><td>3,499 (47.5%)</td><td class="hi">1,669 (22.7%)</td><td>1,843 (25.0%)</td></tr>
+      </tbody></table></div>
+    <p class="cap">Table 1. Gemini’s labels by game. “Yes” counts only yes answers, not uncertain ones.</p>
+
+    <div class="tbw rv"><table class="tb">
+      <thead><tr><th>Check</th><th>N</th><th>Agreement</th><th>Cohen’s kappa</th></tr></thead>
+      <tbody>
+        <tr><td>Human vs human, toxicity</td><td>89</td><td>97.8%</td><td>0.845</td></tr>
+        <tr><td>Human vs human, irony</td><td>83</td><td>98.8%</td><td>0.903</td></tr>
+      </tbody></table></div>
+    <p class="cap">Table 2. Agreement between the two human annotators on the pilot reviews both labeled.</p>
+
+    <h3 class="sh rv">Which toxic words, and of what type</h3>
+    <div class="bento" style="margin-top:18px"><article class="tile w6 rv"><div class="types" id="types" style="margin-top:0"></div>
+      <p class="small" style="margin-top:8px">Share of the 1,669 toxic reviews with each type; a review can have several. Examples are real review text, picked as the clearest. Types are Gemini’s labels, and some phrases are jokes or sarcasm.</p></article></div>
+  </section>
+
+  <!-- 05 -->
+  <section id="interpretation">
+    <p class="eyebrow rv">05 · Interpretation</p>
+    <h2 data-split><span class="grad">How you define “toxic” changes the answer.</span></h2>
+    <p class="lede rv">A written codebook lets an LLM label thousands of reviews and give a reason for each, so the labels can be audited one by one. But how we define toxicity changes the answer more than the model does: one extra rule moved the rate from 47.5% to 22.7%. Reviews that do not recommend a game are toxic more often, which is an association, not a cause.</p>
+    <h3 class="sh rv">What the results support</h3>
+    <ol class="items rv">
+      <li><b>Conclusion.</b> A written codebook with structured output gives every label a reason, so the labels can be checked one by one. Finished labels are saved as they arrive, so the full run can be paused, resumed and re-checked without paying twice.</li>
+      <li><b>Definitions matter.</b> One extra rule (cheating alone is not toxic) cut the toxicity rate from 47.5% to 22.7%, so the definition changes the result more than the choice of model.</li>
+      <li><b>Toxic communities and recommendations.</b> Reviews that do not recommend the game are toxic more often (28.4% against 19.9%). Reviewers who dislike a game may also be more likely to complain about other players, so this is a link and not a cause.</li>
+    </ol>
+    <h3 class="sh rv">What they do not support</h3>
+    <ol class="items warn rv">
+      <li><b>Accuracy outside English.</b> That Gemini is accurate on non-English reviews. That has not been tested yet.</li>
+      <li><b>That 22.7% of Steam reviews mention toxicity.</b> That is Gemini’s rate on these three games, and it has not been validated. It depends on the cheating rule: the first pass without it gave 47.5%.</li>
+      <li>How common toxicity, irony or gender talk is on Steam in general.</li>
+      <li>That toxic communities cause fewer recommendations. Any link between labels and recommendations is an association.</li>
+    </ol>
+  </section>
+
+  <!-- 06 -->
+  <section id="limits">
+    <p class="eyebrow rv">06 · Limitations</p>
+    <h2 data-split><span class="grad">What this does not show.</span></h2>
+    <ol class="items warn rv">
+      <li>The pilot is small (90 reviews, about 10% positive), so the kappa values are rough.</li>
+      <li>The codebook was checked almost only on English reviews, but about 80% of the data is not English.</li>
+      <li>The Gemini trial used only human-positive reviews and the codebook was tuned on the same cases.</li>
+      <li>The quoted phrases and their types are Gemini’s own explanation, not proof of why it decided, and we have not yet checked them against a human (a 30-row spot-check file is ready). 185 reviews (11%) have toxic words aimed only at the developer, which the cheating rule says is not enough on its own, so some of them are probably false positives.</li>
+      <li>The cheating rule was written after we saw the first-pass results, to fit how we want to define toxicity. It changes what the toxicity label means, and we have not checked it against humans.</li>
+      <li>The full-run labels come from Gemini alone. We have not yet compared them with humans on a random sample of these reviews.</li>
+      <li>Labels describe what the text says. They do not verify behavior, identity or events.</li>
+      <li>Three games only, from one pre-filtered Kaggle file, so the results do not cover Steam as a whole.</li>
+    </ol>
+  </section>
+
+  <!-- 07 -->
+  <section id="reproduce">
+    <p class="eyebrow rv">07 · Reproduce</p>
+    <h2 data-split><span class="grad">Run it yourself.</span></h2>
+    <p class="lede rv">The code, data files and run instructions are in the GitHub repository, and the notebooks run in the order listed below.</p>
+    <ol class="items rv">
+      <li><b>Repository.</b> <a href="https://github.com/Ghifariyadi/team-steam" style="color:var(--blu)">team-steam on GitHub</a></li>
+      <li><b>Environment.</b> Run <code>uv sync --frozen</code> from the repository folder.</li>
+      <li><b>Run order.</b> <code>notebooks/kappa_test.ipynb</code> (human agreement), then <code>notebooks/scale_up.ipynb</code> (10-review trial, then the full run; the plumbing is in <code>scripts/steam_labeling.py</code>), then <code>notebooks/harm_recheck.ipynb</code> (the cheating rule) and <code>notebooks/toxic_evidence.ipynb</code> (the toxic words).</li>
+      <li><b>Data access.</b> The dataset downloads through <code>kagglehub</code>. The Gemini calls need your own Google Cloud (Vertex AI) or Gemini API access, set in a local <code>.env</code> file that is not committed.</li>
+    </ol>
+    <div class="term rv">
+      <div class="bar"><i></i><i></i><i></i><span>reproduce it</span><button type="button" id="copy">Copy</button></div>
+      <pre id="cmd"><span class="tl st"><span class="p">$ </span>git clone https://github.com/Ghifariyadi/team-steam.git</span><span class="tl st"><span class="p">$ </span>cd team-steam</span><span class="tl st"><span class="p">$ </span>uv sync --frozen</span></pre>
+    </div>
+    <h3 class="sh rv">References</h3>
+    <ol class="items rv">
+      <li>Kowert, R. (2020). Dark participation in games.</li>
+      <li>Van Hee, C., Lefever, E., and Hoste, V. (2018). SemEval-2018 Task 3: Irony detection in English tweets.</li>
+      <li>KieranPoc. Steam reviews dataset, Kaggle.</li>
+    </ol>
+  </section>
+
+  </div>
+</div>
+</div>
+</main>
+<footer id="foot"><span>Richard · Josh · Ghif · COMPSS 211A</span><span><a href="alt.html">Summary</a> · Full details · <a href="index.html">Original site</a></span></footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (id) { return document.getElementById(id); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var esc = function (s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+
+  var LANGS = [['Simplified Chinese', 2304], ['English', 1457], ['Russian', 1068], ['Turkish', 564], ['Portuguese (BR)', 406], ['Korean', 329]];
+  var GCOUNT = [['Counter-Strike 2', 3017], ['PUBG', 2404], ['Grand Theft Auto V', 1944]];
+  var TYPES = [
+    ['Insult at a person', 'aimed at other players', 48.5, [['A bunch of no-life cunts whom nobody likes', 'Polish, translated'], ['retards and fucking amoebas who have 500 ping', 'Polish, translated']]],
+    ['Racism and discrimination', '88% nationality or ethnicity', 25.9, [['get ready to be cursed by angry iranians', 'from the human-labeled pilot'], ['This game is so much fun when those motherfucking Russians aren’t around.', 'Turkish, translated'], ['those little monkeys don’t know how to play normally', 'Ukrainian, translated']]],
+    ['Swearing', 'curse words', 20.1, [['FUCKING TEAMKILLER', ''], ['Fuck you Rockstar. Fuck. You.', '']]],
+    ['Threat or wishing harm', 'wishing someone dead or sick', 6.2, [['wishes you dead', ''], ['may you die a slow and painful disease, guys', 'French, translated']]]
+  ];
+  var bars = function (rows, first) {
+    var mx = rows[0][1];
+    return rows.map(function (l, i) {
+      return '<div class="lang' + (i === first ? ' en' : '') + '"><span>' + esc(l[0]) + '</span><span class="tr"><i style="--w:' + (l[1] / mx).toFixed(4) + ';--d:' + (.5 + i * .1) + 's"></i></span><b>' + l[1].toLocaleString('en-US') + '</b></div>';
+    }).join('');
+  };
+  $('langs').innerHTML = bars(LANGS, 1);
+  $('gcount').innerHTML = bars(GCOUNT, 0);
+  var b2 = function (cls, v, d) { return '<div class="bar2 ' + cls + '"><span class="tr"><i style="--w:' + (v / 100).toFixed(4) + ';--d:' + d + 's"></i></span><b>' + v.toFixed(1) + '%</b></div>'; };
+  $('types').innerHTML = TYPES.map(function (r, i) {
+    return '<div class="ty"><div class="hd"><b>' + r[0] + '</b><span>' + r[1] + '</span></div>' + b2('or', r[2], .5 + i * .12) + '<div class="exs">' +
+      r[3].map(function (q) { return '<div class="ex">“' + esc(q[0]) + '”' + (q[1] ? '<small>' + q[1] + '</small>' : '') + '</div>'; }).join('') + '</div></div>';
+  }).join('');
+
+  function words(el, cls) {
+    var n = 0;
+    (function walk(node) {
+      [].slice.call(node.childNodes).forEach(function (c) {
+        if (c.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          c.textContent.split(/(\s+)/).forEach(function (p) {
+            if (!p) return;
+            if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(' ')); return; }
+            var i = document.createElement('span'); i.className = cls; i.style.setProperty('--i', n++); i.textContent = p; frag.appendChild(i);
+          });
+          c.parentNode.replaceChild(frag, c);
+        } else if (c.nodeType === 1) walk(c);
+      });
+    })(el);
+  }
+  [].forEach.call(document.querySelectorAll('[data-split]'), function (h) {
+    h.setAttribute('aria-label', h.textContent); words(h, 'wd');
+    [].forEach.call(h.querySelectorAll('.wd'), function (w) { w.setAttribute('aria-hidden', 'true'); });
+    h.style.setProperty('--b', (h.getAttribute('data-b') || '.1') + 's');
+  });
+  ['.ty', '.ex', '.lang', '.fl'].forEach(function (sel) {
+    [].forEach.call(document.querySelectorAll(sel), function (el) {
+      var sibs = [].slice.call(el.parentNode.children).filter(function (x) { return x.matches(sel); });
+      el.classList.add('st'); el.style.setProperty('--k', sibs.indexOf(el));
+    });
+  });
+  [].forEach.call(document.querySelectorAll('.term pre .tl'), function (el, i) { el.style.setProperty('--k', i); });
+
+  var els = [].slice.call(document.querySelectorAll('.rv, [data-split], .eyebrow, #foot, .term'));
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+    els.forEach(function (s) { io.observe(s); });
+  } else els.forEach(function (s) { s.classList.add('in'); });
+
+  var nav = $('nav'), prog = $('prog'), links = [].slice.call($('toc').querySelectorAll('a')), ticking = false;
+  var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.transform = 'scaleX(' + clamp(window.scrollY / Math.max(1, h)) + ')';
+    nav.classList.toggle('s', window.scrollY > 24);
+    var mid = window.innerHeight * 0.4, best = -1;
+    targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top <= mid) best = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === best); });
+    if (best >= 0 && window.innerWidth <= 900) { var a = links[best], box = $('toc'); box.scrollLeft = a.offsetLeft - 20; }
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+  if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+    [].forEach.call(document.querySelectorAll('.tile'), function (t) {
+      t.addEventListener('pointermove', function (e) { var r = t.getBoundingClientRect(); t.style.setProperty('--mx', (e.clientX - r.left) + 'px'); t.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
+    });
+  }
+  var cp = $('copy');
+  if (cp) cp.addEventListener('click', function () {
+    var text = 'git clone https://github.com/Ghifariyadi/team-steam.git\ncd team-steam\nuv sync --frozen';
+    try { navigator.clipboard.writeText(text).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1600); }); } catch (e) { cp.textContent = 'Select and copy'; }
+  });
+})();
+</script>
+</body>
+</html>

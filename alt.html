@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#08090a">
 <meta name="color-scheme" content="dark">
-<title>Is half of Steam toxic? · Irony and toxicity in Steam reviews</title>
-<meta name="description" content="We asked an AI to read 7,365 Steam reviews and tell us how many are toxic. Then we checked its answer.">
+<title>Irony and toxicity in Steam reviews · COMPSS 211A</title>
+<meta name="description" content="We used Gemini to label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity and irony, then looked at how far the labels can be trusted.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@
   @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, .55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(61, 220, 151, 0); } }
   .pill b { color: var(--tx); font-weight: 500; }
   .pill em { font-style: normal; padding: 5px 9px; border-radius: 99px; background: rgba(255, 255, 255, .08); color: var(--tx); font-size: 12px; }
-  .hero h1 { margin: 22px auto 0; max-width: 11ch; }
+  .hero h1 { margin: 22px auto 0; max-width: 15ch; font-size: clamp(2.5rem, 7.2vw, 5.8rem); line-height: 1.04; }
   .hero .sub { margin-left: auto; margin-right: auto; text-wrap: balance; }
   .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
 
@@ -164,37 +164,24 @@
   .rings small { display: block; text-align: center; margin-top: 8px; font: 500 11.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
   .langs { margin-top: 22px; display: grid; gap: 10px; }
   .lang { display: grid; grid-template-columns: 112px minmax(0, 1fr) 46px; align-items: center; gap: 12px; font-size: 13.5px; color: var(--mut); }
+  #gcount .lang { grid-template-columns: 150px minmax(0, 1fr) 46px; }
   .lang .tr { height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .07); overflow: hidden; }
   .lang .tr i, .bar2 .tr i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, #4a7bd8, var(--blu)); transform: scaleX(0); transform-origin: left; transition: transform 1.8s var(--out) var(--d, 0s); box-shadow: 0 0 14px rgba(110, 168, 255, .4); }
   .in .lang .tr i, .in .bar2 .tr i { transform: scaleX(var(--w)); }
   .lang.en .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
   .lang b { text-align: right; font: 500 12px/1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
 
-  /* the twist: one block, plays by itself when it comes into view */
-  .twb { padding: clamp(24px, 4vw, 44px); margin-top: clamp(36px, 5vw, 56px); }
-  .twb::after { content: ""; position: absolute; left: 0; top: 0; width: 70%; height: 100%; background: radial-gradient(closest-side at 30% 40%, rgba(255, 138, 76, var(--glow, .26)), transparent); pointer-events: none; }
-  .twg { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
-  .twtop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .twtop .btn { padding: 7px 12px; font-size: 12.5px; border-radius: 8px; }
-  .big { margin-top: 14px; font: 560 clamp(5.4rem, 15vw, 11.5rem)/.9 var(--sans); letter-spacing: -.07em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 80px var(--sh, rgba(255, 138, 76, .45)); }
-  .big small { font-size: .32em; letter-spacing: -.03em; margin-left: .06em; font-weight: 500; }
-  .track { position: relative; margin-top: 26px; height: 10px; border-radius: 10px; background: rgba(255, 255, 255, .08); overflow: hidden; }
-  .seg { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 10px; background: var(--org); will-change: width; }
-  .tlabels { position: relative; height: 92px; margin-top: 14px; font-size: 14px; line-height: 1.35; }
-  .tlabels div { left: 0 !important; } .tl2 { top: 46px !important; }
-  .tlabels div { position: absolute; top: 0; opacity: 0; will-change: opacity; }
-  .tlabels b { display: block; font: 500 12px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-  .tl1 b { color: #fff; } .tl2 b { color: var(--org); } .tlabels span { color: var(--mut); }
-  .tsteps { list-style: none; margin: 0; padding: 0 0 0 26px; position: relative; display: grid; gap: 22px; }
-  .tsteps::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 1px; background: var(--line2); }
-  .tsteps li { position: relative; opacity: .3; transform: translateX(-6px); transition: opacity .8s var(--out), transform .8s var(--out); }
-  .tsteps li::before { content: ""; position: absolute; left: -26px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line2); transition: background .6s, border-color .6s, box-shadow .6s; }
-  .tsteps li.on { opacity: .6; transform: none; }
-  .tsteps li.cur { opacity: 1; }
-  .tsteps li.cur::before { background: var(--org); border-color: var(--org); box-shadow: 0 0 0 5px rgba(255, 138, 76, .18), 0 0 18px rgba(255, 138, 76, .6); }
-  .tsteps b { display: block; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
-  .tsteps span { display: block; margin-top: 7px; font: 560 clamp(1.1rem, 2vw, 1.4rem)/1.25 var(--sans); letter-spacing: -.025em; }
-  .tsteps em { font-style: normal; color: var(--org); }
+  /* headline numbers */
+  .hlg { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 80px); margin-top: 6px; }
+  .hn { font: 560 clamp(4.4rem, 11.5vw, 9rem)/.92 var(--sans); letter-spacing: -.065em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 80px rgba(255, 138, 76, .42); }
+  .hn.bl { color: var(--tx); text-shadow: 0 0 80px rgba(110, 168, 255, .35); }
+  .hlg p { margin-top: 16px; max-width: 30ch; font-size: 16px; }
+  .hlg .bar2 { grid-template-columns: minmax(0, 1fr); margin-top: 22px; }
+  .hlg .bar2 .tr { height: 10px; border-radius: 10px; }
+  .hlg .bar2.bl .tr i { background: linear-gradient(90deg, #4a7bd8, var(--blu)); }
+  .note { display: flex; gap: 12px; align-items: flex-start; margin: 30px 0 0; padding: 14px 16px; max-width: 62ch; border: 1px solid rgba(255, 138, 76, .28); border-radius: 12px; background: rgba(255, 138, 76, .06); font-size: 14.5px; line-height: 1.55; color: #d6d9df; }
+  .note i { flex: none; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; background: rgba(255, 138, 76, .16); color: var(--org); font: 600 12px/1 var(--sans); font-style: normal; }
+  .note b { font-weight: 560; color: var(--tx); }
 
   /* finding tiles */
   .bar2 { display: grid; grid-template-columns: minmax(0, 1fr) 54px; align-items: center; gap: 14px; }
@@ -229,6 +216,9 @@
 
   /* learned + limits */
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: clamp(40px, 6vw, 64px); }
+  .lis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 clamp(24px, 4vw, 48px); margin-top: 22px; }
+  .lis .li { padding: 22px 0 6px; }
+  .tile.solo { margin-top: clamp(40px, 6vw, 64px); }
   .li { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 22px 0; border-top: 1px solid var(--line); }
   .tt + .li { margin-top: 22px; }
   .li .ic { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 600 13px/1 var(--sans); margin-top: 1px; }
@@ -281,6 +271,7 @@
   @keyframes blinkdot { 50% { background: #5a5f69; } }
   footer { opacity: 0; transform: translateY(14px); transition: opacity 1.2s var(--out), transform 1.2s var(--out); } footer.in { opacity: 1; transform: none; }
 
+  @media (max-width: 1120px) { .btn.hide-m { display: none; } }
   @media (max-width: 900px) {
     .links { display: none; }
     .stats { grid-template-columns: 1fr 1fr; }
@@ -291,8 +282,8 @@
     .types { grid-template-columns: 1fr; }
     .game { grid-template-columns: 1fr; gap: 8px; }
     .win .bd { grid-template-columns: 1fr; } .col { min-height: 0; padding: 18px; } .col + .col { border-left: 0; border-top: 1px solid var(--line); }
-    .twg { grid-template-columns: 1fr; }
-    .tlabels { height: 84px; } .tlabels div { left: 0 !important; } .tl2 { top: 42px !important; }
+    .hlg { grid-template-columns: 1fr; gap: 34px; }
+    .lis { grid-template-columns: 1fr; }
     .rv, .wd, .tile { filter: none; }
   }
   @media (max-width: 560px) { .btn.hide-s { display: none; } .nr .btn { padding: 9px 13px; } .cta .btn.lg { width: 100%; justify-content: center; } .lang { grid-template-columns: 104px minmax(0, 1fr) 44px; } .pill { font-size: 12px; } .pill b { display: none; } }
@@ -301,7 +292,6 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .rv, .wd, .caps p.on, .match { opacity: 1; transform: none; filter: none; }
     .lang .tr i, .bar2 .tr i { transform: scaleX(var(--w)); } .meter i { transform: none; } .ring .f { stroke-dashoffset: calc(301.6 * (1 - var(--k))); } .vcol .pl i { transform: none; }
-    .tsteps li { opacity: 1; transform: none; }
     .win { transform: none !important; }
     .st, .st .ic, footer { opacity: 1; transform: none; }
   }
@@ -312,12 +302,12 @@
 <div class="prog" id="prog" aria-hidden="true"></div>
 
 <header class="nav" id="nav">
-  <a class="logo" href="#top"><i></i><span>Steam Toxicity Study</span></a>
+  <a class="logo" href="#top"><i></i><span>Steam reviews study</span></a>
   <nav class="links" id="links" aria-label="Sections">
-    <a href="#question">Question</a><a href="#method">Method</a><a href="#twist">The twist</a><a href="#findings">Findings</a><a href="#limits">Limits</a>
+    <a href="#question">Question</a><a href="#data">Data</a><a href="#method">Method</a><a href="#findings">Findings</a><a href="#interpretation">Interpretation</a><a href="#limits">Limitations</a>
   </nav>
   <div class="nr">
-    <a class="btn hide-s" href="index.html" title="The original version, with all the details">Original</a>
+    <a class="btn hide-s hide-m" href="alt-detail.html" title="Every number, rule and caveat on one page">Full details</a>
     <a class="btn w" href="https://github.com/Ghifariyadi/team-steam">GitHub <i>↗</i></a>
   </div>
 </header>
@@ -326,12 +316,12 @@
 <!-- HERO -->
 <section class="hero" id="hero">
   <div class="wrap">
-    <a class="pill rv" href="#findings" style="--d:.05s"><span class="dot"></span><span>COMPSS 211A <b>· Research preview</b></span><em>7,365 reviews →</em></a>
-    <h1 data-split data-b=".1"><span class="grad">Is half of Steam </span><span class="gor">toxic?</span></h1>
-    <p class="sub rv" style="--d:.5s">We asked an AI to read <b>7,365 Steam reviews</b> and tell us. Then we checked its answer, and it was not what we expected.</p>
+    <a class="pill rv" href="#question" style="--d:.05s"><span class="dot"></span><span>COMPSS 211A <b>· Final project</b></span><em>Richard · Josh · Ghif</em></a>
+    <h1 data-split data-b=".1"><span class="grad">Irony and toxicity </span><span class="gor">in Steam reviews</span></h1>
+    <p class="sub rv" style="--d:.5s">We used Gemini to label <b>7,365 Steam reviews</b> of Counter-Strike 2, PUBG and GTA V, then looked at how far the labels can be trusted.</p>
     <div class="cta rv" style="--d:.65s">
-      <a class="btn w lg" href="#twist">See what we found <i>→</i></a>
-      <a class="btn lg" href="https://github.com/Ghifariyadi/team-steam">View on GitHub</a>
+      <a class="btn w lg" href="#question">Research question <i>→</i></a>
+      <a class="btn lg" href="https://github.com/Ghifariyadi/team-steam">GitHub</a>
     </div>
 
     <div class="stagewin rv" style="--d:.8s">
@@ -359,24 +349,41 @@
   </div>
 </section>
 
-<!-- STATS -->
-<section class="pad" style="padding-bottom:0" id="stats">
-  <div class="wrap">
-    <div class="stats rv">
-      <div class="stat"><b data-count="7365">7,365</b><span>Steam reviews</span></div>
-      <div class="stat"><b data-count="3">3</b><span>games: Counter-Strike 2, PUBG, GTA V</span></div>
-      <div class="stat"><b data-count="80" data-suffix="%">80%</b><span>not written in English</span></div>
-      <div class="stat"><b data-count="2">2</b><span>human annotators checking the codebook</span></div>
-    </div>
-  </div>
-</section>
-
 <!-- QUESTION -->
 <section class="pad" id="question">
   <div class="wrap">
-    <p class="eyebrow rv">The question</p>
-    <p class="statement" data-scrub>What do players write when a game goes wrong? We looked for toxicity, for irony, and for whether either changes if they recommend the game.</p>
+    <p class="eyebrow rv">Research question</p>
+    <p class="statement" data-scrub>Players use reviews to report harassment and toxic communities. Irony can flip what a review says. So how do toxicity and irony show up, and do toxic reviews recommend less?</p>
     <p class="rq rv"><b>Research question</b>How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?</p>
+  </div>
+</section>
+
+<!-- DATA -->
+<section class="pad" id="data" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow rv">Data</p>
+    <h2 data-split><span class="grad">Three games, and mostly not in English.</span></h2>
+    <div class="stats rv" style="margin-top:clamp(40px,6vw,64px)">
+      <div class="stat"><b data-count="7365">7,365</b><span>public Steam reviews</span></div>
+      <div class="stat"><b data-count="3">3</b><span>games: Counter-Strike 2, PUBG, GTA V</span></div>
+      <div class="stat"><b data-count="80" data-suffix="%">80%</b><span>not written in English</span></div>
+      <div class="stat"><b data-count="2">2</b><span>empty reviews, skipped</span></div>
+    </div>
+    <div class="bento">
+      <article class="tile rv" style="--d:.05s">
+        <span class="no">01 · GAMES</span>
+        <h3>Three games, one file.</h3>
+        <p>Reviews per game, before labeling.</p>
+        <div class="langs" id="gcount" role="img" aria-label="Reviews per game: Counter-Strike 2 3,017, PUBG 2,404, Grand Theft Auto V 1,944"></div>
+        <p class="small" style="margin-top:20px">Source: the Kaggle Steam reviews dataset by KieranPoc. We used its file with weighted score above 0.8, so this is a filtered subset and not every review.</p>
+      </article>
+      <article class="tile rv" style="--d:.15s">
+        <span class="no">02 · LANGUAGES</span>
+        <h3>Mostly not in English.</h3>
+        <p>Reviews per language, top six.</p>
+        <div class="langs" id="langs" role="img" aria-label="Reviews per language: Simplified Chinese 2,304, English 1,457, Russian 1,068, Turkish 564, Portuguese 406, Korean 329"></div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -384,7 +391,7 @@
 <section class="pad" id="method" style="padding-top:0">
   <div class="wrap">
     <p class="eyebrow rv">Method</p>
-    <h2 data-split><span class="grad">One AI. One rulebook. Two humans to check.</span></h2>
+    <h2 data-split><span class="grad">A written codebook, Gemini, and two humans.</span></h2>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ea8ff"/><stop offset="1" stop-color="#3ddc97"/></linearGradient></defs></svg>
     <div class="bento">
       <article class="tile w4 rv" style="--d:.05s">
@@ -410,63 +417,51 @@
         <h3>Two people checked first.</h3>
         <p>Two annotators labeled 90 reviews blind. Agreement, corrected for chance:</p>
         <div class="rings">
-          <div><div class="ring" style="--k:.85"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.85" data-dec="2">0.85</b></div><small>Annotator 1</small></div>
-          <div><div class="ring" style="--k:.90"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.90" data-dec="2">0.90</b></div><small>Annotator 2</small></div>
+          <div><div class="ring" style="--k:.85"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.85" data-dec="2">0.85</b></div><small>Toxicity</small></div>
+          <div><div class="ring" style="--k:.90"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.90" data-dec="2">0.90</b></div><small>Irony</small></div>
         </div>
       </article>
       <article class="tile rv" style="--d:.2s">
-        <span class="no">04 · DATA</span>
-        <h3>Mostly not in English.</h3>
-        <p>Reviews per language, top six.</p>
-        <div class="langs" id="langs" role="img" aria-label="Reviews per language: Simplified Chinese 2,304, English 1,457, Russian 1,068, Turkish 564, Portuguese 406, Korean 329"></div>
+        <span class="no">04 · ONE RULE ADDED LATER</span>
+        <h3>The cheating rule.</h3>
+        <p>After the first results we added one rule to the codebook: complaining about cheaters alone is not toxic. Gemini then re-checked every review it had called toxic.</p>
+        <p class="small" style="margin-top:16px">The rule came after we saw results, so it is a choice we made, not a blind test.</p>
       </article>
     </div>
   </div>
 </section>
 
-<!-- THE TWIST -->
-<section class="pad" id="twist" style="padding-top:0">
-  <div class="wrap">
-    <p class="eyebrow rv">The twist</p>
-    <h2 data-split><span class="grad">One rule cut the number </span><span class="gor">in half.</span></h2>
-    <article class="tile twb rv" id="twb" style="--d:.05s" aria-label="47.5% became 22.7% after one rule">
-      <div class="twg">
-        <div class="twl">
-          <div class="twtop"><span class="tag" id="twtag">First pass</span><button class="btn" id="replay" type="button">Replay <i>↺</i></button></div>
-          <div class="big" id="bign"><span id="bignum">47.5</span><small>%</small></div>
-          <div class="track" id="track" aria-hidden="true"><div class="seg" id="segB"></div><div class="seg" id="segA"></div></div>
-          <div class="tlabels" id="tl" aria-hidden="true">
-            <div class="tl1" id="tl1"><b>1,669 still toxic</b><span>something beyond cheating</span></div>
-            <div class="tl2" id="tl2"><b>1,829 flipped</b><span>mostly cheating complaints</span></div>
-          </div>
-        </div>
-        <ol class="tsteps" id="tsteps">
-          <li><b>First pass</b><span>Gemini called <em>3,499 reviews toxic.</em> Almost half.</span></li>
-          <li><b>We read them</b><span>Most were people <em>yelling about cheaters.</em></span></li>
-          <li><b>One new rule</b><span><em>Cheating alone is not toxic.</em></span></li>
-          <li><b>The result</b><span>With the rule, <em>22.7%</em> of the reviews mention toxicity.</span></li>
-        </ol>
-      </div>
-      <p class="sr">First pass: 47.5 percent of 7,363 reviews flagged toxic. After the rule that cheating alone is not toxic: 22.7 percent. 1,829 reviews flipped to not toxic.</p>
-    </article>
-  </div>
-</section>
-
 <!-- FINDINGS -->
-<section class="pad" id="findings" style="padding-top:clamp(60px,8vw,110px)">
+<section class="pad" id="findings" style="padding-top:0">
   <div class="wrap">
     <p class="eyebrow rv">Findings</p>
-    <h2 data-split><span class="grad">Three things the numbers say.</span></h2>
+    <h2 data-split><span class="grad">What the labels show.</span></h2>
     <div class="bento">
-      <article class="tile w4 rv" style="--d:.05s">
-        <span class="no">01 · WHERE</span>
-        <h3><span class="gor">Counter-Strike 2</span> is the most toxic, and the most ironic.</h3>
+      <article class="tile w6 rv" style="--d:.05s">
+        <span class="no">01 · OVERALL</span>
+        <div class="hlg">
+          <div>
+            <div class="hn"><span data-count="22.7" data-dec="1" data-suffix="%">22.7%</span></div>
+            <div class="bar2 or"><span class="tr"><i style="--w:.227;--d:.5s"></i></span></div>
+            <p>of the 7,363 labeled reviews mention toxicity (1,669 reviews).</p>
+          </div>
+          <div>
+            <div class="hn bl"><span data-count="25.0" data-dec="1" data-suffix="%">25.0%</span></div>
+            <div class="bar2 bl"><span class="tr"><i style="--w:.25;--d:.65s"></i></span></div>
+            <p>are ironic (1,843 reviews).</p>
+          </div>
+        </div>
+        <div class="note"><i>!</i><span><b>One rule came after the first results:</b> complaining about cheaters alone is not toxic. The 22.7% is with that rule.</span></div>
+      </article>
+      <article class="tile w4 rv" style="--d:.1s">
+        <span class="no">02 · WHERE</span>
+        <h3><span class="gor">Counter-Strike 2</span> has the most toxicity and the most irony.</h3>
         <div id="games"></div>
-        <div class="legend"><span><i class="o"></i>Mentions toxicity, with the cheating rule</span><span><i></i>Ironic</span></div>
-        <p class="small" style="margin-top:18px">Overall 22.7% mention toxicity and 25.0% are ironic, out of 7,363 labeled reviews. Before the rule, toxicity was 49.9% in Counter-Strike 2, 39.7% in GTA V and 50.9% in PUBG.</p>
+        <div class="legend"><span><i class="o"></i>Mentions toxicity</span><span><i></i>Ironic</span></div>
+        <p class="small" style="margin-top:18px">Share of each game’s labeled reviews. Toxicity counts the cheating rule.</p>
       </article>
       <article class="tile w2 rv" style="--d:.15s">
-        <span class="no">02 · DOES IT MATTER</span>
+        <span class="no">03 · DOES IT MATTER</span>
         <h3>Not recommended, more toxic.</h3>
         <div class="vsb">
           <div class="vcol hot"><b data-count="28.4" data-dec="1" data-suffix="%">28.4%</b><div class="pl"><i style="--h:84"></i></div><span>“Not recommended”</span><small>2,369 reviews</small></div>
@@ -475,7 +470,7 @@
         <p class="small" style="margin-top:18px">A link, not a cause.</p>
       </article>
       <article class="tile w6 rv" style="--d:.1s">
-        <span class="no">03 · WHAT</span>
+        <span class="no">04 · WHAT</span>
         <h3>Most toxic reviews <span class="gor">insult other players.</span></h3>
         <div class="types" id="types"></div>
         <p class="small" style="margin-top:8px">Share of the 1,669 toxic reviews with each type; a review can have several. Examples are real review text, picked as the clearest. Types are Gemini’s labels, and some phrases are jokes or sarcasm.</p>
@@ -484,36 +479,44 @@
   </div>
 </section>
 
-<!-- MEANING + LIMITS -->
-<section class="pad" id="limits" style="padding-top:0">
+<!-- INTERPRETATION -->
+<section class="pad" id="interpretation" style="padding-top:0">
   <div class="wrap">
-    <p class="eyebrow rv">Interpretation and limits</p>
+    <p class="eyebrow rv">Interpretation</p>
     <h2 data-split><span class="grad">How you define “toxic” changes the answer.</span></h2>
-    <div class="two">
-      <article class="tile rv" style="--d:.05s">
-        <span class="tt">What we learned</span>
-        <div class="li"><span class="ic y">✓</span><div><h4>The definition mattered more than the model.</h4><p>One extra rule moved toxicity from 47.5% to 22.7%. Same AI, same reviews.</p></div></div>
+    <article class="tile solo rv" style="--d:.05s">
+      <div class="lis">
+        <div class="li"><span class="ic y">✓</span><div><h4>The definition mattered more than the model.</h4><p>One extra rule, that cheating alone is not toxic, cut the toxicity rate roughly in half. Same AI, same reviews.</p></div></div>
         <div class="li"><span class="ic y">✓</span><div><h4>Every label comes with a reason.</h4><p>So we could audit them one by one, and found the cheating problem that way.</p></div></div>
         <div class="li"><span class="ic y">✓</span><div><h4>Counting is not explaining.</h4><p>We can say how many reviews mention toxicity. We cannot say what causes it.</p></div></div>
-      </article>
-      <article class="tile rv" style="--d:.15s">
-        <span class="tt">What this does not show</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- LIMITATIONS -->
+<section class="pad" id="limits" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow rv">Limitations</p>
+    <h2 data-split><span class="grad">What this does not show.</span></h2>
+    <article class="tile solo rv" style="--d:.05s">
+      <div class="lis">
         <div class="li"><span class="ic w">!</span><div><h4>Humans have not checked these labels yet.</h4><p>The two annotators agreed with each other on 90 reviews. We have not compared Gemini with humans on the full 7,363.</p></div></div>
         <div class="li"><span class="ic w">!</span><div><h4>About 80% of the reviews are not in English.</h4><p>We tuned and tested the rulebook mostly on English. Gemini outside English is untested.</p></div></div>
-        <div class="li"><span class="ic w">!</span><div><h4>We wrote the cheating rule after seeing the first result.</h4><p>So 22.7% is not a blind result. And it is three games, not all of Steam.</p></div></div>
-      </article>
-    </div>
+        <div class="li"><span class="ic w">!</span><div><h4>The cheating rule came after the first results.</h4><p>So 22.7% is not a blind result. And it covers three games from one filtered file, not all of Steam.</p></div></div>
+      </div>
+    </article>
   </div>
 </section>
 
 <!-- CLOSE -->
 <section class="pad closer" id="close" style="padding-top:clamp(40px,6vw,80px)">
   <div class="wrap">
-    <p class="eyebrow rv" style="justify-content:center">Check our work</p>
+    <p class="eyebrow rv" style="justify-content:center">Code and data</p>
     <h2 data-split><span class="grad">Before you trust a toxicity number, ask how </span><span class="gor">toxic</span><span class="grad"> was defined.</span></h2>
     <div class="cta rv" style="--d:.5s">
       <a class="btn w lg" href="https://github.com/Ghifariyadi/team-steam">Code and data on GitHub <i>↗</i></a>
-      <a class="btn lg" href="index.html">Full details: methods, tables, limits <i>→</i></a>
+      <a class="btn lg" href="alt-detail.html">Full details <i>→</i></a>
     </div>
     <div class="term rv" style="--d:.65s">
       <div class="bar"><i></i><i></i><i></i><span>reproduce it</span><button type="button" id="copy">Copy</button></div>
@@ -523,7 +526,7 @@
   </div>
 </section>
 </main>
-<footer id="foot"><span>Richard · Josh · Ghif · COMPSS 211A</span><span>Alternative version of the project site · <a href="index.html">Open the original</a></span></footer>
+<footer id="foot"><span>Richard · Josh · Ghif · COMPSS 211A</span><span>Summary · <a href="alt-detail.html">Full details</a> · <a href="index.html">Original site</a></span></footer>
 
 <script>
 (function () {
@@ -544,11 +547,15 @@
     ['Threat or wishing harm', 'wishing someone dead or sick', 6.2, [['wishes you dead', ''], ['may you die a slow and painful disease, guys', 'French, translated']]]
   ];
   var MAXL = LANGS[0][1];
+  var GCOUNT = [['Counter-Strike 2', 3017], ['PUBG', 2404], ['Grand Theft Auto V', 1944]];
 
   /* ---------- build ---------- */
   $('mq').innerHTML = (function () { var a = ['简体中文', 'English', 'Русский', 'Türkçe', 'Português', '한국어']; return a.concat(a, a, a).map(function (x) { return '<span>' + x + '</span>'; }).join(''); })();
   $('langs').innerHTML = LANGS.map(function (l, i) {
     return '<div class="lang' + (i === 1 ? ' en' : '') + '"><span>' + esc(l[0]) + '</span><span class="tr"><i style="--w:' + (l[1] / MAXL).toFixed(4) + ';--d:' + (.5 + i * .1) + 's"></i></span><b>' + l[1].toLocaleString('en-US') + '</b></div>';
+  }).join('');
+  $('gcount').innerHTML = GCOUNT.map(function (l, i) {
+    return '<div class="lang' + (i === 0 ? ' en' : '') + '"><span>' + esc(l[0]) + '</span><span class="tr"><i style="--w:' + (l[1] / GCOUNT[0][1]).toFixed(4) + ';--d:' + (.5 + i * .1) + 's"></i></span><b>' + l[1].toLocaleString('en-US') + '</b></div>';
   }).join('');
   var b2 = function (cls, v, d) { return '<div class="bar2 ' + cls + '"><span class="tr"><i style="--w:' + (v / 100).toFixed(4) + ';--d:' + d + 's"></i></span><b>' + v.toFixed(1) + '%</b></div>'; };
   $('games').innerHTML = GAMES.map(function (g, i) {
@@ -660,46 +667,6 @@
     if (reduce) return;
     var p = clamp(window.scrollY / (window.innerHeight * 0.55)), e = ease(p), small = window.innerWidth < 900;
     win.style.transform = 'rotateX(' + lerp(small ? 8 : 16, 0, e).toFixed(2) + 'deg) scale(' + lerp(.94, 1, e).toFixed(3) + ')';
-  }
-
-  /* ---------- the twist: plays once when it comes into view, replayable ---------- */
-  var bignum = $('bignum'), bign = $('bign'), segA = $('segA'), segB = $('segB'), tl1 = $('tl1'), tl2 = $('tl2'), twb = $('twb'), twtag = $('twtag');
-  var steps = [].slice.call(document.querySelectorAll('#tsteps li'));
-  var KEEP = 1669 / 7363 * 100, FLIP = 1829 / 7363 * 100;      // 22.67% stays, 24.84% flips
-  var FROM = [255, 138, 76], TO = [244, 245, 246];
-  var mix = function (t) { return 'rgb(' + FROM.map(function (a, i) { return Math.round(lerp(a, TO[i], t)); }).join(',') + ')'; };
-  var lastPhase = -1, twRaf = 0;
-  function drawTwist(p) {
-    var a = clamp((p - 0.2) / 0.22), b = clamp((p - 0.58) / 0.34), d = ease(clamp((p - 0.86) / 0.12));
-    var v = KEEP + FLIP * (1 - ease(b));
-    bignum.textContent = v.toFixed(1);
-    bign.style.color = mix(d);
-    bign.style.setProperty('--sh', 'rgba(' + Math.round(lerp(255, 110, d)) + ',' + Math.round(lerp(138, 168, d)) + ',' + Math.round(lerp(76, 255, d)) + ',.42)');
-    twb.style.setProperty('--glow', lerp(.3, .08, ease(b)).toFixed(3));
-    segA.style.width = KEEP + '%'; segA.style.background = mix(d);
-    segB.style.left = 'calc(' + KEEP + '% - 10px)'; segB.style.width = 'calc(' + (FLIP * (1 - ease(b))) + '% + 10px)';
-    segB.style.opacity = String((1 - ease(a) * .2) * (1 - ease(b))); segB.style.transform = 'translateX(' + (a * 4) + 'px)';
-    tl1.style.opacity = String(ease(a)); tl1.style.left = '0';
-    tl2.style.opacity = String(ease(a) * (1 - ease(clamp((p - 0.6) / 0.2)))); tl2.style.left = 'calc(' + KEEP + '% + 14px)';
-    var phase = p < 0.16 ? 0 : p < 0.5 ? 1 : p < 0.86 ? 2 : 3;
-    if (phase !== lastPhase) {
-      steps.forEach(function (c, i) { c.classList.toggle('on', i <= phase); c.classList.toggle('cur', i === phase); });
-      twtag.textContent = phase < 2 ? 'First pass' : phase === 2 ? 'One new rule' : 'With the rule';
-      lastPhase = phase;
-    }
-  }
-  function playTwist() {
-    cancelAnimationFrame(twRaf); lastPhase = -1;
-    if (reduce) { drawTwist(1); return; }
-    var T = 7000, t0 = null;
-    drawTwist(0);
-    (function f(t) { if (t0 === null) t0 = t; var p = clamp((t - t0) / T); drawTwist(p); if (p < 1) twRaf = requestAnimationFrame(f); })(performance.now());
-  }
-  if (reduce) drawTwist(1); else drawTwist(0);
-  $('replay').addEventListener('click', playTwist);
-  if ('IntersectionObserver' in window && !reduce) {
-    var tio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { tio.disconnect(); setTimeout(playTwist, 500); } }); }, { threshold: 0.55 });
-    tio.observe(twb);
   }
 
   /* ---------- nav, progress, spotlight ---------- */
