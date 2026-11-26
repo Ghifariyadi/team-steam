@@ -473,7 +473,7 @@
     <p class="lede rv">About 80% of the reviews are not in English. Each review stays in its original language, and labels come from the original text, never from a translation.</p>
     <ol class="items rv">
       <li><b>Source.</b> KieranPoc’s Kaggle Steam reviews dataset (<code>weighted_score_above_08.csv</code>), collected through the Steam reviews API and loaded with <code>kagglehub</code>. The file is already filtered to reviews with a weighted score above 0.8, so it is a subset and not every review. Each row is one review. We keep three games: Counter-Strike 2 (3,017), PUBG: BATTLEGROUNDS (2,404) and Grand Theft Auto V (1,944), 7,365 reviews in total.</li>
-      <li><b>Preparation.</b> Empty reviews are skipped (2 of them) instead of getting an invented label, which leaves 7,363 labeled reviews. For readers, non-English reviews are also translated into English in a separate column (<code>translation_en</code>), and that translation is never sent for labeling.</li>
+      <li><b>Preparation.</b> Empty reviews are skipped (2 of them) instead of getting an invented label, which leaves 7,363 labeled reviews. For readers, non-English reviews are also translated into English in a separate column (<code>translation_en</code>), and that translation is never sent for labeling. We label from the original text because emotion is easier to catch before translation, since machine translation tends to lose or flatten it (<a href="https://arxiv.org/abs/2510.25967" target="_blank" rel="noopener">Kabir et al., 2025</a>).</li>
     </ol>
     <div class="bento" style="margin-top:28px">
       <article class="tile rv">
