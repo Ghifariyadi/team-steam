@@ -170,24 +170,31 @@
   .lang.en .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
   .lang b { text-align: right; font: 500 12px/1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
 
-  /* the twist: pinned, scroll-linked */
-  .twist { height: 340vh; }
-  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; align-items: center; padding: 84px 0 64px; overflow: hidden; }
-  .stage::before { content: ""; position: absolute; left: 50%; top: 42%; width: min(1100px, 130vw); height: 700px; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(255, 138, 76, var(--glow, .3)), transparent); filter: blur(30px); pointer-events: none; }
-  .stage .wrap { position: relative; }
-  .big { font: 560 clamp(6.5rem, 26vw, 17rem)/.88 var(--sans); letter-spacing: -.07em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 90px var(--sh, rgba(255, 138, 76, .45)); }
+  /* the twist: one block, plays by itself when it comes into view */
+  .twb { padding: clamp(24px, 4vw, 44px); margin-top: clamp(36px, 5vw, 56px); }
+  .twb::after { content: ""; position: absolute; left: 0; top: 0; width: 70%; height: 100%; background: radial-gradient(closest-side at 30% 40%, rgba(255, 138, 76, var(--glow, .26)), transparent); pointer-events: none; }
+  .twg { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+  .twtop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .twtop .btn { padding: 7px 12px; font-size: 12.5px; border-radius: 8px; }
+  .big { margin-top: 14px; font: 560 clamp(5.4rem, 15vw, 11.5rem)/.9 var(--sans); letter-spacing: -.07em; font-variant-numeric: tabular-nums; color: var(--org); white-space: nowrap; text-shadow: 0 0 80px var(--sh, rgba(255, 138, 76, .45)); }
   .big small { font-size: .32em; letter-spacing: -.03em; margin-left: .06em; font-weight: 500; }
-  .track { position: relative; margin-top: 34px; height: 10px; border-radius: 10px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+  .track { position: relative; margin-top: 26px; height: 10px; border-radius: 10px; background: rgba(255, 255, 255, .08); overflow: hidden; }
   .seg { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 10px; background: var(--org); will-change: width; }
-  .tlabels { position: relative; height: 58px; margin-top: 14px; font-size: 14px; line-height: 1.35; }
+  .tlabels { position: relative; height: 92px; margin-top: 14px; font-size: 14px; line-height: 1.35; }
+  .tlabels div { left: 0 !important; } .tl2 { top: 46px !important; }
   .tlabels div { position: absolute; top: 0; opacity: 0; will-change: opacity; }
   .tlabels b { display: block; font: 500 12px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
   .tl1 b { color: #fff; } .tl2 b { color: var(--org); } .tlabels span { color: var(--mut); }
-  .caps { position: relative; height: 5.4em; margin-top: 20px; }
-  .caps p { position: absolute; inset: 0 auto auto 0; margin: 0; max-width: 26ch; font: 560 clamp(1.45rem, 3.6vw, 2.5rem)/1.15 var(--sans); letter-spacing: -.035em; opacity: 0; transform: translateY(14px); filter: blur(6px); transition: opacity .8s var(--out), transform .8s var(--out), filter .8s var(--out); }
-  .caps p.on { opacity: 1; transform: none; filter: none; }
-  .caps p em { font-style: normal; color: var(--org); }
-  .hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); transition: opacity .5s; }
+  .tsteps { list-style: none; margin: 0; padding: 0 0 0 26px; position: relative; display: grid; gap: 22px; }
+  .tsteps::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 1px; background: var(--line2); }
+  .tsteps li { position: relative; opacity: .3; transform: translateX(-6px); transition: opacity .8s var(--out), transform .8s var(--out); }
+  .tsteps li::before { content: ""; position: absolute; left: -26px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line2); transition: background .6s, border-color .6s, box-shadow .6s; }
+  .tsteps li.on { opacity: .6; transform: none; }
+  .tsteps li.cur { opacity: 1; }
+  .tsteps li.cur::before { background: var(--org); border-color: var(--org); box-shadow: 0 0 0 5px rgba(255, 138, 76, .18), 0 0 18px rgba(255, 138, 76, .6); }
+  .tsteps b { display: block; font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .tsteps span { display: block; margin-top: 7px; font: 560 clamp(1.1rem, 2vw, 1.4rem)/1.25 var(--sans); letter-spacing: -.025em; }
+  .tsteps em { font-style: normal; color: var(--org); }
 
   /* finding tiles */
   .bar2 { display: grid; grid-template-columns: minmax(0, 1fr) 54px; align-items: center; gap: 14px; }
@@ -245,6 +252,35 @@
   footer { margin-top: clamp(70px, 10vw, 120px); padding: 28px clamp(18px, 4vw, 40px) 70px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font: 400 12.5px/1.5 var(--mono); color: var(--dim); }
   footer a { color: var(--mut); }
 
+
+  /* every piece of content gets a motion of its own */
+  .st { opacity: 0; transform: translateY(16px); transition: opacity .9s var(--out), transform .9s var(--out); transition-delay: calc(var(--k, 0) * 90ms + .25s); }
+  .in .st { opacity: 1; transform: none; }
+  .st .ic { transform: scale(.3) rotate(-25deg); transition: transform .8s cubic-bezier(.34, 1.56, .64, 1); transition-delay: calc(var(--k, 0) * 90ms + .55s); }
+  .in .st .ic { transform: none; }
+  .logo i { animation: spin 14s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .eyebrow::before { width: 0; transition: width 1.1s var(--out) .1s; }
+  .eyebrow.in::before { width: 22px; }
+  .rq { position: relative; border-left: 0; padding-left: 22px; }
+  .rq::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--line2); transform: scaleY(0); transform-origin: top; transition: transform 1.4s var(--out) .3s; }
+  .rq.in::before { transform: none; }
+  .btn.w { position: relative; overflow: hidden; }
+  .btn.w::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .85), transparent); transform: skewX(-18deg); animation: shine 6s ease-in-out infinite; }
+  @keyframes shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
+  .pill { position: relative; overflow: hidden; }
+  .pill::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent); animation: shine2 7s ease-in-out infinite; }
+  @keyframes shine2 { 0%, 60% { left: -40%; } 100% { left: 130%; } }
+  .win::after { content: ""; position: absolute; inset: 0; border-radius: 16px; pointer-events: none; box-shadow: inset 0 0 70px rgba(110, 168, 255, .09); animation: glowp 5s ease-in-out infinite; }
+  @keyframes glowp { 50% { box-shadow: inset 0 0 90px rgba(255, 138, 76, .12); } }
+  .tile { transition: border-color .4s, transform .5s var(--out), opacity 1s var(--out), filter 1s var(--out); }
+  .tile.in:hover { transform: translateY(-3px); }
+  .stat b, .big2 span { transition: color .4s; } .stat:hover b { color: #fff; }
+  .term pre .tl { display: block; }
+  .term .bar i { animation: blinkdot 3s ease-in-out infinite; } .term .bar i:nth-child(2) { animation-delay: .4s; } .term .bar i:nth-child(3) { animation-delay: .8s; }
+  @keyframes blinkdot { 50% { background: #5a5f69; } }
+  footer { opacity: 0; transform: translateY(14px); transition: opacity 1.2s var(--out), transform 1.2s var(--out); } footer.in { opacity: 1; transform: none; }
+
   @media (max-width: 900px) {
     .links { display: none; }
     .stats { grid-template-columns: 1fr 1fr; }
@@ -255,6 +291,7 @@
     .types { grid-template-columns: 1fr; }
     .game { grid-template-columns: 1fr; gap: 8px; }
     .win .bd { grid-template-columns: 1fr; } .col { min-height: 0; padding: 18px; } .col + .col { border-left: 0; border-top: 1px solid var(--line); }
+    .twg { grid-template-columns: 1fr; }
     .tlabels { height: 84px; } .tlabels div { left: 0 !important; } .tl2 { top: 42px !important; }
     .rv, .wd, .tile { filter: none; }
   }
@@ -264,8 +301,9 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .rv, .wd, .caps p.on, .match { opacity: 1; transform: none; filter: none; }
     .lang .tr i, .bar2 .tr i { transform: scaleX(var(--w)); } .meter i { transform: none; } .ring .f { stroke-dashoffset: calc(301.6 * (1 - var(--k))); } .vcol .pl i { transform: none; }
-    .twist { height: auto; } .stage { position: static; height: auto; min-height: 100svh; } .hint { display: none; }
+    .tsteps li { opacity: 1; transform: none; }
     .win { transform: none !important; }
+    .st, .st .ic, footer { opacity: 1; transform: none; }
   }
 </style>
 </head>
@@ -387,25 +425,30 @@
 </section>
 
 <!-- THE TWIST -->
-<section class="twist" id="twist" aria-label="The twist: 47.5% became 22.7%">
-  <div class="stage">
-    <div class="wrap">
-      <p class="eyebrow">The twist</p>
-      <div class="big" id="bign"><span id="bignum">22.7</span><small>%</small></div>
-      <div class="track" id="track" aria-hidden="true"><div class="seg" id="segB"></div><div class="seg" id="segA"></div></div>
-      <div class="tlabels" id="tl" aria-hidden="true">
-        <div class="tl1" id="tl1"><b>1,669 still toxic</b><span>something beyond cheating</span></div>
-        <div class="tl2" id="tl2"><b>1,829 flipped</b><span>mostly cheating complaints</span></div>
-      </div>
-      <div class="caps" id="caps">
-        <p data-p="0">First pass: Gemini called <em>3,499 reviews toxic.</em> Almost half.</p>
-        <p data-p="1">Then we read them. Most were people <em>yelling about cheaters.</em></p>
-        <p data-p="2">So we added one rule: <em>cheating alone is not toxic.</em></p>
-        <p data-p="3">With the rule, <em>22.7%</em> of the reviews mention toxicity.</p>
+<section class="pad" id="twist" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow rv">The twist</p>
+    <h2 data-split><span class="grad">One rule cut the number </span><span class="gor">in half.</span></h2>
+    <article class="tile twb rv" id="twb" style="--d:.05s" aria-label="47.5% became 22.7% after one rule">
+      <div class="twg">
+        <div class="twl">
+          <div class="twtop"><span class="tag" id="twtag">First pass</span><button class="btn" id="replay" type="button">Replay <i>↺</i></button></div>
+          <div class="big" id="bign"><span id="bignum">47.5</span><small>%</small></div>
+          <div class="track" id="track" aria-hidden="true"><div class="seg" id="segB"></div><div class="seg" id="segA"></div></div>
+          <div class="tlabels" id="tl" aria-hidden="true">
+            <div class="tl1" id="tl1"><b>1,669 still toxic</b><span>something beyond cheating</span></div>
+            <div class="tl2" id="tl2"><b>1,829 flipped</b><span>mostly cheating complaints</span></div>
+          </div>
+        </div>
+        <ol class="tsteps" id="tsteps">
+          <li><b>First pass</b><span>Gemini called <em>3,499 reviews toxic.</em> Almost half.</span></li>
+          <li><b>We read them</b><span>Most were people <em>yelling about cheaters.</em></span></li>
+          <li><b>One new rule</b><span><em>Cheating alone is not toxic.</em></span></li>
+          <li><b>The result</b><span>With the rule, <em>22.7%</em> of the reviews mention toxicity.</span></li>
+        </ol>
       </div>
       <p class="sr">First pass: 47.5 percent of 7,363 reviews flagged toxic. After the rule that cheating alone is not toxic: 22.7 percent. 1,829 reviews flipped to not toxic.</p>
-    </div>
-    <div class="hint" id="hint">Keep scrolling</div>
+    </article>
   </div>
 </section>
 
@@ -474,15 +517,13 @@
     </div>
     <div class="term rv" style="--d:.65s">
       <div class="bar"><i></i><i></i><i></i><span>reproduce it</span><button type="button" id="copy">Copy</button></div>
-      <pre id="cmd"><span class="p">$ </span>git clone https://github.com/Ghifariyadi/team-steam
-<span class="p">$ </span>cd team-steam &amp;&amp; uv sync --frozen
-<span class="c"># then run the notebooks in order: kappa_test, scale_up, harm_recheck, toxic_evidence</span></pre>
+      <pre id="cmd"><span class="tl st"><span class="p">$ </span>git clone https://github.com/Ghifariyadi/team-steam</span><span class="tl st"><span class="p">$ </span>cd team-steam &amp;&amp; uv sync --frozen</span><span class="tl st c"># then run the notebooks in order: kappa_test, scale_up, harm_recheck, toxic_evidence</span></pre>
     </div>
     <p class="small" style="margin:18px auto 0;text-align:center">The dataset downloads through kagglehub. The Gemini calls need your own Google Cloud (Vertex AI) or Gemini API access in a local .env file.</p>
   </div>
 </section>
 </main>
-<footer><span>Richard · Josh · Ghif · COMPSS 211A</span><span>Alternative version of the project site · <a href="index.html">Open the original</a></span></footer>
+<footer id="foot"><span>Richard · Josh · Ghif · COMPSS 211A</span><span>Alternative version of the project site · <a href="index.html">Open the original</a></span></footer>
 
 <script>
 (function () {
@@ -550,6 +591,16 @@
     scrubW.forEach(function (w, i) { w.style.opacity = (0.2 + 0.8 * clamp(t - i)).toFixed(3); });
   }
 
+
+  /* stagger: rows, list items, quotes and stats come in one after another */
+  ['.rule', '.li', '.ex', '.ty', '.game', '.lang', '.stat', '.vcol', '.tl.st'].forEach(function (sel) {
+    [].forEach.call(document.querySelectorAll(sel), function (el) {
+      var sibs = [].slice.call(el.parentNode.children).filter(function (x) { return x.matches(sel.replace('.tl.st', '.tl')); });
+      el.classList.add('st'); el.style.setProperty('--k', sibs.indexOf(el));
+    });
+  });
+  [].forEach.call(document.querySelectorAll('.term pre .tl'), function (el, i) { el.style.setProperty('--k', i); });
+
   /* ---------- hero product window: Gemini's answer types out ---------- */
   var CODE = '<span class="c">{</span>\n  <span class="k">"harm_mention"</span>: <span class="s">"yes"</span>,\n  <span class="k">"harm_reason"</span>: <span class="s">"A direct vulgar meme phrase used as a hostile or abusive expression."</span>,\n  <span class="k">"irony"</span>: <span class="s">"no"</span>,\n  <span class="k">"irony_reason"</span>: <span class="s">"There is no identifiable ironic mechanism."</span>\n<span class="c">}</span>';
   function showCode() { $('code').innerHTML = CODE; $('match').classList.add('on'); }
@@ -572,7 +623,7 @@
   }
 
   /* ---------- reveal on scroll ---------- */
-  var secs = [].slice.call(document.querySelectorAll('.rv, [data-split]'));   /* each element reveals when it, itself, scrolls into view */
+  var secs = [].slice.call(document.querySelectorAll('.rv, [data-split], .rq, .eyebrow, #foot, .term'));   /* each element reveals when it, itself, scrolls into view */
   function countUp(el) {
     var to = parseFloat(el.getAttribute('data-count')), dec = +(el.getAttribute('data-dec') || 0), suf = el.getAttribute('data-suffix') || '';
     if (reduce) return;
@@ -611,30 +662,45 @@
     win.style.transform = 'rotateX(' + lerp(small ? 8 : 16, 0, e).toFixed(2) + 'deg) scale(' + lerp(.94, 1, e).toFixed(3) + ')';
   }
 
-  /* ---------- the twist: scroll-linked, never hijacks scrolling ---------- */
-  var tw = $('twist'), bignum = $('bignum'), bign = $('bign'), segA = $('segA'), segB = $('segB'), tl1 = $('tl1'), tl2 = $('tl2'), hint = $('hint'), stage = tw.querySelector('.stage');
-  var caps = [].slice.call(document.querySelectorAll('#caps p'));
+  /* ---------- the twist: plays once when it comes into view, replayable ---------- */
+  var bignum = $('bignum'), bign = $('bign'), segA = $('segA'), segB = $('segB'), tl1 = $('tl1'), tl2 = $('tl2'), twb = $('twb'), twtag = $('twtag');
+  var steps = [].slice.call(document.querySelectorAll('#tsteps li'));
   var KEEP = 1669 / 7363 * 100, FLIP = 1829 / 7363 * 100;      // 22.67% stays, 24.84% flips
   var FROM = [255, 138, 76], TO = [244, 245, 246];
   var mix = function (t) { return 'rgb(' + FROM.map(function (a, i) { return Math.round(lerp(a, TO[i], t)); }).join(',') + ')'; };
-  var lastPhase = -1;
+  var lastPhase = -1, twRaf = 0;
   function drawTwist(p) {
     var a = clamp((p - 0.2) / 0.22), b = clamp((p - 0.58) / 0.34), d = ease(clamp((p - 0.86) / 0.12));
     var v = KEEP + FLIP * (1 - ease(b));
     bignum.textContent = v.toFixed(1);
     bign.style.color = mix(d);
     bign.style.setProperty('--sh', 'rgba(' + Math.round(lerp(255, 110, d)) + ',' + Math.round(lerp(138, 168, d)) + ',' + Math.round(lerp(76, 255, d)) + ',.42)');
-    stage.style.setProperty('--glow', lerp(.34, .1, ease(b)).toFixed(3));
+    twb.style.setProperty('--glow', lerp(.3, .08, ease(b)).toFixed(3));
     segA.style.width = KEEP + '%'; segA.style.background = mix(d);
     segB.style.left = 'calc(' + KEEP + '% - 10px)'; segB.style.width = 'calc(' + (FLIP * (1 - ease(b))) + '% + 10px)';
     segB.style.opacity = String((1 - ease(a) * .2) * (1 - ease(b))); segB.style.transform = 'translateX(' + (a * 4) + 'px)';
     tl1.style.opacity = String(ease(a)); tl1.style.left = '0';
     tl2.style.opacity = String(ease(a) * (1 - ease(clamp((p - 0.6) / 0.2)))); tl2.style.left = 'calc(' + KEEP + '% + 14px)';
     var phase = p < 0.16 ? 0 : p < 0.5 ? 1 : p < 0.86 ? 2 : 3;
-    if (phase !== lastPhase) { caps.forEach(function (c, i) { c.classList.toggle('on', i === phase); }); lastPhase = phase; }
-    hint.style.opacity = p < 0.08 ? 1 : 0;
+    if (phase !== lastPhase) {
+      steps.forEach(function (c, i) { c.classList.toggle('on', i <= phase); c.classList.toggle('cur', i === phase); });
+      twtag.textContent = phase < 2 ? 'First pass' : phase === 2 ? 'One new rule' : 'With the rule';
+      lastPhase = phase;
+    }
   }
-  function twistProgress() { var r = tw.getBoundingClientRect(); return clamp(-r.top / Math.max(1, r.height - window.innerHeight)); }
+  function playTwist() {
+    cancelAnimationFrame(twRaf); lastPhase = -1;
+    if (reduce) { drawTwist(1); return; }
+    var T = 7000, t0 = null;
+    drawTwist(0);
+    (function f(t) { if (t0 === null) t0 = t; var p = clamp((t - t0) / T); drawTwist(p); if (p < 1) twRaf = requestAnimationFrame(f); })(performance.now());
+  }
+  if (reduce) drawTwist(1); else drawTwist(0);
+  $('replay').addEventListener('click', playTwist);
+  if ('IntersectionObserver' in window && !reduce) {
+    var tio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { tio.disconnect(); setTimeout(playTwist, 500); } }); }, { threshold: 0.55 });
+    tio.observe(twb);
+  }
 
   /* ---------- nav, progress, spotlight ---------- */
   var nav = $('nav'), prog = $('prog'), links = [].slice.call($('links').children), ticking = false;
@@ -646,13 +712,11 @@
     var mid = window.innerHeight * 0.4, best = -1;
     targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top <= mid) best = i; });
     links.forEach(function (a, i) { a.classList.toggle('on', i === best); });
-    if (!reduce) drawTwist(twistProgress());
     drawScrub(); drawWin();
     ticking = false;
   }
   window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
   window.addEventListener('resize', onScroll);
-  if (reduce) drawTwist(1);
   onScroll();
   if (!reduce && window.matchMedia('(pointer: fine)').matches) {
     [].forEach.call(document.querySelectorAll('.tile'), function (t) {
