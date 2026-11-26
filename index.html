@@ -107,10 +107,21 @@
   .tag { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line2); font: 500 11.5px/1 var(--mono); letter-spacing: 0; text-transform: none; color: var(--mut); }
   .tag.g { color: var(--grn); border-color: rgba(61, 220, 151, .35); }
   .rev { font: 400 clamp(1.3rem, 2.8vw, 1.9rem)/1.3 var(--sans); letter-spacing: -.02em; }
-  .code { font: 400 13.5px/1.75 var(--mono); color: #c7ccd6; white-space: pre-wrap; min-height: 9.5em; }
-  .code .k { color: #8aa7ff; } .code .s { color: #7ee2b8; } .code .c { color: var(--dim); }
-  .caret::after { content: ""; display: inline-block; width: 7px; height: 1.05em; margin-left: 2px; vertical-align: -.18em; background: var(--blu); animation: blink 1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+  .proc { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font: 450 14.5px/1 var(--sans); color: var(--mut); }
+  .proc .pd { width: 8px; height: 8px; border-radius: 50%; background: var(--blu); box-shadow: 0 0 12px var(--blu); animation: pulse 1.1s ease-in-out infinite; transition: background .5s, box-shadow .5s; }
+  .proc .dots::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
+  .proc.done .pd { background: var(--grn); box-shadow: 0 0 12px var(--grn); animation: none; }
+  .proc.done .dots { display: none; }
+  @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+  .chk { display: grid; gap: 18px; min-height: 8.5em; }
+  .ck { opacity: 0; transform: translateY(10px) scale(.97); filter: blur(6px); transition: opacity .8s var(--out), transform .8s var(--out), filter .8s var(--out); }
+  .ck.on { opacity: 1; transform: none; filter: none; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 999px; border: 1px solid; font: 600 16px/1 var(--sans); letter-spacing: -.01em; }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+  .pill.r { color: var(--red); background: rgba(255, 107, 107, .12); border-color: rgba(255, 107, 107, .4); }
+  .pill.g { color: var(--grn); background: rgba(61, 220, 151, .12); border-color: rgba(61, 220, 151, .4); }
+  .ck .why { margin: 10px 0 0 4px; font: 400 13.5px/1.5 var(--sans); color: var(--dim); max-width: 38ch; }
   .match { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; opacity: 0; transform: translateY(8px); transition: opacity .8s var(--out), transform .8s var(--out); }
   .match.on { opacity: 1; transform: none; }
   .win .ft { display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); font: 400 12px/1 var(--mono); color: var(--dim); }
@@ -396,7 +407,11 @@
           </div>
           <div class="col">
             <div class="lbl">Gemini output</div>
-            <div class="code" id="code" aria-live="off"></div>
+            <div class="proc" id="proc"><span class="pd"></span><span id="ptxt">Gemini processing</span><span class="dots"></span></div>
+            <div class="chk" id="chk">
+              <div class="ck"><span class="pill r"><i></i>Toxic</span><p class="why">A direct vulgar meme phrase used as a hostile or abusive expression.</p></div>
+              <div class="ck"><span class="pill g"><i></i>Not ironic</span><p class="why">There is no identifiable ironic mechanism.</p></div>
+            </div>
             <div class="match" id="match"><span class="tag g">Human: toxic ✓</span><span class="tag g">Human: not ironic ✓</span></div>
           </div>
         </div>
@@ -721,24 +736,13 @@
   [].forEach.call(document.querySelectorAll('.term pre .tl'), function (el, i) { el.style.setProperty('--k', i); });
 
   /* ---------- hero product window: Gemini's answer types out ---------- */
-  var CODE = '<span class="c">{</span>\n  <span class="k">"is_toxic"</span>: <span class="s">"yes"</span>,\n  <span class="k">"toxic_reason"</span>: <span class="s">"A direct vulgar meme phrase used as a hostile or abusive expression."</span>,\n  <span class="k">"is_ironic"</span>: <span class="s">"no"</span>,\n  <span class="k">"ironic_reason"</span>: <span class="s">"There is no identifiable ironic mechanism."</span>\n<span class="c">}</span>';
-  function showCode() { $('code').innerHTML = CODE; $('match').classList.add('on'); }
+  var cks = document.querySelectorAll('#chk .ck');
+  function procDone() { $('proc').classList.add('done'); $('ptxt').textContent = 'Gemini labeled this review'; }
+  function showCode() { procDone(); [].forEach.call(cks, function (c) { c.classList.add('on'); }); $('match').classList.add('on'); }
   function runHero() {
-    var el = $('code'), probe = document.createElement('div'); probe.innerHTML = CODE;
-    var total = probe.textContent.length, n = 0, tmp = document.createElement('div');
-    el.classList.add('caret');
-    (function step() {
-      n = Math.min(total, n + 3);
-      var out = '', shown = 0, inTag = false, i, ch;
-      for (i = 0; i < CODE.length; i++) {
-        ch = CODE[i];
-        if (ch === '<') { inTag = true; out += ch; continue; }
-        if (inTag) { out += ch; if (ch === '>') inTag = false; continue; }
-        out += ch; shown++; if (shown >= n) break;
-      }
-      tmp.innerHTML = out; el.innerHTML = tmp.innerHTML;       /* the browser closes any open tags */
-      if (n < total) setTimeout(step, 22); else { el.classList.remove('caret'); $('match').classList.add('on'); }
-    })();
+    setTimeout(procDone, 1700);
+    [].forEach.call(cks, function (c, i) { setTimeout(function () { c.classList.add('on'); }, 2000 + i * 700); });
+    setTimeout(function () { $('match').classList.add('on'); }, 3600);
   }
 
   /* ---------- reveal on scroll ---------- */
