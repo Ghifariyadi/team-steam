@@ -318,6 +318,9 @@
   .st .lr .fl.en { background: #f6d365; }
   .st .lr .ct { text-align: right; font: 500 12.5px/1 var(--mono); color: #d3dee4; font-variant-numeric: tabular-nums; }
   .st.on .lr .fl { width: var(--w); }
+  /* inside a section the card is narrow: stack the two panels so the language bars have room */
+  #main .demo .sp.on { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  #main .demo .st .big b { font-size: clamp(56px, 12vw, 72px); }
   .st .chip { display: inline-block; padding: 3px 10px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px; background: rgba(255, 255, 255, .05); font: 500 12px/1.4 var(--mono); color: #cfdbe2; }
   .st .kx { margin-bottom: 20px; }
   .st .kx-h { display: grid; margin-bottom: 12px; min-height: 66px; }
