@@ -171,8 +171,11 @@
   }
   @media (max-width: 560px) {
     .bar-in, .hero, .page, footer { padding-left: 18px; padding-right: 18px; }
-    .hero { padding-top: 52px; }
-    .marquee { margin-left: -18px; margin-right: -18px; }
+    .hero { padding-top: 52px; padding-bottom: 6px; }
+    .cta { margin-bottom: 22px; }
+    .marquee { margin: 0 -18px 18px; }
+    .hero-extra .ask { margin-bottom: 0; }
+    .page { padding-top: 14px; }
     body { font-size: 16px; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -412,6 +415,15 @@
   .rr-n em { display: block; margin-top: 2px; font: 400 12.5px/1.4 var(--sans); font-style: normal; color: var(--dim); }
   @media (max-width: 640px) { .rr { grid-template-columns: 1fr; gap: 6px; } }
 
+  /* two views: standard (default) and short */
+  .bar-r { display: flex; align-items: center; gap: 8px; flex: none; }
+  .view { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 999px; background: rgba(255, 255, 255, .05); color: var(--hi); font: 600 13.5px/1 var(--sans); cursor: pointer; transition: border-color .2s, background .2s; }
+  .view:hover { border-color: var(--teal); background: rgba(92, 209, 191, .1); }
+  .view svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  body.view-alt .view { border-color: rgba(92, 209, 191, .6); background: rgba(92, 209, 191, .12); }
+  body:not(.view-alt) .v-alt, body.view-alt .v-std { display: none; }
+  .v-alt p { margin: 0 0 18px; font: 800 clamp(1.35rem, 3.4vw, 2rem)/1.2 var(--disp); letter-spacing: -.03em; color: var(--hi); }
+  @media (max-width: 560px) { .view span { display: none; } .view { padding: 9px 11px; } }
   /* short points + expandable details */
   .bl { display: grid; gap: 10px; }
   .bi { border: 1px solid var(--edge); border-radius: 18px; background: rgba(255, 255, 255, .035); transition: border-color .2s, background .2s; }
@@ -448,7 +460,10 @@
 <div class="bar">
   <div class="bar-in">
     <a class="brand" href="#"><span class="mark" aria-hidden="true"></span><span id="brand">Project</span></a>
-    <a class="gh" href="https://github.com/Ghifariyadi/team-steam">GitHub</a>
+    <div class="bar-r">
+      <button type="button" class="view" id="view" aria-pressed="false"></button>
+      <a class="gh" href="https://github.com/Ghifariyadi/team-steam">GitHub</a>
+    </div>
   </div>
   <div class="progress" id="progress" aria-hidden="true"></div>
 </div>
@@ -525,6 +540,13 @@ function blocks(lines) {
       continue;
     }
     if ((m = l.match(/^:::demo\s+([\w-]+)\s*$/))) { out.push('<div class="demo" data-demo="' + m[1] + '"></div>'); i++; continue; }
+    if ((m = l.match(/^:::(std|alt)\s*$/))) {
+      var vi = []; i++;
+      while (i < lines.length && !/^:::\s*$/.test(lines[i])) { vi.push(lines[i]); i++; }
+      i++;
+      out.push('<div class="v-' + m[1] + '">' + blocks(vi) + '</div>');
+      continue;
+    }
     if ((m = l.match(/^:::more(?:\s+(.*))?$/))) {
       var mi = []; i++;
       while (i < lines.length && !/^:::\s*$/.test(lines[i])) { mi.push(lines[i]); i++; }
@@ -1060,6 +1082,27 @@ if (typeof document !== 'undefined') {
       main.innerHTML = d.html;
       initDemos(main);
       fillMarquee();
+
+      /* two views: standard (default) and short */
+      var viewBtn = $('view');
+      var IC_SHORT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h6"/></svg>';
+      var IC_STD = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/></svg>';
+      function setView(alt, byUser) {
+        document.body.classList.toggle('view-alt', alt);
+        viewBtn.setAttribute('aria-pressed', alt ? 'true' : 'false');
+        viewBtn.innerHTML = (alt ? IC_STD : IC_SHORT) + '<span>' + (alt ? 'Standard view' : 'Short view') + '</span>';
+        viewBtn.title = alt ? 'Back to the standard view' : 'Show the short view with less text';
+        viewBtn.setAttribute('aria-label', viewBtn.title);
+        try { localStorage.setItem('view', alt ? 'short' : 'standard'); } catch (e) {}
+        try { var u = new URL(location.href); if (alt) u.searchParams.set('view', 'short'); else u.searchParams.delete('view'); history.replaceState(null, '', u); } catch (e) {}
+        window.dispatchEvent(new Event('resize'));
+      }
+      viewBtn.addEventListener('click', function () { setView(!document.body.classList.contains('view-alt'), true); });
+      var wantAlt = false, vp = '';
+      try { vp = new URL(location.href).searchParams.get('view') || ''; } catch (e) {}
+      if (vp) wantAlt = vp === 'short';
+      else { try { wantAlt = localStorage.getItem('view') === 'short'; } catch (e) {} }
+      setView(wantAlt, false);
 
       var secs = [].slice.call(main.querySelectorAll('section')), tabs = [], cur = -1, locked = false, lockTimer, ticking = false;
 

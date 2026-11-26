@@ -17,6 +17,8 @@ HOW TO EDIT THIS FILE (the website reads it automatically)
 - Each "## Section" is one short paragraph, then a "More details" button.
   Put the long text in a block that starts with three colons and the word more, and ends with three colons.
   Inside it, use a numbered list (1. 2. 3.) with one longer paragraph per item.
+- Two views (the button in the top bar): the standard view shows the short paragraph of each section, the short view shows only a one-line headline.
+  Wrap text in a block that starts with three colons and the word std to show it only in the standard view, or alt to show it only in the short view.
 - Anything in a comment like this one is hidden on the website.
 -->
 
@@ -31,7 +33,13 @@ We label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity me
 
 ## Question and motivation | Question
 
+:::std
 Steam reviews are a public record of how multiplayer games feel to play: players use them to report harassment, cheating and toxic communities. Irony can flip what a review says, so we ask how toxicity and irony show up in 7,365 reviews of Counter-Strike 2, PUBG and GTA V, and whether the toxic ones recommend the game less.
+:::
+
+:::alt
+How do toxicity and irony show up in 7,365 Steam reviews, and do the toxic ones recommend the game less?
+:::
 
 :::more More details
 1. Players use game reviews to report harassment, cheating and toxic communities, so reviews are a public record of how multiplayer spaces feel to the people in them.
@@ -43,7 +51,13 @@ Steam reviews are a public record of how multiplayer games feel to play: players
 
 ## Data and methods | Data & methods
 
+:::std
 We use 7,365 public Steam reviews of three games, about 80% of them not in English. Gemini labels each review from a written codebook. The toxic ones get a second check with one added rule, that cheating alone is not toxic, and two humans labeled a 90-review pilot to test the codebook.
+:::
+
+:::alt
+Gemini labeled 7,365 reviews from a written codebook, and humans checked the codebook first.
+:::
 
 :::demo pipeline
 
@@ -64,7 +78,13 @@ We use 7,365 public Steam reviews of three games, about 80% of them not in Engli
 
 ## Findings
 
+:::std
 Gemini flagged toxicity in 22.7% of the 7,363 labeled reviews and irony in 25.0%. Counter-Strike 2 has the most of both. Most toxic reviews insult other players, and reviews that do not recommend the game are toxic more often.
+:::
+
+:::alt
+22.7% of the reviews mention toxicity, and 25.0% are ironic.
+:::
 
 :::demo results
 
@@ -96,7 +116,13 @@ Table: Table 2. Agreement between the two human annotators on the pilot reviews 
 
 ## Interpretation and conclusions | Interpretation
 
+:::std
 A written codebook lets an LLM label thousands of reviews and give a reason for each, so the labels can be audited one by one. But how we define toxicity changes the answer more than the model does: one extra rule moved the rate from 47.5% to 22.7%. Reviews that do not recommend a game are toxic more often, which is an association, not a cause.
+:::
+
+:::alt
+How we define toxicity changes the answer: one rule moved it from 47.5% to 22.7%.
+:::
 
 :::more More details
 1. **Conclusion.** A written codebook with structured output gives every label a reason, so the labels can be checked one by one. Finished labels are saved as they arrive, so the full run can be paused, resumed and re-checked without paying twice.
@@ -110,7 +136,13 @@ A written codebook lets an LLM label thousands of reviews and give a reason for 
 
 ## Limitations
 
+:::std
 These are Gemini's labels and we have not checked them against humans on this data. About 80% of the reviews are not in English and the codebook was only tested on English. The cheating rule was written after we saw the first results, and we cover only three games.
+:::
+
+:::alt
+These are Gemini's labels, and humans have not checked them on this data yet.
+:::
 
 :::more More details
 1. The pilot is small (90 reviews, about 10% positive), so the kappa values are rough.
@@ -125,7 +157,13 @@ These are Gemini's labels and we have not checked them against humans on this da
 
 ## Appendix
 
+:::std
 The code, data files and run instructions are in the GitHub repository, and the notebooks run in the order listed below.
+:::
+
+:::alt
+The code and data files are in the GitHub repository.
+:::
 
 :::more More details
 1. **Repository:** [team-steam on GitHub](https://github.com/Ghifariyadi/team-steam)
