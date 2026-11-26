@@ -45,6 +45,8 @@ Steam reviews are a public record of how multiplayer games feel to play: players
 
 We use 7,365 public Steam reviews of three games, about 80% of them not in English. Gemini labels each review from a written codebook. The toxic ones get a second check with one added rule, that cheating alone is not toxic, and two humans labeled a 90-review pilot to test the codebook.
 
+:::demo langs
+
 :::demo pipeline
 
 :::more More details

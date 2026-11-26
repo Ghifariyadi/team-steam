@@ -358,6 +358,18 @@
   }
   /* big cards in the hero */
   .hero-extra .demo, .hero-extra .demo[data-demo="labeling"], .hero-extra .demo[data-demo="pipeline"], .hero-extra .demo[data-demo="results"], .hero-extra .demo[data-demo="stats"] { display: block; padding: 28px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 30px; background: linear-gradient(160deg, rgba(58, 143, 196, .16), rgba(255, 255, 255, .025) 60%), #0a1117; box-shadow: 0 40px 100px -50px rgba(14, 107, 120, .55); margin: 0 0 20px; }
+  .lgc { margin: 4px 0 22px; }
+  .lg-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 12px; }
+  .lg-h b { font: 800 clamp(2.6rem, 9vw, 3.6rem)/1 var(--disp); letter-spacing: -.04em; background: linear-gradient(135deg, #fff, #c4e3f0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lg-h span { max-width: 44ch; font-size: 15px; line-height: 1.45; color: var(--soft); }
+  .lg-r { display: grid; grid-template-columns: 138px minmax(0, 1fr) 46px; align-items: center; gap: 12px; padding: 4px 0; font-size: 14px; }
+  .lg-n { color: #d3dee4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lg-t { height: 10px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+  .lg-t i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #3a8fc4, #5cd1bf); transition: width 1.3s var(--ease) var(--dl, 0s); }
+  .lg-t i.en { background: #f6d365; }
+  .lgc.sh .lg-t i { width: var(--w); }
+  .lg-c { text-align: right; font: 500 12.5px/1 var(--mono); color: #d3dee4; font-variant-numeric: tabular-nums; }
+  @media (max-width: 520px) { .lg-r { grid-template-columns: 126px minmax(0, 1fr) 40px; gap: 8px; font-size: 13px; } }
   #main .demo[data-demo="labeling"] { padding: 0; border-radius: 0; background: none; box-shadow: none; }
   .big-h { margin: 0 0 22px; }
   .big-hr { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -879,7 +891,25 @@ function initPipeline(root) {
 }
 
 /* Labeling demo: renders where content.md has a ":::demo labeling" line. Plays only while on screen. */
+/* Compact language bars: renders where content.md has a ":::demo langs" line. Numbers are the Coverage counts in the Data section. */
+function initLangs(root) {
+  [].forEach.call(root.querySelectorAll('.demo[data-demo="langs"]'), function (host) {
+    var L = [['Simplified Chinese', 2304], ['English', 1457], ['Russian', 1068], ['Turkish', 564], ['Portuguese (BR)', 406], ['Korean', 329]], max = L[0][1];
+    host.innerHTML = '<div class="lgc"><div class="lg-h"><b>80%</b><span>of the 7,365 reviews are not in English. Reviews per language, top six:</span></div>' +
+      L.map(function (l, i) {
+        return '<div class="lg-r"><span class="lg-n">' + l[0] + '</span><span class="lg-t"><i class="' + (i === 1 ? 'en' : '') + '" style="--w:' + (l[1] / max * 100).toFixed(1) + '%;--dl:' + (i * 90) + 'ms"></i></span><span class="lg-c">' + l[1].toLocaleString('en-US') + '</span></div>';
+      }).join('') + '</div>';
+    var box = host.firstChild;
+    function reveal() { box.classList.add('sh'); }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { reveal(); io.disconnect(); } }, { threshold: 0.2 });
+      io.observe(host);
+    } else reveal();
+  });
+}
+
 function initDemos(root) {
+  initLangs(root);
   initStats(root);
   initResults(root);
   initToxic(root);
