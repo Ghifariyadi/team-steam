@@ -609,7 +609,7 @@
   [].forEach.call(document.querySelectorAll('.term pre .tl'), function (el, i) { el.style.setProperty('--k', i); });
 
   /* ---------- hero product window: Gemini's answer types out ---------- */
-  var CODE = '<span class="c">{</span>\n  <span class="k">"harm_mention"</span>: <span class="s">"yes"</span>,\n  <span class="k">"harm_reason"</span>: <span class="s">"A direct vulgar meme phrase used as a hostile or abusive expression."</span>,\n  <span class="k">"irony"</span>: <span class="s">"no"</span>,\n  <span class="k">"irony_reason"</span>: <span class="s">"There is no identifiable ironic mechanism."</span>\n<span class="c">}</span>';
+  var CODE = '<span class="c">{</span>\n  <span class="k">"is_toxic"</span>: <span class="s">"yes"</span>,\n  <span class="k">"toxic_reason"</span>: <span class="s">"A direct vulgar meme phrase used as a hostile or abusive expression."</span>,\n  <span class="k">"is_ironic"</span>: <span class="s">"no"</span>,\n  <span class="k">"ironic_reason"</span>: <span class="s">"There is no identifiable ironic mechanism."</span>\n<span class="c">}</span>';
   function showCode() { $('code').innerHTML = CODE; $('match').classList.add('on'); }
   function runHero() {
     var el = $('code'), probe = document.createElement('div'); probe.innerHTML = CODE;
