@@ -43,7 +43,7 @@
   .logo i { flex: none; width: 18px; height: 18px; border-radius: 6px; background: conic-gradient(from 210deg, var(--blu), var(--org), var(--blu)); box-shadow: 0 0 18px rgba(110, 168, 255, .45); }
   .logo span { overflow: hidden; text-overflow: ellipsis; }
   .links { display: flex; gap: 4px; }
-  .links a { padding: 8px 13px; border-radius: 8px; color: var(--mut); font: 500 14px/1 var(--sans); text-decoration: none; transition: color .2s, background .2s; }
+  .links a { white-space: nowrap; padding: 8px 13px; border-radius: 8px; color: var(--mut); font: 500 14px/1 var(--sans); text-decoration: none; transition: color .2s, background .2s; }
   .links a:hover, .links a.on { color: var(--tx); background: rgba(255, 255, 255, .06); }
   .nr { display: flex; gap: 8px; align-items: center; flex: none; }
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 17px; border-radius: 9px; border: 1px solid var(--line2); background: rgba(255, 255, 255, .03); color: var(--tx); font: 500 14px/1 var(--sans); text-decoration: none; transition: background .25s, border-color .25s, transform .25s var(--ease); }
@@ -327,7 +327,7 @@
   @keyframes blinkdot { 50% { background: #5a5f69; } }
   footer { opacity: 0; transform: translateY(14px); transition: opacity 1.2s var(--out), transform 1.2s var(--out); } footer.in { opacity: 1; transform: none; }
 
-  @media (max-width: 1120px) { .btn.hide-m { display: none; } }
+  @media (max-width: 1120px) { .btn.hide-m { display: none; } .links a { padding: 8px 9px; } }
   @media (max-width: 900px) {
     .links { display: none; }
     .stats { grid-template-columns: 1fr 1fr; gap: 34px 20px; }
@@ -343,7 +343,7 @@
     .lis { grid-template-columns: 1fr; }
     .rv, .wd, .tile { filter: none; }
   }
-  @media (max-width: 560px) { .btn.hide-s { display: none; } .nr .btn { padding: 9px 13px; } .cta .btn.lg { width: 100%; justify-content: center; } .lang { grid-template-columns: 104px minmax(0, 1fr) 44px; } .pill { font-size: 12px; } .pill b { display: none; } }
+  @media (max-width: 560px) { .btn.hide-s, .btn.hide-xs { display: none; } .nr .btn { padding: 9px 13px; } .cta .btn.lg { width: 100%; justify-content: center; } .lang { grid-template-columns: 104px minmax(0, 1fr) 44px; } .pill { font-size: 12px; } .pill b { display: none; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -417,7 +417,8 @@
   <a class="logo" href="#top"><i></i><span>Steam reviews study</span></a>
   <div class="nr">
     <a class="btn hide-s" href="alt.html">← Summary</a>
-    <a class="btn w" href="https://github.com/Ghifariyadi/team-steam">GitHub <i>↗</i></a>
+    <a class="btn" href="index.html" title="Back to the main version of the project site">Main site</a>
+    <a class="btn w hide-xs" href="https://github.com/Ghifariyadi/team-steam">GitHub <i>↗</i></a>
   </div>
 </header>
 
