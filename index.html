@@ -127,6 +127,9 @@
   .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; }
   .stat b { display: block; font: 560 clamp(2.8rem, 6.4vw, 5.4rem)/1 var(--sans); letter-spacing: -.055em; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, .42)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .stat span { display: block; margin-top: 10px; font: 400 14px/1.4 var(--sans); color: var(--mut); }
+  .stats.lim { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stats.lim .stat b { font-size: clamp(2rem, 4.2vw, 3.4rem); letter-spacing: -.045em; }
+  .stats.lim .stat span { max-width: 26ch; }
 
   /* statement */
   .statement { margin: 0; font: 560 clamp(1.55rem, 3.5vw, 2.7rem)/1.18 var(--sans); letter-spacing: -.035em; max-width: 26em; }
@@ -331,6 +334,7 @@
   @media (max-width: 900px) {
     .links { display: none; }
     .stats { grid-template-columns: 1fr 1fr; gap: 34px 20px; }
+    .stats.lim { grid-template-columns: 1fr; gap: 30px; }
     .bento { grid-template-columns: 1fr; }
     .tile, .tile.w4, .tile.w2, .tile.w6 { grid-column: auto; padding: 22px; }
     .two { grid-template-columns: 1fr; }
@@ -480,7 +484,7 @@
       </article>
       <article class="tile sl rv" style="--d:.35s">
         <span class="no">04 · ONE RULE ADDED LATER</span>
-        <h3>The cheating rule.</h3>
+        <h3>One more rule.</h3>
         <p>After the first results we added one rule to the codebook: complaining about cheaters alone is not toxic. Gemini then re-checked every review it had called toxic.</p>
         <p class="small" style="margin-top:16px">The rule came after we saw results, so it is a choice we made, not a blind test.</p>
       </article>
@@ -520,7 +524,7 @@
         <h3><span class="gor">Counter-Strike 2</span> has the most toxicity and the most irony.</h3>
         <div id="games"></div>
         <div class="legend"><span><i class="o"></i>Mentions toxicity</span><span><i></i>Ironic</span></div>
-        <p class="small" style="margin-top:18px">Share of each game’s labeled reviews. Toxicity counts the cheating rule.</p>
+        <p class="small" style="margin-top:18px">Share of each game’s labeled reviews. Toxicity includes the extra rule.</p>
       </article>
       <article class="tile w2 rv" style="--d:.15s">
         <span class="no">03 · DOES IT MATTER</span>
@@ -563,7 +567,7 @@
     <article class="tile solo rv" style="--d:.05s">
       <div class="lis">
         <div class="li"><span class="ic y">✓</span><div><h4>The definition mattered more than the model.</h4><p>One extra rule, that cheating alone is not toxic, cut the toxicity rate roughly in half. Same AI, same reviews.</p></div></div>
-        <div class="li"><span class="ic y">✓</span><div><h4>Every label comes with a reason.</h4><p>So we could audit them one by one, and found the cheating problem that way.</p></div></div>
+        <div class="li"><span class="ic y">✓</span><div><h4>Every label comes with a reason.</h4><p>So we could audit them one by one, and spotted what to fix that way.</p></div></div>
         <div class="li"><span class="ic y">✓</span><div><h4>Counting is not explaining.</h4><p>We can say how many reviews mention toxicity. We cannot say what causes it.</p></div></div>
       </div>
     </article>
@@ -574,14 +578,9 @@
 <section class="pad" id="limits" style="padding-top:0">
   <div class="wrap">
     <p class="eyebrow rv">Limitations</p>
-    <h2 data-split><span class="grad">What this does not show.</span></h2>
-    <article class="tile solo rv" style="--d:.05s">
-      <div class="lis">
-        <div class="li"><span class="ic w">!</span><div><h4>Humans have not checked these labels yet.</h4><p>The two annotators agreed with each other on 90 reviews. We have not compared Gemini with humans on the full 7,363.</p></div></div>
-        <div class="li"><span class="ic w">!</span><div><h4>About 80% of the reviews are not in English.</h4><p>We tuned and tested the rulebook mostly on English. Gemini outside English is untested.</p></div></div>
-        <div class="li"><span class="ic w">!</span><div><h4>The cheating rule came after the first results.</h4><p>So 22.7% is not a blind result. And it covers three games from one filtered file, not all of Steam.</p></div></div>
-      </div>
-    </article>
+    <h2 data-split style="max-width:22ch"><span class="grad">Three games, </span><span class="gor">for now.</span></h2>
+    <p class="sub rv" style="--d:.2s;max-width:46em;text-align:left;margin-left:0">We only cover three games: Counter-Strike 2, PUBG and GTA V. That also keeps the genres limited, since they are all action games, mostly shooters. So the numbers speak for these reviews, not for every kind of game on Steam.</p>
+    <p class="sub rv" style="--d:.3s;max-width:46em;text-align:left;margin-left:0;margin-top:18px">Next, we can run the same codebook on more games and more genres, and see if the patterns hold.</p>
   </div>
 </section>
 
