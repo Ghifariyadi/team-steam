@@ -33,8 +33,10 @@ Never commit `.env`.
 ```text
 .
 ├── README.md        this file
-├── index.html       the project website (GitHub Pages)
-├── content.md       the text of the website; edit this to change the page
+├── index.html       the project website (GitHub Pages): the summary page, text and numbers are written in the file
+├── details.html     full details and backup page (every number, rule and caveat)
+├── alt.html         the alternative site; it reads content.md and renders it
+├── content.md       the text of alt.html; editing it does not change index.html
 ├── notebooks/       analysis, in run order (below)
 ├── scripts/         labeling code the notebooks call
 ├── prompts/         the codebook and the cheating rule sent to Gemini
@@ -49,7 +51,7 @@ Never commit `.env`.
 1. `notebooks/kappa_test.ipynb` measures how well the two human annotators agree on the 90-review pilot (`data/blind_labelling_annotator_1.csv` and `_2.csv`).
 2. `notebooks/scale_up.ipynb` loads the dataset, tests Gemini on 10 reviews, and labels all reviews (first pass). Its last cells add the toxicity re-label summary. Output: `data/gemini_labels_gemini-3.5-flash-lite.csv`. Every finished label is cached in `data/gemini_full_*.jsonl`, so a re-run skips what is saved and costs nothing.
 3. `notebooks/harm_recheck.ipynb` re-asks Gemini about the 3,499 reviews labeled toxic, with the full codebook plus the cheating rule (`prompts/cheating_rule.txt`). Output: `data/gemini_harm_recheck_gemini-3.5-flash-lite.csv` and `.jsonl`. It does not change the first-pass files. Set `SAMPLE = 100` for a quick test, `None` for all.
-4. The website numbers come from the two CSVs above and are written into `index.html` and `content.md`.
+4. The website numbers come from the two CSVs above and are written into `index.html`, `details.html` and `content.md`.
 
 Scripts: `scripts/steam_labeling.py` runs the labeling (parallel requests, retries, cache). `scripts/harm_recheck.py` runs the toxicity re-check.
 
@@ -83,7 +85,7 @@ Scripts: `scripts/steam_labeling.py` runs the labeling (parallel requests, retri
 
 ## Final project website
 
-The site is `index.html`, which reads `content.md` and renders it. To change the text, edit `content.md` and push to `main`. GitHub Pages updates in 1 to 2 minutes. The site is public, so do not put restricted data or credentials in either file.
+The site is `index.html` (the summary) and `details.html` (the full details). Their text and numbers are written directly in the files, so to change them edit the HTML and push to `main`. If a number changes, update it in both files. The alternative version, `alt.html`, reads `content.md` and renders it, so editing `content.md` only changes that page. GitHub Pages updates in 1 to 2 minutes. The site is public, so do not put restricted data or credentials in any of these files.
 
 ## Before submitting
 
