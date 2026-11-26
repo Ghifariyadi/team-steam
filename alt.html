@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#08090a">
 <meta name="color-scheme" content="dark">
 <title>Irony and toxicity in Steam reviews · COMPSS 211A</title>
-<meta name="description" content="We used Gemini to label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity and irony, then looked at how far the labels can be trusted.">
+<meta name="description" content="A written codebook, checked by two human annotators, then used by Gemini to label 7,365 Steam reviews of Counter-Strike 2, PUBG and GTA V for toxicity and irony.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -71,6 +71,9 @@
   h2 { font-size: clamp(2rem, 5vw, 3.8rem); max-width: 18ch; }
   .grad { background: linear-gradient(180deg, #fff 25%, rgba(255, 255, 255, .5)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .gor { background: linear-gradient(100deg, #ffb27d, var(--org) 55%, #ff5d5d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad.sp, .gor.sp { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; -webkit-text-fill-color: initial; }
+  .grad .wd { background: linear-gradient(180deg, #fff 25%, rgba(255, 255, 255, .5)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+  .gor .wd { background: linear-gradient(100deg, #ffb27d, var(--org) 55%, #ff5d5d); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
   .sub { margin: 24px 0 0; max-width: 34em; font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.55; color: var(--mut); }
   .sub b { color: var(--tx); font-weight: 500; }
   .small { margin: 22px 0 0; max-width: 62ch; font-size: 14.5px; line-height: 1.65; color: var(--dim); }
@@ -121,14 +124,12 @@
   @keyframes mq { to { transform: translateX(-50%); } }
 
   /* stats strip */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .stat { padding: 34px 28px; }
-  .stat + .stat { border-left: 1px solid var(--line); }
-  .stat b { display: block; font: 560 clamp(2.2rem, 5vw, 3.8rem)/1 var(--sans); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; }
+  .stat b { display: block; font: 560 clamp(2.8rem, 6.4vw, 5.4rem)/1 var(--sans); letter-spacing: -.055em; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, .42)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .stat span { display: block; margin-top: 10px; font: 400 14px/1.4 var(--sans); color: var(--mut); }
 
   /* statement */
-  .statement { margin: 0; font: 560 clamp(1.8rem, 4.4vw, 3.5rem)/1.14 var(--sans); letter-spacing: -.04em; max-width: 24ch; }
+  .statement { margin: 0; font: 560 clamp(1.55rem, 3.5vw, 2.7rem)/1.18 var(--sans); letter-spacing: -.035em; max-width: 26em; }
   .statement .sw { transition: opacity .3s linear; }
   .rq { position: relative; margin: 40px 0 0; padding: 22px 26px 24px; max-width: 64ch; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012)); font-size: 16px; line-height: 1.65; color: #c9cdd6; overflow: hidden; }
   .rq::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(110, 168, 255, .8), rgba(255, 138, 76, .8), transparent); transform: scaleX(0); transition: transform 1.6s var(--out) .3s; }
@@ -174,6 +175,18 @@
   .in .lang .tr i, .in .bar2 .tr i { transform: scaleX(var(--w)); }
   .lang.en .tr i { background: linear-gradient(90deg, #d4642a, var(--org)); box-shadow: 0 0 14px rgba(255, 138, 76, .45); }
   .lang b { text-align: right; font: 500 12px/1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
+
+  /* method slider */
+  .slider { display: flex; gap: 14px; margin-top: clamp(40px, 6vw, 64px); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab; outline: none; }
+  .slider::-webkit-scrollbar { display: none; }
+  .slider.drag { scroll-snap-type: none; scroll-behavior: auto; cursor: grabbing; user-select: none; }
+  .slider .tile.sl { flex: 0 0 min(520px, 86%); min-height: 430px; scroll-snap-align: start; }
+  .slc { display: flex; align-items: center; gap: 10px; margin-top: 22px; }
+  .slc .pg { flex: 1; height: 2px; margin-right: 14px; border-radius: 2px; background: rgba(255, 255, 255, .09); overflow: hidden; }
+  .slc .pg i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--blu), var(--org)); transform-origin: left; transform: scaleX(.5); transition: transform .6s var(--out); }
+  .arr { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line2); background: rgba(255, 255, 255, .03); color: var(--tx); font: 400 17px/1 var(--sans); cursor: pointer; transition: background .25s, border-color .25s, opacity .25s, transform .25s var(--ease); }
+  .arr:hover:not(:disabled) { background: rgba(255, 255, 255, .09); border-color: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+  .arr:disabled { opacity: .3; cursor: default; }
 
   /* headline numbers */
   .hlg { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 80px); margin-top: 6px; }
@@ -266,7 +279,7 @@
   @keyframes glowp { 50% { box-shadow: inset 0 0 90px rgba(255, 138, 76, .12); } }
   .tile { transition: border-color .4s, transform .5s var(--out), opacity 1s var(--out), filter 1s var(--out); }
   .tile.in:hover { transform: translateY(-3px); }
-  .stat b, .big2 span { transition: color .4s; } .stat:hover b { color: #fff; }
+  .big2 span { transition: color .4s; }
   .term pre .tl { display: block; }
   .term .bar i { animation: blinkdot 3s ease-in-out infinite; } .term .bar i:nth-child(2) { animation-delay: .4s; } .term .bar i:nth-child(3) { animation-delay: .8s; }
   @keyframes blinkdot { 50% { background: #5a5f69; } }
@@ -275,8 +288,7 @@
   @media (max-width: 1120px) { .btn.hide-m { display: none; } }
   @media (max-width: 900px) {
     .links { display: none; }
-    .stats { grid-template-columns: 1fr 1fr; }
-    .stat { padding: 26px 18px; } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .stats { grid-template-columns: 1fr 1fr; gap: 34px 20px; }
     .bento { grid-template-columns: 1fr; }
     .tile, .tile.w4, .tile.w2, .tile.w6 { grid-column: auto; padding: 22px; }
     .two { grid-template-columns: 1fr; }
@@ -319,7 +331,7 @@
   <div class="wrap">
     <a class="pill rv" href="#question" style="--d:.05s"><span class="dot"></span><span>COMPSS 211A <b>· Final project</b></span><em>Richard · Josh · Ghif</em></a>
     <h1 data-split data-b=".1"><span class="grad">Irony and toxicity </span><span class="gor">in Steam reviews</span></h1>
-    <p class="sub rv" style="--d:.5s">We used Gemini to label <b>7,365 Steam reviews</b> of Counter-Strike 2, PUBG and GTA V, then looked at how far the labels can be trusted.</p>
+    <p class="sub rv" style="--d:.5s">We wrote a codebook, checked it with two human annotators, then had Gemini label <b>7,365 Steam reviews</b> of Counter-Strike 2, PUBG and GTA V.</p>
     <div class="cta rv" style="--d:.65s">
       <a class="btn w lg" href="#question">Research question <i>→</i></a>
       <a class="btn lg" href="https://github.com/Ghifariyadi/team-steam">GitHub</a>
@@ -354,8 +366,7 @@
 <section class="pad" id="question">
   <div class="wrap">
     <p class="eyebrow rv">Research question</p>
-    <p class="statement" data-scrub>Players use reviews to report harassment and toxic communities. Irony can flip what a review says. So how do toxicity and irony show up, and do toxic reviews recommend less?</p>
-    <p class="rq rv"><b>Research question</b>How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?</p>
+    <p class="statement" data-scrub>“How do literal, mixed and ironic evaluations intersect with gender stereotypes and accounts of harassment, and do reviews that describe toxic communities recommend games less?”</p>
   </div>
 </section>
 
@@ -363,7 +374,7 @@
 <section class="pad" id="data" style="padding-top:0">
   <div class="wrap">
     <p class="eyebrow rv">Data</p>
-    <h2 data-split><span class="grad">Three games, and mostly not in English.</span></h2>
+    <h2 data-split><span class="grad">Reviews from three games, in several languages.</span></h2>
     <div class="stats rv" style="margin-top:clamp(40px,6vw,64px)">
       <div class="stat"><b data-count="7365">7,365</b><span>public Steam reviews</span></div>
       <div class="stat"><b data-count="3">3</b><span>games: Counter-Strike 2, PUBG, GTA V</span></div>
@@ -380,7 +391,7 @@
       </article>
       <article class="tile rv" style="--d:.15s">
         <span class="no">02 · LANGUAGES</span>
-        <h3>Mostly not in English.</h3>
+        <h3>Several languages.</h3>
         <p>Reviews per language, top six.</p>
         <div class="langs" id="langs" role="img" aria-label="Reviews per language: Simplified Chinese 2,304, English 1,457, Russian 1,068, Turkish 564, Portuguese 406, Korean 329"></div>
       </article>
@@ -394,8 +405,8 @@
     <p class="eyebrow rv">Method</p>
     <h2 data-split><span class="grad">A written codebook, Gemini, and two humans.</span></h2>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ea8ff"/><stop offset="1" stop-color="#3ddc97"/></linearGradient></defs></svg>
-    <div class="bento">
-      <article class="tile w4 rv" style="--d:.05s">
+    <div class="slider" id="slider" tabindex="0" role="region" aria-label="Method steps. Scroll sideways or use the arrows.">
+      <article class="tile sl rv" style="--d:.05s">
         <span class="no">01 · CODEBOOK</span>
         <h3>The rulebook comes first.</h3>
         <p>It says exactly what counts as toxic and what counts as ironic, as yes / no rules.</p>
@@ -405,29 +416,34 @@
           <div class="rule"><span class="ic n">×</span><span class="t">Complaining about cheaters, on its own</span><em>not toxic</em></div>
         </div>
       </article>
-      <article class="tile w2 rv" style="--d:.15s">
-        <span class="no">02 · GEMINI</span>
-        <h3>Every review, one by one.</h3>
+      <article class="tile sl rv" style="--d:.15s">
+        <span class="no">02 · HUMANS</span>
+        <h3>Two people checked it first.</h3>
+        <p>Two annotators labeled 90 reviews blind. Agreement, corrected for chance:</p>
+        <div class="rings">
+          <div><div class="ring" style="--k:.85"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b>0.85</b></div><small>Toxicity</small></div>
+          <div><div class="ring" style="--k:.90"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b>0.90</b></div><small>Irony</small></div>
+        </div>
+      </article>
+      <article class="tile sl rv" style="--d:.25s">
+        <span class="no">03 · GEMINI</span>
+        <h3>Then every review, one by one.</h3>
         <p>In its original language. A label plus a reason.</p>
         <div class="big2"><span data-count="7365">7,365</span><small>/ 7,365</small></div>
         <div class="meter"><i></i></div>
         <div class="meta"><span>labeled</span><span>one run, 46 min</span></div>
       </article>
-      <article class="tile rv" style="--d:.1s">
-        <span class="no">03 · HUMANS</span>
-        <h3>Two people checked first.</h3>
-        <p>Two annotators labeled 90 reviews blind. Agreement, corrected for chance:</p>
-        <div class="rings">
-          <div><div class="ring" style="--k:.85"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.85" data-dec="2">0.85</b></div><small>Toxicity</small></div>
-          <div><div class="ring" style="--k:.90"><svg viewBox="0 0 112 112"><circle class="t" cx="56" cy="56" r="48"/><circle class="f" cx="56" cy="56" r="48"/></svg><b data-count="0.90" data-dec="2">0.90</b></div><small>Irony</small></div>
-        </div>
-      </article>
-      <article class="tile rv" style="--d:.2s">
+      <article class="tile sl rv" style="--d:.35s">
         <span class="no">04 · ONE RULE ADDED LATER</span>
         <h3>The cheating rule.</h3>
         <p>After the first results we added one rule to the codebook: complaining about cheaters alone is not toxic. Gemini then re-checked every review it had called toxic.</p>
         <p class="small" style="margin-top:16px">The rule came after we saw results, so it is a choice we made, not a blind test.</p>
       </article>
+    </div>
+    <div class="slc rv">
+      <div class="pg" aria-hidden="true"><i id="pgf"></i></div>
+      <button class="arr" id="prev" type="button" aria-label="Previous step">←</button>
+      <button class="arr" id="next" type="button" aria-label="Next step">→</button>
     </div>
   </div>
 </section>
@@ -602,6 +618,7 @@
         } else if (c.nodeType === 1) walk(c);
       });
     })(el);
+    if (cls === 'wd') [].forEach.call(el.querySelectorAll('.grad, .gor'), function (x) { x.classList.add('sp'); });
   }
   [].forEach.call(document.querySelectorAll('[data-split]'), function (h) {
     h.setAttribute('aria-label', h.textContent); words(h, 'wd');
@@ -688,6 +705,28 @@
     var p = clamp(window.scrollY / (window.innerHeight * 0.55)), e = ease(p), small = window.innerWidth < 900;
     win.style.transform = 'rotateX(' + lerp(small ? 8 : 16, 0, e).toFixed(2) + 'deg) scale(' + lerp(.94, 1, e).toFixed(3) + ')';
   }
+
+  /* ---------- method slider: arrows, drag with a mouse, progress ---------- */
+  (function () {
+    var sl = $('slider'), prev = $('prev'), next = $('next'), pgf = $('pgf');
+    if (!sl) return;
+    var cards = [].slice.call(sl.children);
+    var step = function () { return cards[1].offsetLeft - cards[0].offsetLeft; };
+    function upd() {
+      var max = sl.scrollWidth - sl.clientWidth;
+      prev.disabled = sl.scrollLeft < 4; next.disabled = sl.scrollLeft > max - 4;
+      pgf.style.transform = 'scaleX(' + clamp((sl.scrollLeft + sl.clientWidth) / sl.scrollWidth).toFixed(3) + ')';
+    }
+    prev.addEventListener('click', function () { sl.scrollBy({ left: -step(), behavior: reduce ? 'auto' : 'smooth' }); });
+    next.addEventListener('click', function () { sl.scrollBy({ left: step(), behavior: reduce ? 'auto' : 'smooth' }); });
+    sl.addEventListener('scroll', upd, { passive: true }); window.addEventListener('resize', upd);
+    sl.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
+    var down = false, sx = 0, s0 = 0;
+    sl.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; sx = e.clientX; s0 = sl.scrollLeft; sl.classList.add('drag'); });
+    window.addEventListener('pointermove', function (e) { if (down) sl.scrollLeft = s0 - (e.clientX - sx); });
+    window.addEventListener('pointerup', function () { if (!down) return; down = false; sl.classList.remove('drag'); });
+    upd();
+  })();
 
   /* ---------- nav, progress, spotlight ---------- */
   var nav = $('nav'), prog = $('prog'), links = [].slice.call($('links').children), ticking = false;
